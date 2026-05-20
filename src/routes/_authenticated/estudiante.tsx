@@ -91,7 +91,9 @@ function EstudianteDashboard() {
           <Stat label="Cursos activos" value={activos.length} icon={BookOpen} />
           <Stat label="Inscripciones" value={enrollments.length} icon={GraduationCap} />
           <Stat label="Progreso promedio" value={`${promedio}%`} icon={Calendar} />
-          <Stat label="Certificados" value={data?.certificates.length ?? 0} icon={Award} />
+          <Link to="/certificados" className="block">
+            <Stat label="Certificados" value={data?.certificates.length ?? 0} icon={Award} />
+          </Link>
         </div>
 
         <section>
