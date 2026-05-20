@@ -19,9 +19,11 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
+import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authenticated/mis-cursos.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -87,6 +89,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
+  id: '/verificar/$numero',
+  path: '/verificar/$numero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -102,6 +109,12 @@ const AuthenticatedDocenteRoute = AuthenticatedDocenteRouteImport.update({
   path: '/docente',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCertificadosRoute =
+  AuthenticatedCertificadosRouteImport.update({
+    id: '/certificados',
+    path: '/certificados',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -200,9 +213,11 @@ export interface FileRoutesByFullPath {
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRoute
   '/estudiante': typeof AuthenticatedEstudianteRoute
   '/programas/$slug': typeof ProgramasSlugRoute
+  '/verificar/$numero': typeof VerificarNumeroRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -228,9 +243,11 @@ export interface FileRoutesByTo {
   '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRoute
   '/estudiante': typeof AuthenticatedEstudianteRoute
   '/programas/$slug': typeof ProgramasSlugRoute
+  '/verificar/$numero': typeof VerificarNumeroRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -259,9 +276,11 @@ export interface FileRoutesById {
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRoute
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRoute
   '/programas/$slug': typeof ProgramasSlugRoute
+  '/verificar/$numero': typeof VerificarNumeroRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -290,9 +309,11 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sobre-nosotros'
     | '/admin'
+    | '/certificados'
     | '/docente'
     | '/estudiante'
     | '/programas/$slug'
+    | '/verificar/$numero'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -318,9 +339,11 @@ export interface FileRouteTypes {
     | '/programas'
     | '/registro'
     | '/sobre-nosotros'
+    | '/certificados'
     | '/docente'
     | '/estudiante'
     | '/programas/$slug'
+    | '/verificar/$numero'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -348,9 +371,11 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sobre-nosotros'
     | '/_authenticated/admin'
+    | '/_authenticated/certificados'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
     | '/programas/$slug'
+    | '/verificar/$numero'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
@@ -378,6 +403,7 @@ export interface RootRouteChildren {
   ProgramasRoute: typeof ProgramasRouteWithChildren
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
+  VerificarNumeroRoute: typeof VerificarNumeroRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -452,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verificar/$numero': {
+      id: '/verificar/$numero'
+      path: '/verificar/$numero'
+      fullPath: '/verificar/$numero'
+      preLoaderRoute: typeof VerificarNumeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programas/$slug': {
       id: '/programas/$slug'
       path: '/$slug'
@@ -471,6 +504,13 @@ declare module '@tanstack/react-router' {
       path: '/docente'
       fullPath: '/docente'
       preLoaderRoute: typeof AuthenticatedDocenteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/certificados': {
+      id: '/_authenticated/certificados'
+      path: '/certificados'
+      fullPath: '/certificados'
+      preLoaderRoute: typeof AuthenticatedCertificadosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -616,6 +656,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRoute
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRoute
   AuthenticatedMisCursosSlugRoute: typeof AuthenticatedMisCursosSlugRoute
@@ -624,6 +665,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRoute,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRoute,
   AuthenticatedMisCursosSlugRoute: AuthenticatedMisCursosSlugRoute,
@@ -657,6 +699,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramasRoute: ProgramasRouteWithChildren,
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
+  VerificarNumeroRoute: VerificarNumeroRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

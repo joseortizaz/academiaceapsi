@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { generarCertificadoPDF } from "@/lib/certificate-pdf";
 import {
   ArrowLeft, CheckCircle2, Circle, Video, FileText, Download, Award,
 } from "lucide-react";
@@ -279,15 +280,22 @@ function CursoPlayer() {
               <Award className="mx-auto h-8 w-8 text-primary" />
               <p className="mt-2 text-sm font-medium">¡Has completado el programa!</p>
               {certificate ? (
-                <Button asChild className="mt-3 w-full" size="sm">
-                  <a
-                    href={certificate.url_pdf ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Descargar certificado
-                  </a>
+                <Button
+                  className="mt-3 w-full"
+                  size="sm"
+                  onClick={() =>
+                    generarCertificadoPDF({
+                      numero: certificate.numero_certificado,
+                      nombreCompleto: `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim() || "Estudiante",
+                      tituloPrograma: programa.titulo,
+                      duracionHoras: programa.duracion_horas,
+                      fechaEmision: certificate.fecha_emision,
+                      verificacionUrl: `${window.location.origin}/verificar/${certificate.numero_certificado}`,
+                    })
+                  }
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Descargar certificado
                 </Button>
               ) : (
                 <Button onClick={emitirCertificado} size="sm" className="mt-3 w-full">
