@@ -16,7 +16,11 @@ import { Route as DocentesRouteImport } from './routes/docentes'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccederRouteImport } from './routes/acceder'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
+import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
   id: '/sobre-nosotros',
@@ -53,10 +57,29 @@ const AccederRoute = AccederRouteImport.update({
   path: '/acceder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
+  id: '/estudiante',
+  path: '/estudiante',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDocenteRoute = AuthenticatedDocenteRouteImport.update({
+  id: '/docente',
+  path: '/docente',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -68,6 +91,9 @@ export interface FileRoutesByFullPath {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/docente': typeof AuthenticatedDocenteRoute
+  '/estudiante': typeof AuthenticatedEstudianteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,10 +104,14 @@ export interface FileRoutesByTo {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/docente': typeof AuthenticatedDocenteRoute
+  '/estudiante': typeof AuthenticatedEstudianteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/acceder': typeof AccederRoute
   '/blog': typeof BlogRoute
   '/contactos': typeof ContactosRoute
@@ -89,6 +119,9 @@ export interface FileRoutesById {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/docente': typeof AuthenticatedDocenteRoute
+  '/_authenticated/estudiante': typeof AuthenticatedEstudianteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +134,9 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/registro'
     | '/sobre-nosotros'
+    | '/admin'
+    | '/docente'
+    | '/estudiante'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,9 +147,13 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/registro'
     | '/sobre-nosotros'
+    | '/admin'
+    | '/docente'
+    | '/estudiante'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/acceder'
     | '/blog'
     | '/contactos'
@@ -121,10 +161,14 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/registro'
     | '/sobre-nosotros'
+    | '/_authenticated/admin'
+    | '/_authenticated/docente'
+    | '/_authenticated/estudiante'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccederRoute: typeof AccederRoute
   BlogRoute: typeof BlogRoute
   ContactosRoute: typeof ContactosRoute
@@ -185,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccederRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -192,11 +243,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/estudiante': {
+      id: '/_authenticated/estudiante'
+      path: '/estudiante'
+      fullPath: '/estudiante'
+      preLoaderRoute: typeof AuthenticatedEstudianteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/docente': {
+      id: '/_authenticated/docente'
+      path: '/docente'
+      fullPath: '/docente'
+      preLoaderRoute: typeof AuthenticatedDocenteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRoute
+  AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedDocenteRoute: AuthenticatedDocenteRoute,
+  AuthenticatedEstudianteRoute: AuthenticatedEstudianteRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccederRoute: AccederRoute,
   BlogRoute: BlogRoute,
   ContactosRoute: ContactosRoute,
@@ -208,3 +297,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
