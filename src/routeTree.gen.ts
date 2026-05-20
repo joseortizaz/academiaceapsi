@@ -21,6 +21,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
+import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
+import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/admin.pagos'
+import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
+import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
+import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
+import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
+import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
+import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 
 const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
   id: '/sobre-nosotros',
@@ -81,6 +93,75 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminTestimoniosRoute =
+  AuthenticatedAdminTestimoniosRouteImport.update({
+    id: '/testimonios',
+    path: '/testimonios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProgramasRoute =
+  AuthenticatedAdminProgramasRouteImport.update({
+    id: '/programas',
+    path: '/programas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPagosRoute = AuthenticatedAdminPagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminModulosRoute =
+  AuthenticatedAdminModulosRouteImport.update({
+    id: '/modulos',
+    path: '/modulos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminMensajesRoute =
+  AuthenticatedAdminMensajesRouteImport.update({
+    id: '/mensajes',
+    path: '/mensajes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminInscripcionesRoute =
+  AuthenticatedAdminInscripcionesRouteImport.update({
+    id: '/inscripciones',
+    path: '/inscripciones',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDocentesRoute =
+  AuthenticatedAdminDocentesRouteImport.update({
+    id: '/docentes',
+    path: '/docentes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCategoriasRoute =
+  AuthenticatedAdminCategoriasRouteImport.update({
+    id: '/categorias',
+    path: '/categorias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminAnunciosRoute =
+  AuthenticatedAdminAnunciosRouteImport.update({
+    id: '/anuncios',
+    path: '/anuncios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -91,9 +172,21 @@ export interface FileRoutesByFullPath {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/docente': typeof AuthenticatedDocenteRoute
   '/estudiante': typeof AuthenticatedEstudianteRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
+  '/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/admin/pagos': typeof AuthenticatedAdminPagosRoute
+  '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -104,9 +197,20 @@ export interface FileRoutesByTo {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/docente': typeof AuthenticatedDocenteRoute
   '/estudiante': typeof AuthenticatedEstudianteRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
+  '/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/admin/pagos': typeof AuthenticatedAdminPagosRoute
+  '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -119,9 +223,21 @@ export interface FileRoutesById {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/docente': typeof AuthenticatedDocenteRoute
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRoute
+  '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
+  '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/_authenticated/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/_authenticated/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
+  '/_authenticated/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/_authenticated/admin/pagos': typeof AuthenticatedAdminPagosRoute
+  '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +253,18 @@ export interface FileRouteTypes {
     | '/admin'
     | '/docente'
     | '/estudiante'
+    | '/admin/anuncios'
+    | '/admin/blog'
+    | '/admin/categorias'
+    | '/admin/docentes'
+    | '/admin/inscripciones'
+    | '/admin/mensajes'
+    | '/admin/modulos'
+    | '/admin/pagos'
+    | '/admin/programas'
+    | '/admin/testimonios'
+    | '/admin/usuarios'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -147,9 +275,20 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/registro'
     | '/sobre-nosotros'
-    | '/admin'
     | '/docente'
     | '/estudiante'
+    | '/admin/anuncios'
+    | '/admin/blog'
+    | '/admin/categorias'
+    | '/admin/docentes'
+    | '/admin/inscripciones'
+    | '/admin/mensajes'
+    | '/admin/modulos'
+    | '/admin/pagos'
+    | '/admin/programas'
+    | '/admin/testimonios'
+    | '/admin/usuarios'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -164,6 +303,18 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
+    | '/_authenticated/admin/anuncios'
+    | '/_authenticated/admin/blog'
+    | '/_authenticated/admin/categorias'
+    | '/_authenticated/admin/docentes'
+    | '/_authenticated/admin/inscripciones'
+    | '/_authenticated/admin/mensajes'
+    | '/_authenticated/admin/modulos'
+    | '/_authenticated/admin/pagos'
+    | '/_authenticated/admin/programas'
+    | '/_authenticated/admin/testimonios'
+    | '/_authenticated/admin/usuarios'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,17 +415,134 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/testimonios': {
+      id: '/_authenticated/admin/testimonios'
+      path: '/testimonios'
+      fullPath: '/admin/testimonios'
+      preLoaderRoute: typeof AuthenticatedAdminTestimoniosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/programas': {
+      id: '/_authenticated/admin/programas'
+      path: '/programas'
+      fullPath: '/admin/programas'
+      preLoaderRoute: typeof AuthenticatedAdminProgramasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/pagos': {
+      id: '/_authenticated/admin/pagos'
+      path: '/pagos'
+      fullPath: '/admin/pagos'
+      preLoaderRoute: typeof AuthenticatedAdminPagosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/modulos': {
+      id: '/_authenticated/admin/modulos'
+      path: '/modulos'
+      fullPath: '/admin/modulos'
+      preLoaderRoute: typeof AuthenticatedAdminModulosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/mensajes': {
+      id: '/_authenticated/admin/mensajes'
+      path: '/mensajes'
+      fullPath: '/admin/mensajes'
+      preLoaderRoute: typeof AuthenticatedAdminMensajesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/inscripciones': {
+      id: '/_authenticated/admin/inscripciones'
+      path: '/inscripciones'
+      fullPath: '/admin/inscripciones'
+      preLoaderRoute: typeof AuthenticatedAdminInscripcionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/docentes': {
+      id: '/_authenticated/admin/docentes'
+      path: '/docentes'
+      fullPath: '/admin/docentes'
+      preLoaderRoute: typeof AuthenticatedAdminDocentesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/blog': {
+      id: '/_authenticated/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/anuncios': {
+      id: '/_authenticated/admin/anuncios'
+      path: '/anuncios'
+      fullPath: '/admin/anuncios'
+      preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
+  AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
+  AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
+  AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
+  AuthenticatedAdminInscripcionesRoute: typeof AuthenticatedAdminInscripcionesRoute
+  AuthenticatedAdminMensajesRoute: typeof AuthenticatedAdminMensajesRoute
+  AuthenticatedAdminModulosRoute: typeof AuthenticatedAdminModulosRoute
+  AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
+  AuthenticatedAdminProgramasRoute: typeof AuthenticatedAdminProgramasRoute
+  AuthenticatedAdminTestimoniosRoute: typeof AuthenticatedAdminTestimoniosRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
+  AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
+  AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
+  AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
+  AuthenticatedAdminInscripcionesRoute: AuthenticatedAdminInscripcionesRoute,
+  AuthenticatedAdminMensajesRoute: AuthenticatedAdminMensajesRoute,
+  AuthenticatedAdminModulosRoute: AuthenticatedAdminModulosRoute,
+  AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
+  AuthenticatedAdminProgramasRoute: AuthenticatedAdminProgramasRoute,
+  AuthenticatedAdminTestimoniosRoute: AuthenticatedAdminTestimoniosRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRoute
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRoute,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRoute,
 }
@@ -297,13 +565,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
