@@ -63,9 +63,10 @@ function AnunciosPage() {
   });
 
   const save = async (v: Anuncio) => {
+    if (!v.autor_id && !user?.id) return toast.error("Sesión no encontrada");
     const payload = {
       ...v,
-      autor_id: v.autor_id || user?.id,
+      autor_id: v.autor_id || user!.id,
       programa_id: v.programa_id || null,
       fecha_expiracion: v.fecha_expiracion || null,
     };
