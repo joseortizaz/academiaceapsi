@@ -445,6 +445,57 @@ export type Database = {
         }
         Relationships: []
       }
+      program_access_links: {
+        Row: {
+          activo: boolean | null
+          created_at: string
+          id: string
+          meeting_id: string | null
+          modulo_id: string | null
+          password: string | null
+          programa_id: string
+          tipo: string
+          url: string
+        }
+        Insert: {
+          activo?: boolean | null
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          modulo_id?: string | null
+          password?: string | null
+          programa_id: string
+          tipo: string
+          url: string
+        }
+        Update: {
+          activo?: boolean | null
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          modulo_id?: string | null
+          password?: string | null
+          programa_id?: string
+          tipo?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_access_links_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_access_links_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_modules: {
         Row: {
           created_at: string
@@ -460,7 +511,6 @@ export type Database = {
           titulo: string
           updated_at: string
           video_url: string | null
-          zoom_link: string | null
         }
         Insert: {
           created_at?: string
@@ -476,7 +526,6 @@ export type Database = {
           titulo: string
           updated_at?: string
           video_url?: string | null
-          zoom_link?: string | null
         }
         Update: {
           created_at?: string
@@ -492,7 +541,6 @@ export type Database = {
           titulo?: string
           updated_at?: string
           video_url?: string | null
-          zoom_link?: string | null
         }
         Relationships: [
           {
@@ -539,8 +587,6 @@ export type Database = {
           titulo: string
           updated_at: string
           video_intro_url: string | null
-          zoom_link: string | null
-          zoom_meeting_id: string | null
         }
         Insert: {
           categoria_id?: string | null
@@ -569,8 +615,6 @@ export type Database = {
           titulo: string
           updated_at?: string
           video_intro_url?: string | null
-          zoom_link?: string | null
-          zoom_meeting_id?: string | null
         }
         Update: {
           categoria_id?: string | null
@@ -599,8 +643,6 @@ export type Database = {
           titulo?: string
           updated_at?: string
           video_intro_url?: string | null
-          zoom_link?: string | null
-          zoom_meeting_id?: string | null
         }
         Relationships: [
           {
