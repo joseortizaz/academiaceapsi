@@ -1,16 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { GraduationCap, Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react";
+import logoCeapsi from "@/assets/logo-ceapsi.png";
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
       <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-              <GraduationCap className="h-5 w-5" />
-            </div>
-            <p className="text-base font-bold">Academia Ceapsi RD</p>
+          <div className="rounded-lg bg-white p-3 inline-block">
+            <img src={logoCeapsi} alt="CEAPSI" className="h-16 w-auto" />
           </div>
           <p className="mt-4 text-sm text-primary-foreground/75">
             Formación profesional en psicología y ciencias del comportamiento para
@@ -35,9 +33,10 @@ export function Footer() {
             Contacto
           </p>
           <ul className="space-y-3 text-sm text-primary-foreground/80">
-            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /><span>Av. Winston Churchill, Santo Domingo, RD</span></li>
-            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><span>+1 (809) 555-0123</span></li>
-            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-accent" /><span>info@academiaceapsi.do</span></li>
+            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /><span>Presidente Hipólito Irigoyen No. 5, Zona Universitaria, Distrito Nacional, Rep. Dom.</span></li>
+            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><a href="tel:+18097845106" className="hover:text-accent">809-784-5106</a></li>
+            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><a href="https://wa.me/18098695705" target="_blank" rel="noopener noreferrer" className="hover:text-accent">WhatsApp: 809-869-5705</a></li>
+            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-accent" /><a href="mailto:admin@ceapsird.com" className="hover:text-accent">admin@ceapsird.com</a></li>
           </ul>
         </div>
 

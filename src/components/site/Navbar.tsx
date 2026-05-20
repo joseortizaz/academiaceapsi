@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, GraduationCap, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import logoCeapsi from "@/assets/logo-ceapsi.png";
 
 const links = [
   { to: "/", label: "Inicio" },
@@ -36,15 +37,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <GraduationCap className="h-5 w-5" />
-          </div>
-          <div className="leading-tight">
-            <p className="text-sm font-bold text-primary">Academia Ceapsi</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              República Dominicana
-            </p>
-          </div>
+          <img src={logoCeapsi} alt="CEAPSI - Centro de Aprendizaje y Cambio" className="h-12 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
