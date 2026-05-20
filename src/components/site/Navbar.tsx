@@ -16,6 +16,21 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, primaryRole, user } = useAuth();
+  const navigate = useNavigate();
+
+  const dashboardPath =
+    primaryRole === "admin"
+      ? "/admin"
+      : primaryRole === "docente"
+        ? "/docente"
+        : "/estudiante";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur">
