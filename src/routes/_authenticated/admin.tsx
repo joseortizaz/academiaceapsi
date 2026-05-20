@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 const nav = [
   { to: "/admin", label: "Resumen", icon: LayoutDashboard, exact: true },
+  { to: "/admin/hero", label: "Carrusel Hero", icon: Images },
   { to: "/admin/programas", label: "Programas", icon: GraduationCap },
   { to: "/admin/categorias", label: "Categorías", icon: FolderTree },
   { to: "/admin/docentes", label: "Docentes", icon: Users },
