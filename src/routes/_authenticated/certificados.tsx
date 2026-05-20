@@ -12,7 +12,8 @@ export const Route = createFileRoute("/_authenticated/certificados")({
 });
 
 function MisCertificados() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const profile = user;
 
   const { data: certificados = [], isLoading } = useQuery({
     queryKey: ["mis-certificados", user?.id],
