@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -8,8 +8,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 import appCss from "../styles.css?url";
 
@@ -78,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Academia Ceapsi RD — Diplomados y cursos de psicología" },
       { name: "description", content: "Plataforma educativa dominicana de diplomados y cursos en psicología, educación y ciencias del comportamiento. En vivo por Zoom o a tu ritmo." },
       { name: "author", content: "Academia Ceapsi RD" },
-      { property: "og:title", content: "Academia Ceapsi RD" },
-      { property: "og:description", content: "Diplomados y cursos de psicología en República Dominicana." },
+      { property: "og:title", content: "Academia Ceapsi RD — Diplomados y cursos de psicología" },
+      { property: "og:description", content: "Plataforma educativa dominicana de diplomados y cursos en psicología, educación y ciencias del comportamiento. En vivo por Zoom o a tu ritmo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Academia Ceapsi RD — Diplomados y cursos de psicología" },
+      { name: "twitter:description", content: "Plataforma educativa dominicana de diplomados y cursos en psicología, educación y ciencias del comportamiento. En vivo por Zoom o a tu ritmo." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97d1879b-0e27-49b6-9e74-1efdf0661ef7" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97d1879b-0e27-49b6-9e74-1efdf0661ef7" },
     ],
     links: [
       {
@@ -112,15 +114,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      queryClient.invalidateQueries();
-    });
-    return () => subscription.unsubscribe();
-  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
