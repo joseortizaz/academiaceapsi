@@ -111,16 +111,25 @@ export function Navbar() {
               </Link>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Button asChild variant="outline">
-                <Link to="/registro" onClick={() => setOpen(false)}>
-                  Registro
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link to="/acceder" onClick={() => setOpen(false)}>
-                  Accede
-                </Link>
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Button asChild variant="outline">
+                    <Link to={dashboardPath} onClick={() => setOpen(false)}>Mi panel</Link>
+                  </Button>
+                  <Button variant="ghost" onClick={() => { setOpen(false); handleLogout(); }}>
+                    Salir
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="outline">
+                    <Link to="/registro" onClick={() => setOpen(false)}>Registro</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/acceder" onClick={() => setOpen(false)}>Accede</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
