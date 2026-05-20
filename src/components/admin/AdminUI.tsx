@@ -44,7 +44,7 @@ interface FormDialogProps<T> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial: T;
-  onSubmit: (values: T) => Promise<void> | void;
+  onSubmit: (values: T) => Promise<unknown> | unknown;
   children: (state: T, set: (patch: Partial<T>) => void) => ReactNode;
   trigger?: ReactNode;
   submitLabel?: string;
