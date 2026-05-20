@@ -1,13 +1,15 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X, GraduationCap, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Inicio" },
+  { to: "/programas", label: "Programas" },
   { to: "/sobre-nosotros", label: "Sobre nosotros" },
   { to: "/docentes", label: "Docentes" },
-  { to: "/galeria", label: "Galería" },
   { to: "/blog", label: "Blog" },
   { to: "/contactos", label: "Contactos" },
 ];
