@@ -1,0 +1,368 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  ArrowLeft, CheckCircle2, Circle, Video, FileText, Download, Award,
+} from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
+  component: CursoPlayer,
+});
+
+function CursoPlayer() {
+  const { slug } = Route.useParams();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
+
+  const { data: programa } = useQuery({
+    queryKey: ["mc-programa", slug],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("programs").select("*").eq("slug", slug).maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: enrollment } = useQuery({
+    queryKey: ["mc-enrollment", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("enrollments")
+        .select("*")
+        .eq("programa_id", programa!.id)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: modulos = [] } = useQuery({
+    queryKey: ["mc-modulos", programa?.id],
+    enabled: !!programa?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("program_modules")
+        .select("*")
+        .eq("programa_id", programa!.id)
+        .order("orden");
+      return data ?? [];
+    },
+  });
+
+  const { data: progresos = [] } = useQuery({
+    queryKey: ["mc-progress", enrollment?.id],
+    enabled: !!enrollment?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("module_progress")
+        .select("*")
+        .eq("enrollment_id", enrollment!.id);
+      return data ?? [];
+    },
+  });
+
+  const { data: links = [] } = useQuery({
+    queryKey: ["mc-links", programa?.id],
+    enabled: !!programa?.id && enrollment?.estado === "activo",
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("program_access_links")
+        .select("*")
+        .eq("programa_id", programa!.id)
+        .eq("activo", true);
+      return data ?? [];
+    },
+  });
+
+  const { data: certificate } = useQuery({
+    queryKey: ["mc-cert", enrollment?.id],
+    enabled: !!enrollment?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("certificates")
+        .select("*")
+        .eq("enrollment_id", enrollment!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const progressMap = useMemo(
+    () => new Map(progresos.map((p) => [p.modulo_id, p])),
+    [progresos],
+  );
+
+  const completados = progresos.filter((p) => p.completado).length;
+  const total = modulos.length;
+  const pct = total > 0 ? Math.round((completados / total) * 100) : 0;
+
+  const activeModule =
+    modulos.find((m) => m.id === activeModuleId) ?? modulos[0];
+
+  const toggleComplete = async (moduloId: string) => {
+    if (!enrollment) return;
+    const existing = progressMap.get(moduloId);
+    const nuevoEstado = !existing?.completado;
+    try {
+      if (existing) {
+        await supabase
+          .from("module_progress")
+          .update({
+            completado: nuevoEstado,
+            fecha_completado: nuevoEstado ? new Date().toISOString() : null,
+          })
+          .eq("id", existing.id);
+      } else {
+        await supabase.from("module_progress").insert({
+          enrollment_id: enrollment.id,
+          modulo_id: moduloId,
+          completado: nuevoEstado,
+          fecha_completado: nuevoEstado ? new Date().toISOString() : null,
+        });
+      }
+
+      const nuevosCompletados = nuevoEstado ? completados + 1 : completados - 1;
+      const nuevoPct = total > 0 ? Math.round((nuevosCompletados / total) * 100) : 0;
+      await supabase
+        .from("enrollments")
+        .update({
+          progreso_porcentaje: nuevoPct,
+          ...(nuevoPct === 100 ? { fecha_completado: new Date().toISOString(), estado: "completado" } : {}),
+        })
+        .eq("id", enrollment.id);
+
+      qc.invalidateQueries({ queryKey: ["mc-progress", enrollment.id] });
+      qc.invalidateQueries({ queryKey: ["mc-enrollment", programa?.id, user?.id] });
+    } catch (e: any) {
+      toast.error(e.message ?? "No se pudo actualizar el progreso");
+    }
+  };
+
+  const emitirCertificado = async () => {
+    if (!enrollment || !programa || !user || pct < 100) return;
+    try {
+      const { error } = await supabase.from("certificates").insert({
+        user_id: user.id,
+        programa_id: programa.id,
+        enrollment_id: enrollment.id,
+        numero_certificado: `CEAPSI-${new Date().getFullYear()}-${enrollment.id.slice(0, 8)}`,
+        estado: "emitido",
+      });
+      if (error) throw error;
+      toast.success("¡Certificado emitido!");
+      qc.invalidateQueries({ queryKey: ["mc-cert", enrollment.id] });
+    } catch (e: any) {
+      toast.error(e.message ?? "Solicita a un administrador la emisión del certificado");
+    }
+  };
+
+  if (!programa) {
+    return <div className="p-8 text-muted-foreground">Cargando…</div>;
+  }
+  if (!enrollment) {
+    return (
+      <div className="mx-auto max-w-xl p-8 text-center">
+        <p className="text-muted-foreground">No estás inscrito en este programa.</p>
+        <Button asChild className="mt-4">
+          <Link to="/programas/$slug" params={{ slug }}>Ver detalle</Link>
+        </Button>
+      </div>
+    );
+  }
+  if (enrollment.estado === "pendiente") {
+    return (
+      <div className="mx-auto max-w-xl p-8 text-center">
+        <h2 className="text-xl font-bold">Pago pendiente</h2>
+        <p className="mt-2 text-muted-foreground">
+          Tu inscripción está registrada pero tu pago aún no ha sido verificado.
+          Tendrás acceso al contenido en cuanto el equipo confirme tu pago.
+        </p>
+        <Button asChild variant="outline" className="mt-4">
+          <Link to="/mis-cursos">Volver a mis cursos</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b bg-card px-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <Button asChild size="sm" variant="ghost">
+            <Link to="/mis-cursos">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Mis cursos
+            </Link>
+          </Button>
+          <div className="hidden text-sm font-medium md:block">{programa.titulo}</div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">{pct}%</span>
+            <div className="hidden w-32 sm:block">
+              <Progress value={pct} />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto grid max-w-7xl gap-6 p-4 lg:grid-cols-[320px_1fr]">
+        <aside className="space-y-2">
+          <div className="rounded-lg border bg-card p-4">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+              Contenido
+            </h2>
+            <ol className="mt-3 space-y-1">
+              {modulos.map((m, i) => {
+                const done = progressMap.get(m.id)?.completado;
+                const isActive = activeModule?.id === m.id;
+                return (
+                  <li key={m.id}>
+                    <button
+                      onClick={() => setActiveModuleId(m.id)}
+                      className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
+                        isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      }`}
+                    >
+                      {done ? (
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                      ) : (
+                        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                      )}
+                      <span className="flex-1">
+                        <span className="font-medium">{i + 1}. {m.titulo}</span>
+                        {m.es_en_vivo && (
+                          <Video className="ml-1 inline h-3 w-3 text-primary" />
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          {links.length > 0 && (
+            <div className="rounded-lg border bg-card p-4">
+              <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                Accesos del programa
+              </h2>
+              <ul className="mt-3 space-y-2 text-sm">
+                {links.map((l) => (
+                  <li key={l.id}>
+                    <a
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {l.tipo}
+                    </a>
+                    {l.password && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        Clave: {l.password}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {pct === 100 && programa.certificado_incluido && (
+            <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 text-center">
+              <Award className="mx-auto h-8 w-8 text-primary" />
+              <p className="mt-2 text-sm font-medium">¡Has completado el programa!</p>
+              {certificate ? (
+                <Button asChild className="mt-3 w-full" size="sm">
+                  <a
+                    href={certificate.url_pdf ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar certificado
+                  </a>
+                </Button>
+              ) : (
+                <Button onClick={emitirCertificado} size="sm" className="mt-3 w-full">
+                  Generar certificado
+                </Button>
+              )}
+            </div>
+          )}
+        </aside>
+
+        <main className="rounded-lg border bg-card p-6">
+          {activeModule ? (
+            <article>
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h1 className="text-2xl font-bold">{activeModule.titulo}</h1>
+                  {activeModule.es_en_vivo && (
+                    <Badge variant="outline" className="mt-2 gap-1">
+                      <Video className="h-3 w-3" /> Sesión en vivo
+                    </Badge>
+                  )}
+                </div>
+                <Button
+                  variant={progressMap.get(activeModule.id)?.completado ? "outline" : "default"}
+                  onClick={() => toggleComplete(activeModule.id)}
+                >
+                  {progressMap.get(activeModule.id)?.completado
+                    ? "Marcar como pendiente"
+                    : "Marcar completado"}
+                </Button>
+              </div>
+
+              {activeModule.video_url && (
+                <div className="mb-6 aspect-video w-full overflow-hidden rounded-lg bg-black">
+                  {activeModule.video_url.includes("youtube") ||
+                  activeModule.video_url.includes("youtu.be") ||
+                  activeModule.video_url.includes("vimeo") ? (
+                    <iframe
+                      src={activeModule.video_url}
+                      title={activeModule.titulo}
+                      allowFullScreen
+                      className="h-full w-full"
+                    />
+                  ) : (
+                    <video controls src={activeModule.video_url} className="h-full w-full" />
+                  )}
+                </div>
+              )}
+
+              {activeModule.descripcion && (
+                <div className="prose prose-sm max-w-none whitespace-pre-wrap text-foreground/90">
+                  {activeModule.descripcion}
+                </div>
+              )}
+
+              {activeModule.material_url && (
+                <Button asChild variant="outline" className="mt-6">
+                  <a href={activeModule.material_url} target="_blank" rel="noopener noreferrer">
+                    <FileText className="mr-2 h-4 w-4" /> Material complementario
+                  </a>
+                </Button>
+              )}
+
+              {activeModule.fecha_sesion && (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  📅 Sesión en vivo:{" "}
+                  {new Date(activeModule.fecha_sesion).toLocaleString("es-DO")}
+                </p>
+              )}
+            </article>
+          ) : (
+            <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
