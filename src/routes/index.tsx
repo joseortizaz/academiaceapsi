@@ -124,16 +124,8 @@ function Home() {
               <div><p className="text-2xl font-bold text-accent">98%</p><p className="text-xs text-primary-foreground/70">Satisfacción</p></div>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
-            <img
-              src={heroImg}
-              alt="Estudiantes dominicanos de la Academia Ceapsi RD"
-              width={1600}
-              height={1024}
-              className="relative rounded-2xl shadow-2xl ring-1 ring-primary-foreground/20"
-            />
-          </div>
+          <HeroCarousel />
+
         </div>
       </section>
 
