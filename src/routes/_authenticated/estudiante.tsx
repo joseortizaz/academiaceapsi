@@ -1,10 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, BookOpen, Calendar, Award, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import {
+  GraduationCap, BookOpen, Award, LogOut, Megaphone, Calendar,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/estudiante")({
   component: EstudianteDashboard,
@@ -14,21 +17,53 @@ function EstudianteDashboard() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
 
+  const { data } = useQuery({
+    queryKey: ["estudiante-dash", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const [enrolls, certs, announcements] = await Promise.all([
+        supabase.from("enrollments").select("*").eq("user_id", user!.id),
+        supabase.from("certificates").select("*").eq("user_id", user!.id),
+        supabase
+          .from("announcements")
+          .select("*")
+          .eq("activo", true)
+          .order("fecha_publicacion", { ascending: false })
+          .limit(5),
+      ]);
+      const programaIds = (enrolls.data ?? []).map((e) => e.programa_id);
+      const programs = programaIds.length
+        ? (await supabase
+            .from("programs")
+            .select("id,titulo,slug,imagen_url,fecha_inicio")
+            .in("id", programaIds)).data ?? []
+        : [];
+      const pmap = new Map(programs.map((p) => [p.id, p]));
+      return {
+        enrollments: (enrolls.data ?? []).map((e) => ({ ...e, programa: pmap.get(e.programa_id) })),
+        certificates: certs.data ?? [],
+        announcements: announcements.data ?? [],
+      };
+    },
+  });
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
 
+  const enrollments = data?.enrollments ?? [];
+  const activos = enrollments.filter((e) => e.estado === "activo");
+  const promedio = activos.length
+    ? Math.round(activos.reduce((s, e) => s + (e.progreso_porcentaje ?? 0), 0) / activos.length)
+    : 0;
+
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Cargando...</p>
-      </div>
-    );
+    return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Cargando…</div>;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
@@ -46,82 +81,89 @@ function EstudianteDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl p-6">
-        <h1 className="text-2xl font-bold text-foreground">Panel del Estudiante</h1>
-        <p className="mt-1 text-muted-foreground">Bienvenido, {user?.nombre}.</p>
-
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Mis Cursos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">0</div>
-              <p className="text-xs text-muted-foreground">Inscritos activos</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Progreso</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">0%</div>
-              <p className="text-xs text-muted-foreground">Promedio general</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Certificados</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">0</div>
-              <p className="text-xs text-muted-foreground">Obtenidos</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Próxima Clase</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg font-bold text-foreground">--</div>
-              <p className="text-xs text-muted-foreground">Sin clases programadas</p>
-            </CardContent>
-          </Card>
+      <main className="mx-auto max-w-6xl space-y-8 p-6">
+        <div>
+          <h1 className="text-2xl font-bold">¡Hola, {user?.nombre}!</h1>
+          <p className="text-muted-foreground">Continúa tu formación profesional.</p>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Mis Cursos Inscritos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Aún no tienes cursos inscritos. Explora nuestro catálogo para comenzar.
-              </p>
-              <Button className="mt-4" asChild>
-                <Link to="/">Explorar cursos</Link>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat label="Cursos activos" value={activos.length} icon={BookOpen} />
+          <Stat label="Inscripciones" value={enrollments.length} icon={GraduationCap} />
+          <Stat label="Progreso promedio" value={`${promedio}%`} icon={Calendar} />
+          <Stat label="Certificados" value={data?.certificates.length ?? 0} icon={Award} />
+        </div>
+
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-lg font-bold">Mis cursos</h2>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/mis-cursos">Ver todos</Link>
+            </Button>
+          </div>
+          {enrollments.length === 0 ? (
+            <div className="rounded-lg border border-dashed bg-card p-10 text-center">
+              <p className="text-muted-foreground">Aún no estás inscrito en ningún programa.</p>
+              <Button asChild className="mt-4">
+                <Link to="/programas">Explorar catálogo</Link>
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {enrollments.slice(0, 6).map((e) => (
+                <Link
+                  key={e.id}
+                  to={e.estado === "activo" ? "/mis-cursos/$slug" : "/mis-cursos"}
+                  params={e.estado === "activo" ? { slug: e.programa?.slug ?? "" } : undefined}
+                  className="block overflow-hidden rounded-lg border bg-card transition hover:shadow-md"
+                >
+                  <div className="aspect-video bg-muted">
+                    {e.programa?.imagen_url && (
+                      <img src={e.programa.imagen_url} alt="" className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <div className="space-y-2 p-4">
+                    <Badge variant={e.estado === "activo" ? "default" : "secondary"}>{e.estado}</Badge>
+                    <h3 className="line-clamp-2 font-semibold">{e.programa?.titulo}</h3>
+                    <Progress value={e.progreso_porcentaje ?? 0} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Calendario
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Tu calendario de clases en vivo se mostrará aquí.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {(data?.announcements ?? []).length > 0 && (
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+              <Megaphone className="h-5 w-5 text-primary" /> Anuncios
+            </h2>
+            <div className="space-y-3">
+              {data!.announcements.map((a) => (
+                <article key={a.id} className="rounded-lg border bg-card p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-semibold">{a.titulo}</h3>
+                    <Badge variant="outline">{a.tipo}</Badge>
+                  </div>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{a.contenido}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
+    </div>
+  );
+}
+
+function Stat({ label, value, icon: Icon }: { label: string; value: number | string; icon: any }) {
+  return (
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <Icon className="h-5 w-5 text-primary" />
+      </div>
+      <p className="mt-2 text-3xl font-bold">{value}</p>
     </div>
   );
 }

@@ -1,0 +1,383 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
+import { PublicLayout } from "@/components/site/PublicLayout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video,
+} from "lucide-react";
+
+export const Route = createFileRoute("/programas/$slug")({
+  component: DetallePrograma,
+});
+
+function DetallePrograma() {
+  const { slug } = Route.useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const qc = useQueryClient();
+  const [inscOpen, setInscOpen] = useState(false);
+  const [metodo, setMetodo] = useState("transferencia");
+  const [referencia, setReferencia] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const { data: programa, isLoading } = useQuery({
+    queryKey: ["public", "programa", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("programs")
+        .select("*")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: modulos = [] } = useQuery({
+    queryKey: ["public", "modulos", programa?.id],
+    enabled: !!programa?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("program_modules")
+        .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion")
+        .eq("programa_id", programa!.id)
+        .order("orden");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: docente } = useQuery({
+    queryKey: ["public", "docente", programa?.docente_id],
+    enabled: !!programa?.docente_id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("teachers")
+        .select("nombre,apellido,titulo,especialidad,avatar_url,biografia")
+        .eq("id", programa!.docente_id!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: existing } = useQuery({
+    queryKey: ["enrollment", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("enrollments")
+        .select("id,estado")
+        .eq("programa_id", programa!.id)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <PublicLayout>
+        <div className="container mx-auto px-4 py-20 text-center text-muted-foreground">Cargando…</div>
+      </PublicLayout>
+    );
+  }
+
+  if (!programa) {
+    return (
+      <PublicLayout>
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Programa no encontrado</h1>
+          <Button asChild className="mt-4"><Link to="/programas">Ver catálogo</Link></Button>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  const precio = programa.precio_descuento ?? programa.precio;
+
+  const inscribirse = async () => {
+    if (!isAuthenticated || !user) {
+      navigate({ to: "/acceder" });
+      return;
+    }
+    setInscOpen(true);
+  };
+
+  const confirmarInscripcion = async () => {
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      const esGratis = Number(precio) === 0;
+
+      const { data: enr, error: enrErr } = await supabase
+        .from("enrollments")
+        .insert({
+          user_id: user.id,
+          programa_id: programa.id,
+          estado: esGratis ? "activo" : "pendiente",
+        })
+        .select()
+        .single();
+      if (enrErr) throw enrErr;
+
+      if (!esGratis) {
+        const { error: payErr } = await supabase.from("payments").insert({
+          user_id: user.id,
+          programa_id: programa.id,
+          monto: precio,
+          moneda: "DOP",
+          metodo,
+          referencia: referencia || null,
+          estado: "pendiente",
+        });
+        if (payErr) throw payErr;
+      }
+
+      toast.success(
+        esGratis
+          ? "¡Te has inscrito! Ya puedes acceder al contenido."
+          : "Inscripción registrada. Tu pago está pendiente de verificación.",
+      );
+      setInscOpen(false);
+      qc.invalidateQueries({ queryKey: ["enrollment", programa.id] });
+      navigate({ to: "/mis-cursos" });
+    } catch (e: any) {
+      toast.error(e.message ?? "Error al inscribirse");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <PublicLayout>
+      <section className="border-b bg-gradient-to-b from-primary/5 to-background">
+        <div className="container mx-auto grid gap-8 px-4 py-12 lg:grid-cols-[2fr_1fr]">
+          <div>
+            <div className="mb-4 flex flex-wrap gap-2">
+              <Badge variant="outline" className="capitalize">{programa.tipo}</Badge>
+              <Badge variant="secondary" className="capitalize">{programa.modalidad}</Badge>
+              {programa.certificado_incluido && <Badge>Certificado incluido</Badge>}
+            </div>
+            <h1 className="text-3xl font-bold md:text-4xl">{programa.titulo}</h1>
+            {programa.resumen && (
+              <p className="mt-3 text-lg text-muted-foreground">{programa.resumen}</p>
+            )}
+            <div className="mt-6 flex flex-wrap gap-5 text-sm text-muted-foreground">
+              {programa.duracion_horas && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" /> {programa.duracion_horas} horas
+                </span>
+              )}
+              {programa.duracion_semanas && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" /> {programa.duracion_semanas} semanas
+                </span>
+              )}
+              {programa.fecha_inicio && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  Inicio {new Date(programa.fecha_inicio).toLocaleDateString("es-DO")}
+                </span>
+              )}
+              {programa.max_estudiantes && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Users className="h-4 w-4" /> Cupo {programa.max_estudiantes}
+                </span>
+              )}
+            </div>
+          </div>
+          <aside className="rounded-xl border bg-card p-6 shadow-sm">
+            <div className="overflow-hidden rounded-lg bg-muted">
+              {programa.imagen_url ? (
+                <img src={programa.imagen_url} alt={programa.titulo} className="aspect-video w-full object-cover" />
+              ) : (
+                <div className="flex aspect-video items-center justify-center text-primary/30">
+                  <GraduationCap className="h-16 w-16" />
+                </div>
+              )}
+            </div>
+            <div className="mt-4">
+              {programa.precio_descuento ? (
+                <div>
+                  <span className="text-3xl font-bold text-primary">
+                    RD$ {Number(programa.precio_descuento).toLocaleString("es-DO")}
+                  </span>
+                  <span className="ml-2 text-sm text-muted-foreground line-through">
+                    RD$ {Number(programa.precio).toLocaleString("es-DO")}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-3xl font-bold text-primary">
+                  {Number(programa.precio) > 0
+                    ? `RD$ ${Number(programa.precio).toLocaleString("es-DO")}`
+                    : "Gratis"}
+                </span>
+              )}
+            </div>
+            {existing ? (
+              <Button asChild className="mt-4 w-full">
+                <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
+              </Button>
+            ) : (
+              <Button className="mt-4 w-full" onClick={inscribirse}>
+                {isAuthenticated ? "Inscribirme ahora" : "Acceder para inscribirme"}
+              </Button>
+            )}
+            {programa.syllabus_url && (
+              <Button asChild variant="outline" className="mt-2 w-full">
+                <a href={programa.syllabus_url} target="_blank" rel="noopener noreferrer">
+                  Descargar syllabus
+                </a>
+              </Button>
+            )}
+          </aside>
+        </div>
+      </section>
+
+      <section className="container mx-auto grid gap-10 px-4 py-12 lg:grid-cols-[2fr_1fr]">
+        <div className="space-y-10">
+          <div>
+            <h2 className="text-2xl font-bold">Descripción del programa</h2>
+            <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
+              {programa.descripcion}
+            </div>
+          </div>
+
+          {modulos.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-bold">Contenido del programa</h2>
+              <ol className="mt-4 divide-y rounded-lg border bg-card">
+                {modulos.map((m, i) => (
+                  <li key={m.id} className="flex items-start gap-3 p-4">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                      {i + 1}
+                    </span>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold">{m.titulo}</h3>
+                        {m.es_en_vivo && (
+                          <Badge variant="outline" className="gap-1">
+                            <Video className="h-3 w-3" /> En vivo
+                          </Badge>
+                        )}
+                        {m.duracion_minutos && (
+                          <span className="text-xs text-muted-foreground">
+                            {m.duracion_minutos} min
+                          </span>
+                        )}
+                      </div>
+                      {m.descripcion && (
+                        <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+
+        <aside className="space-y-6">
+          {docente && (
+            <div className="rounded-lg border bg-card p-5">
+              <h3 className="font-bold">Docente</h3>
+              <div className="mt-3 flex items-start gap-3">
+                {docente.avatar_url ? (
+                  <img src={docente.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <BookOpen />
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold">{docente.nombre} {docente.apellido}</p>
+                  {docente.titulo && <p className="text-xs text-muted-foreground">{docente.titulo}</p>}
+                  {docente.especialidad && (
+                    <p className="text-xs text-muted-foreground">{docente.especialidad}</p>
+                  )}
+                </div>
+              </div>
+              {docente.biografia && (
+                <p className="mt-3 text-sm text-muted-foreground">{docente.biografia}</p>
+              )}
+            </div>
+          )}
+
+          {programa.horario && (
+            <div className="rounded-lg border bg-card p-5">
+              <h3 className="flex items-center gap-2 font-bold">
+                <Calendar className="h-4 w-4 text-primary" /> Horario
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">{programa.horario}</p>
+            </div>
+          )}
+
+          {programa.certificado_incluido && (
+            <div className="rounded-lg border bg-card p-5">
+              <h3 className="flex items-center gap-2 font-bold">
+                <CheckCircle2 className="h-4 w-4 text-primary" /> Certificación
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Al completar el 100% del programa recibirás tu certificado digital de la Academia Ceapsi RD.
+              </p>
+            </div>
+          )}
+        </aside>
+      </section>
+
+      <Dialog open={inscOpen} onOpenChange={setInscOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar inscripción</DialogTitle>
+            <DialogDescription>
+              {Number(precio) === 0
+                ? "Este programa es gratuito. Confirma tu inscripción para acceder al contenido."
+                : `Monto a pagar: RD$ ${Number(precio).toLocaleString("es-DO")}. Tu acceso se activará una vez verifiquemos el pago.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          {Number(precio) > 0 && (
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label>Método de pago</Label>
+                <Select value={metodo} onValueChange={setMetodo}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="transferencia">Transferencia bancaria</SelectItem>
+                    <SelectItem value="tarjeta">Tarjeta de crédito/débito</SelectItem>
+                    <SelectItem value="paypal">PayPal</SelectItem>
+                    <SelectItem value="efectivo">Efectivo en oficina</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Referencia o número de transacción (opcional)</Label>
+                <Input value={referencia} onChange={(e) => setReferencia(e.target.value)} maxLength={100} />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInscOpen(false)}>Cancelar</Button>
+            <Button onClick={confirmarInscripcion} disabled={submitting}>
+              {submitting ? "Procesando…" : "Confirmar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </PublicLayout>
+  );
+}

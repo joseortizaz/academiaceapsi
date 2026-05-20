@@ -1,19 +1,36 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X, GraduationCap, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Inicio" },
+  { to: "/programas", label: "Programas" },
   { to: "/sobre-nosotros", label: "Sobre nosotros" },
   { to: "/docentes", label: "Docentes" },
-  { to: "/galeria", label: "Galería" },
   { to: "/blog", label: "Blog" },
   { to: "/contactos", label: "Contactos" },
 ];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, primaryRole, user } = useAuth();
+  const navigate = useNavigate();
+
+  const dashboardPath =
+    primaryRole === "admin"
+      ? "/admin"
+      : primaryRole === "docente"
+        ? "/docente"
+        : "/estudiante";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur">
@@ -44,12 +61,31 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="outline">
-            <Link to="/registro">Registro</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/acceder">Accede</Link>
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link to={dashboardPath}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Mi panel
+                </Link>
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {user?.nombre}
+              </span>
+              <Button variant="ghost" size="sm" onClick={handleLogout} aria-label="Salir">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="outline">
+                <Link to="/registro">Registro</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/acceder">Accede</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <button
@@ -75,16 +111,25 @@ export function Navbar() {
               </Link>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Button asChild variant="outline">
-                <Link to="/registro" onClick={() => setOpen(false)}>
-                  Registro
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link to="/acceder" onClick={() => setOpen(false)}>
-                  Accede
-                </Link>
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Button asChild variant="outline">
+                    <Link to={dashboardPath} onClick={() => setOpen(false)}>Mi panel</Link>
+                  </Button>
+                  <Button variant="ghost" onClick={() => { setOpen(false); handleLogout(); }}>
+                    Salir
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="outline">
+                    <Link to="/registro" onClick={() => setOpen(false)}>Registro</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/acceder" onClick={() => setOpen(false)}>Accede</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
