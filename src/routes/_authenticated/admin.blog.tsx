@@ -68,9 +68,10 @@ function BlogPage() {
   });
 
   const save = async (v: Post) => {
+    if (!v.autor_id && !user?.id) return toast.error("Sesión no encontrada");
     const payload = {
       ...v,
-      autor_id: v.autor_id || user?.id,
+      autor_id: v.autor_id || user!.id,
       categoria_id: v.categoria_id || null,
       fecha_publicacion:
         v.estado === "publicado" && !v.fecha_publicacion
