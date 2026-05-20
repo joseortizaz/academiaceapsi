@@ -14,6 +14,37 @@ export const Route = createFileRoute("/registro")({
 });
 
 function Registro() {
+  const navigate = useNavigate();
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { nombre, apellido, telefono },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error("Error de registro", { description: error.message });
+      return;
+    }
+    if (data.user && !data.session) {
+      toast.success("Registro exitoso", { description: "Revisa tu correo para confirmar tu cuenta." });
+      return;
+    }
+    toast.success("¡Bienvenido a Ceapsi RD!");
+    navigate({ to: "/estudiante" });
+  };
+
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="flex items-center justify-center bg-background p-6 md:p-12">
@@ -26,38 +57,30 @@ function Registro() {
               <p className="font-bold text-primary">Academia Ceapsi RD</p>
             </Link>
             <h1 className="text-2xl font-bold text-foreground">Crea tu cuenta</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Únete a la comunidad educativa de Ceapsi RD.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Únete a la comunidad educativa de Ceapsi RD.</p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                toast.info("Registro pendiente", { description: "El backend se activa en el PASO 2." });
-              }}
-              className="mt-6 space-y-4"
-            >
+            <form onSubmit={handleRegister} className="mt-6 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="nombre">Nombre</Label>
-                  <Input id="nombre" required placeholder="María" />
+                  <Input id="nombre" required placeholder="María" value={nombre} onChange={(e) => setNombre(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="apellido">Apellido</Label>
-                  <Input id="apellido" required placeholder="Fernández" />
+                  <Input id="apellido" required placeholder="Fernández" value={apellido} onChange={(e) => setApellido(e.target.value)} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="correo">Correo electrónico</Label>
-                <Input id="correo" type="email" required placeholder="correo@ejemplo.com" />
+                <Input id="correo" type="email" required placeholder="correo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="telefono">Teléfono</Label>
-                <Input id="telefono" type="tel" placeholder="+1 (809) 000-0000" />
+                <Input id="telefono" type="tel" placeholder="+1 (809) 000-0000" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input id="password" type="password" required placeholder="Mínimo 8 caracteres" />
+                <Input id="password" type="password" required placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               <div className="flex items-start gap-2">
                 <Checkbox id="terminos" required />
@@ -65,7 +88,9 @@ function Registro() {
                   Acepto los términos del servicio y la política de privacidad de Academia Ceapsi RD.
                 </Label>
               </div>
-              <Button type="submit" size="lg" className="w-full">Crear cuenta</Button>
+              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                {loading ? "Creando cuenta..." : "Crear cuenta"}
+              </Button>
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
