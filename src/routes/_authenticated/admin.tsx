@@ -1,26 +1,101 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useLocation } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  LayoutDashboard,
+  GraduationCap,
+  FolderTree,
+  Users,
+  BookOpen,
+  MessageSquare,
+  Newspaper,
+  Megaphone,
+  ClipboardList,
+  CreditCard,
+  Mail,
+  UserCog,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  component: AdminDashboard,
+  component: AdminLayout,
 });
 
-function AdminDashboard() {
+const nav = [
+  { to: "/admin", label: "Resumen", icon: LayoutDashboard, exact: true },
+  { to: "/admin/programas", label: "Programas", icon: GraduationCap },
+  { to: "/admin/categorias", label: "Categorías", icon: FolderTree },
+  { to: "/admin/docentes", label: "Docentes", icon: Users },
+  { to: "/admin/modulos", label: "Módulos", icon: BookOpen },
+  { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
+  { to: "/admin/blog", label: "Blog", icon: Newspaper },
+  { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
+  { to: "/admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
+  { to: "/admin/pagos", label: "Pagos", icon: CreditCard },
+  { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
+  { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
+];
+
+function AdminLayout() {
+  const { isLoading, hasRole } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Cargando panel…</div>;
+  }
+  if (!hasRole("admin")) {
+    throw redirect({ to: "/" });
+  }
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <h1 className="text-2xl font-bold">Panel del Administrador</h1>
-      <p className="mt-2 text-muted-foreground">Bienvenido al panel de control.</p>
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "Usuarios registrados", value: "0" },
-          { label: "Diplomados activos", value: "0" },
-          { label: "Inscripciones", value: "0" },
-          { label: "Ingresos (DOP)", value: "$0" },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-lg border bg-card p-4">
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="mt-1 text-2xl font-bold">{stat.value}</p>
-          </div>
-        ))}
+    <div className="flex min-h-screen bg-muted/30">
+      <aside className="hidden w-64 shrink-0 border-r bg-card md:block">
+        <div className="border-b p-4">
+          <h2 className="text-lg font-bold">Administración</h2>
+          <p className="text-xs text-muted-foreground">Academia Ceapsi RD</p>
+        </div>
+        <nav className="flex flex-col gap-1 p-3">
+          {nav.map((item) => {
+            const active = item.exact
+              ? location.pathname === item.to
+              : location.pathname.startsWith(item.to);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted",
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+      <div className="flex-1 overflow-x-auto">
+        <div className="border-b bg-card p-3 md:hidden">
+          <select
+            className="w-full rounded-md border bg-background p-2 text-sm"
+            value={location.pathname}
+            onChange={(e) => {
+              window.location.href = e.target.value;
+            }}
+          >
+            {nav.map((item) => (
+              <option key={item.to} value={item.to}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <main className="p-4 md:p-8">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
