@@ -13,6 +13,7 @@ import {
   CreditCard,
   Mail,
   UserCog,
+  Images,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
