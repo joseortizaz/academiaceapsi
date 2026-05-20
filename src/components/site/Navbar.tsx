@@ -61,12 +61,31 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="outline">
-            <Link to="/registro">Registro</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/acceder">Accede</Link>
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link to={dashboardPath}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Mi panel
+                </Link>
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {user?.nombre}
+              </span>
+              <Button variant="ghost" size="sm" onClick={handleLogout} aria-label="Salir">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="outline">
+                <Link to="/registro">Registro</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/acceder">Accede</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <button
