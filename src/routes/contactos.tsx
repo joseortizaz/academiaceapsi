@@ -23,9 +23,10 @@ function Contactos() {
       <section className="container mx-auto grid gap-10 px-4 py-16 md:grid-cols-3 md:py-24">
         <div className="space-y-4 md:col-span-1">
           {[
-            { icon: MapPin, t: "Ubicación", d: "Av. Winston Churchill, Plaza Acrópolis, Santo Domingo, RD" },
-            { icon: Phone, t: "Teléfono", d: "+1 (809) 555-0123" },
-            { icon: Mail, t: "Correo", d: "info@academiaceapsi.do" },
+            { icon: MapPin, t: "Ubicación", d: "Presidente Hipólito Irigoyen No. 5, Zona Universitaria, Distrito Nacional, Rep. Dom." },
+            { icon: Phone, t: "Oficina", d: "809-784-5106" },
+            { icon: Phone, t: "WhatsApp", d: "809-869-5705" },
+            { icon: Mail, t: "Correo", d: "admin@ceapsird.com" },
             { icon: Clock, t: "Horario", d: "Lun–Vie 8:00 a.m. – 6:00 p.m." },
           ].map((c) => (
             <Card key={c.t} className="border-border">
