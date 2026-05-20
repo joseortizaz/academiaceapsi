@@ -35,9 +35,9 @@ export function Footer() {
             Contacto
           </p>
           <ul className="space-y-3 text-sm text-primary-foreground/80">
-            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /> Av. Winston Churchill, Santo Domingo, RD</li>
-            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /> +1 (809) 555-0123</li>
-            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-accent" /> info@academiaceapsi.do</li>
+            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /><span>Av. Winston Churchill, Santo Domingo, RD</span></li>
+            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><span>+1 (809) 555-0123</span></li>
+            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-accent" /><span>info@academiaceapsi.do</span></li>
           </ul>
         </div>
 
