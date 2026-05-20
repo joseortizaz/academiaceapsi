@@ -296,6 +296,39 @@ export type Database = {
           },
         ]
       }
+      hero_slides: {
+        Row: {
+          activo: boolean
+          alt: string | null
+          created_at: string
+          enlace_url: string | null
+          id: string
+          imagen_url: string
+          orden: number
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          alt?: string | null
+          created_at?: string
+          enlace_url?: string | null
+          id?: string
+          imagen_url: string
+          orden?: number
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          alt?: string | null
+          created_at?: string
+          enlace_url?: string | null
+          id?: string
+          imagen_url?: string
+          orden?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       module_progress: {
         Row: {
           completado: boolean | null

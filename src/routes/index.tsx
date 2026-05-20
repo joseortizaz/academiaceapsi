@@ -1,14 +1,85 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
+} from "@/components/ui/carousel";
+import { supabase } from "@/integrations/supabase/client";
 import { GraduationCap, Award, Video, Users, Clock, CheckCircle2, Star, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero-ceapsi.jpg";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
+
+type HeroSlide = { id: string; imagen_url: string; enlace_url: string | null; alt: string | null };
+
+function HeroCarousel() {
+  const autoplay = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
+  const { data: slides } = useQuery<HeroSlide[]>({
+    queryKey: ["hero_slides"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("hero_slides")
+        .select("id, imagen_url, enlace_url, alt")
+        .eq("activo", true)
+        .order("orden", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const items: HeroSlide[] = slides && slides.length > 0
+    ? slides
+    : [{ id: "default", imagen_url: heroImg, enlace_url: null, alt: "Estudiantes dominicanos de la Academia Ceapsi RD" }];
+
+  const renderImg = (s: HeroSlide) => (
+    <img
+      src={s.imagen_url}
+      alt={s.alt ?? ""}
+      width={1600}
+      height={1024}
+      className="relative w-full rounded-2xl shadow-2xl ring-1 ring-primary-foreground/20"
+    />
+  );
+
+  return (
+    <div className="relative">
+      <div className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
+      <Carousel
+        className="relative"
+        opts={{ loop: true }}
+        plugins={items.length > 1 ? [autoplay.current] : []}
+      >
+        <CarouselContent>
+          {items.map((s) => (
+            <CarouselItem key={s.id}>
+              {s.enlace_url ? (
+                <a href={s.enlace_url} target={s.enlace_url.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+                  {renderImg(s)}
+                </a>
+              ) : (
+                renderImg(s)
+              )}
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        {items.length > 1 && (
+          <>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </>
+        )}
+      </Carousel>
+    </div>
+  );
+}
+
 
 const cursos = [
   { titulo: "Diplomado en Psicología Clínica", tipo: "En vivo por Zoom", duracion: "6 meses", precio: "RD$ 28,500", nivel: "Avanzado" },
@@ -53,16 +124,8 @@ function Home() {
               <div><p className="text-2xl font-bold text-accent">98%</p><p className="text-xs text-primary-foreground/70">Satisfacción</p></div>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
-            <img
-              src={heroImg}
-              alt="Estudiantes dominicanos de la Academia Ceapsi RD"
-              width={1600}
-              height={1024}
-              className="relative rounded-2xl shadow-2xl ring-1 ring-primary-foreground/20"
-            />
-          </div>
+          <HeroCarousel />
+
         </div>
       </section>
 
