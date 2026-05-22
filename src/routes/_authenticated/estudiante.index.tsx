@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
+  Radio, Video, FileVideo,
 } from "lucide-react";
+import { useZoomStore, isLiveNow, type ZoomClass } from "@/lib/zoom-mock";
 
 export const Route = createFileRoute("/_authenticated/estudiante/")({
   component: EstudianteDashboard,
