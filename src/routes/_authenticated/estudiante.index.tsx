@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
+  Radio, Video, FileVideo,
 } from "lucide-react";
+import { useZoomStore, isLiveNow, type ZoomClass } from "@/lib/zoom-mock";
 
 export const Route = createFileRoute("/_authenticated/estudiante/")({
   component: EstudianteDashboard,
@@ -16,6 +19,13 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 
 function EstudianteDashboard() {
   const { user } = useAuth();
+  const { classes: zoomClasses } = useZoomStore();
+
+  const liveZoomClass = zoomClasses.find((c) => c.status === "live" || isLiveNow(c));
+  const upcomingZoom = zoomClasses
+    .filter((c) => c.status === "scheduled" && new Date(c.startAt).getTime() > Date.now())
+    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())[0];
+  const recordedZoom = zoomClasses.filter((c) => c.status === "recorded").slice(0, 4);
 
   const { data } = useQuery({
     queryKey: ["estudiante-dash", user?.id],
@@ -73,6 +83,11 @@ function EstudianteDashboard() {
         <h1 className="text-3xl font-bold tracking-tight">¡Hola, {user?.nombre}! 👋</h1>
         <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
       </div>
+
+      {liveZoomClass && <LiveZoomBanner cls={liveZoomClass} />}
+      {!liveZoomClass && upcomingZoom && <UpcomingZoomCountdown cls={upcomingZoom} />}
+
+
 
       {/* Quick stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -223,6 +238,38 @@ function EstudianteDashboard() {
         </Card>
       </div>
 
+      {recordedZoom.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FileVideo className="h-4 w-4 text-primary" /> Grabaciones recientes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y">
+              {recordedZoom.map((c) => (
+                <li key={c.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{c.titulo}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {c.programaTitulo} · {c.recordingDurationMin} min · {new Date(c.startAt).toLocaleDateString("es-DO")}
+                    </p>
+                  </div>
+                  <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
+                    Grabación disponible
+                  </Badge>
+                  <Button asChild size="sm" variant="outline">
+                    <a href={c.recordingUrl} target="_blank" rel="noreferrer">
+                      <PlayCircle className="mr-1 h-3 w-3" /> Ver
+                    </a>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Anuncios */}
       {(data?.announcements ?? []).length > 0 && (
         <Card>
@@ -265,3 +312,82 @@ function StatCard({
     </Card>
   );
 }
+
+function LiveZoomBanner({ cls }: { cls: ZoomClass }) {
+  return (
+    <Card className="border-red-500/40 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent">
+      <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-3 w-3">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-red-500 text-white hover:bg-red-500">EN VIVO AHORA</Badge>
+              <span className="text-sm font-semibold">{cls.titulo}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {cls.programaTitulo} · {cls.docenteNombre} · ID Zoom {cls.zoomMeetingId}
+            </p>
+          </div>
+        </div>
+        <Button asChild size="lg" className="bg-red-600 hover:bg-red-700">
+          <a href={cls.zoomJoinUrl} target="_blank" rel="noreferrer">
+            <Radio className="mr-2 h-4 w-4" /> Unirse a la clase
+          </a>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function UpcomingZoomCountdown({ cls }: { cls: ZoomClass }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const ms = Math.max(0, new Date(cls.startAt).getTime() - now);
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+
+  return (
+    <Card className="border-primary/30 bg-primary/5">
+      <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-primary/15 p-3 text-primary">
+            <Video className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Próxima clase en vivo</p>
+            <p className="text-xs text-muted-foreground">
+              {cls.titulo} · {cls.programaTitulo}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 font-mono">
+          <TimeBox label="d" value={days} />
+          <span className="text-xl font-bold text-primary">:</span>
+          <TimeBox label="h" value={hours} />
+          <span className="text-xl font-bold text-primary">:</span>
+          <TimeBox label="m" value={minutes} />
+          <span className="text-xl font-bold text-primary">:</span>
+          <TimeBox label="s" value={seconds} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TimeBox({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex min-w-[44px] flex-col items-center rounded-md bg-card px-2 py-1 shadow-sm">
+      <span className="text-lg font-bold tabular-nums">{String(value).padStart(2, "0")}</span>
+      <span className="text-[10px] uppercase text-muted-foreground">{label}</span>
+    </div>
+  );
+}
+

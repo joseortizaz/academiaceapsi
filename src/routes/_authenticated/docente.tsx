@@ -9,6 +9,7 @@ import {
   MessagesSquare,
   LogOut,
   GraduationCap,
+  Video,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/docente")({
 const nav = [
   { to: "/docente", label: "Resumen", icon: LayoutDashboard, exact: true },
   { to: "/docente/cursos", label: "Mis Cursos", icon: BookOpen },
+  { to: "/docente/clases-vivo", label: "Clases en Vivo", icon: Video },
   { to: "/docente/calificaciones", label: "Calificaciones", icon: ClipboardCheck },
   { to: "/docente/comunidad", label: "Comunidad", icon: MessagesSquare },
 ];

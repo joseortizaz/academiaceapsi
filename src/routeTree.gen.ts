@@ -34,6 +34,7 @@ import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './route
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
 import { Route as AuthenticatedDocenteCursosRouteImport } from './routes/_authenticated/docente.cursos'
 import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
+import { Route as AuthenticatedDocenteClasesVivoRouteImport } from './routes/_authenticated/docente.clases-vivo'
 import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
@@ -41,6 +42,7 @@ import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/admin.pagos'
 import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
 import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
+import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_authenticated/admin.integraciones'
 import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
 import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
@@ -182,6 +184,12 @@ const AuthenticatedDocenteComunidadRoute =
     path: '/comunidad',
     getParentRoute: () => AuthenticatedDocenteRoute,
   } as any)
+const AuthenticatedDocenteClasesVivoRoute =
+  AuthenticatedDocenteClasesVivoRouteImport.update({
+    id: '/clases-vivo',
+    path: '/clases-vivo',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
 const AuthenticatedDocenteCalificacionesRoute =
   AuthenticatedDocenteCalificacionesRouteImport.update({
     id: '/calificaciones',
@@ -221,6 +229,12 @@ const AuthenticatedAdminMensajesRoute =
   AuthenticatedAdminMensajesRouteImport.update({
     id: '/mensajes',
     path: '/mensajes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminIntegracionesRoute =
+  AuthenticatedAdminIntegracionesRouteImport.update({
+    id: '/integraciones',
+    path: '/integraciones',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminInscripcionesRoute =
@@ -287,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/pagos': typeof AuthenticatedAdminPagosRoute
@@ -294,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
@@ -324,6 +340,7 @@ export interface FileRoutesByTo {
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/pagos': typeof AuthenticatedAdminPagosRoute
@@ -331,6 +348,7 @@ export interface FileRoutesByTo {
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
@@ -366,6 +384,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/_authenticated/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
+  '/_authenticated/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/_authenticated/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/_authenticated/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/_authenticated/admin/pagos': typeof AuthenticatedAdminPagosRoute
@@ -373,6 +392,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/_authenticated/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/_authenticated/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/_authenticated/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
@@ -408,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
+    | '/admin/integraciones'
     | '/admin/mensajes'
     | '/admin/modulos'
     | '/admin/pagos'
@@ -415,6 +436,7 @@ export interface FileRouteTypes {
     | '/admin/testimonios'
     | '/admin/usuarios'
     | '/docente/calificaciones'
+    | '/docente/clases-vivo'
     | '/docente/comunidad'
     | '/docente/cursos'
     | '/estudiante/cuenta'
@@ -445,6 +467,7 @@ export interface FileRouteTypes {
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
+    | '/admin/integraciones'
     | '/admin/mensajes'
     | '/admin/modulos'
     | '/admin/pagos'
@@ -452,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/testimonios'
     | '/admin/usuarios'
     | '/docente/calificaciones'
+    | '/docente/clases-vivo'
     | '/docente/comunidad'
     | '/docente/cursos'
     | '/estudiante/cuenta'
@@ -486,6 +510,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/finanzas'
     | '/_authenticated/admin/hero'
     | '/_authenticated/admin/inscripciones'
+    | '/_authenticated/admin/integraciones'
     | '/_authenticated/admin/mensajes'
     | '/_authenticated/admin/modulos'
     | '/_authenticated/admin/pagos'
@@ -493,6 +518,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/docente/calificaciones'
+    | '/_authenticated/docente/clases-vivo'
     | '/_authenticated/docente/comunidad'
     | '/_authenticated/docente/cursos'
     | '/_authenticated/estudiante/cuenta'
@@ -695,6 +721,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocenteComunidadRouteImport
       parentRoute: typeof AuthenticatedDocenteRoute
     }
+    '/_authenticated/docente/clases-vivo': {
+      id: '/_authenticated/docente/clases-vivo'
+      path: '/clases-vivo'
+      fullPath: '/docente/clases-vivo'
+      preLoaderRoute: typeof AuthenticatedDocenteClasesVivoRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
     '/_authenticated/docente/calificaciones': {
       id: '/_authenticated/docente/calificaciones'
       path: '/calificaciones'
@@ -742,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/mensajes'
       fullPath: '/admin/mensajes'
       preLoaderRoute: typeof AuthenticatedAdminMensajesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/integraciones': {
+      id: '/_authenticated/admin/integraciones'
+      path: '/integraciones'
+      fullPath: '/admin/integraciones'
+      preLoaderRoute: typeof AuthenticatedAdminIntegracionesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/inscripciones': {
@@ -804,6 +844,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
   AuthenticatedAdminInscripcionesRoute: typeof AuthenticatedAdminInscripcionesRoute
+  AuthenticatedAdminIntegracionesRoute: typeof AuthenticatedAdminIntegracionesRoute
   AuthenticatedAdminMensajesRoute: typeof AuthenticatedAdminMensajesRoute
   AuthenticatedAdminModulosRoute: typeof AuthenticatedAdminModulosRoute
   AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
@@ -821,6 +862,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
   AuthenticatedAdminInscripcionesRoute: AuthenticatedAdminInscripcionesRoute,
+  AuthenticatedAdminIntegracionesRoute: AuthenticatedAdminIntegracionesRoute,
   AuthenticatedAdminMensajesRoute: AuthenticatedAdminMensajesRoute,
   AuthenticatedAdminModulosRoute: AuthenticatedAdminModulosRoute,
   AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
@@ -835,6 +877,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedDocenteRouteChildren {
   AuthenticatedDocenteCalificacionesRoute: typeof AuthenticatedDocenteCalificacionesRoute
+  AuthenticatedDocenteClasesVivoRoute: typeof AuthenticatedDocenteClasesVivoRoute
   AuthenticatedDocenteComunidadRoute: typeof AuthenticatedDocenteComunidadRoute
   AuthenticatedDocenteCursosRoute: typeof AuthenticatedDocenteCursosRoute
   AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
@@ -843,6 +886,7 @@ interface AuthenticatedDocenteRouteChildren {
 const AuthenticatedDocenteRouteChildren: AuthenticatedDocenteRouteChildren = {
   AuthenticatedDocenteCalificacionesRoute:
     AuthenticatedDocenteCalificacionesRoute,
+  AuthenticatedDocenteClasesVivoRoute: AuthenticatedDocenteClasesVivoRoute,
   AuthenticatedDocenteComunidadRoute: AuthenticatedDocenteComunidadRoute,
   AuthenticatedDocenteCursosRoute: AuthenticatedDocenteCursosRoute,
   AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
