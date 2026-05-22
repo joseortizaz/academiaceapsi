@@ -379,8 +379,11 @@ function ProgramasPage() {
             </div>
 
             <div className="grid gap-2">
-              <Label>URL de imagen</Label>
-              <Input value={s.imagen_url ?? ""} onChange={(e) => set({ imagen_url: e.target.value })} />
+              <Label>Imagen del curso</Label>
+              <ImageUploader
+                value={s.imagen_url ?? ""}
+                onChange={(url) => set({ imagen_url: url })}
+              />
             </div>
             <div className="grid gap-2">
               <Label>URL del syllabus (PDF)</Label>
