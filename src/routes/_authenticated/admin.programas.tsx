@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
   AdminPageHeader,
   CreateButton,
