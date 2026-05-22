@@ -19,6 +19,13 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 
 function EstudianteDashboard() {
   const { user } = useAuth();
+  const { classes: zoomClasses } = useZoomStore();
+
+  const liveZoomClass = zoomClasses.find((c) => c.status === "live" || isLiveNow(c));
+  const upcomingZoom = zoomClasses
+    .filter((c) => c.status === "scheduled" && new Date(c.startAt).getTime() > Date.now())
+    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())[0];
+  const recordedZoom = zoomClasses.filter((c) => c.status === "recorded").slice(0, 4);
 
   const { data } = useQuery({
     queryKey: ["estudiante-dash", user?.id],
