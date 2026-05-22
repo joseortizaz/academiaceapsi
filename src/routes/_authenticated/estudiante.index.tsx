@@ -84,6 +84,11 @@ function EstudianteDashboard() {
         <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
       </div>
 
+      {liveZoomClass && <LiveZoomBanner cls={liveZoomClass} />}
+      {!liveZoomClass && upcomingZoom && <UpcomingZoomCountdown cls={upcomingZoom} />}
+
+
+
       {/* Quick stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
