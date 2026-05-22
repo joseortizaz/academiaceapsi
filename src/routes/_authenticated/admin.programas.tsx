@@ -251,7 +251,6 @@ function ProgramasPage() {
                   <SelectContent>
                     <SelectItem value="diplomado">Diplomado</SelectItem>
                     <SelectItem value="curso">Curso</SelectItem>
-                    <SelectItem value="taller">Taller</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -260,9 +259,9 @@ function ProgramasPage() {
                 <Select value={s.modalidad} onValueChange={(v) => set({ modalidad: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sincronico">Sincrónico (en vivo)</SelectItem>
-                    <SelectItem value="asincronico">Asincrónico</SelectItem>
-                    <SelectItem value="hibrido">Híbrido</SelectItem>
+                    <SelectItem value="sincrono">Sincrónico (en vivo)</SelectItem>
+                    <SelectItem value="asincrono">Asincrónico</SelectItem>
+                    <SelectItem value="mixto">Mixto (híbrido)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
