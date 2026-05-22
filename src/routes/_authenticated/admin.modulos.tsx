@@ -16,6 +16,8 @@ import {
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
+import { FileUploader } from "@/components/FileUploader";
+import { AudioUploader } from "@/components/AudioUploader";
 
 export const Route = createFileRoute("/_authenticated/admin/modulos")({
   component: ModulosPage,
@@ -30,6 +32,7 @@ type Modulo = {
   orden: number;
   duracion_minutos: number | null;
   video_url: string;
+  audio_url: string;
   material_url: string;
   es_en_vivo: boolean;
   fecha_sesion: string | null;
@@ -37,7 +40,7 @@ type Modulo = {
 
 const empty = (programa_id: string): Modulo => ({
   programa_id, docente_id: null, titulo: "", descripcion: "", orden: 0,
-  duracion_minutos: null, video_url: "", material_url: "",
+  duracion_minutos: null, video_url: "", audio_url: "", material_url: "",
   es_en_vivo: false, fecha_sesion: null,
 });
 
