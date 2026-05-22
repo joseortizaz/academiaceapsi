@@ -67,7 +67,7 @@ const empty: Programa = {
   descripcion: "",
   resumen: "",
   tipo: "curso",
-  modalidad: "asincronico",
+  modalidad: "asincrono",
   categoria_id: null,
   docente_id: null,
   precio: 0,
