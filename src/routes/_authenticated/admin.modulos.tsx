@@ -16,6 +16,8 @@ import {
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
+import { FileUploader } from "@/components/FileUploader";
+import { AudioUploader } from "@/components/AudioUploader";
 
 export const Route = createFileRoute("/_authenticated/admin/modulos")({
   component: ModulosPage,
@@ -30,6 +32,7 @@ type Modulo = {
   orden: number;
   duracion_minutos: number | null;
   video_url: string;
+  audio_url: string;
   material_url: string;
   es_en_vivo: boolean;
   fecha_sesion: string | null;
@@ -37,7 +40,7 @@ type Modulo = {
 
 const empty = (programa_id: string): Modulo => ({
   programa_id, docente_id: null, titulo: "", descripcion: "", orden: 0,
-  duracion_minutos: null, video_url: "", material_url: "",
+  duracion_minutos: null, video_url: "", audio_url: "", material_url: "",
   es_en_vivo: false, fecha_sesion: null,
 });
 
@@ -203,12 +206,26 @@ function ModulosPage() {
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>URL del video grabado</Label>
-              <Input value={s.video_url ?? ""} onChange={(e) => set({ video_url: e.target.value })} />
+              <Label>Video grabado (URL de YouTube/Vimeo o video subido)</Label>
+              <Input
+                placeholder="https://..."
+                value={s.video_url ?? ""}
+                onChange={(e) => set({ video_url: e.target.value })}
+              />
             </div>
             <div className="grid gap-2">
-              <Label>URL de material complementario</Label>
-              <Input value={s.material_url ?? ""} onChange={(e) => set({ material_url: e.target.value })} />
+              <Label>Audio de la lección</Label>
+              <AudioUploader
+                value={s.audio_url}
+                onChange={(url) => set({ audio_url: url ?? "" })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Material complementario (PDF, Word, Excel, PPT)</Label>
+              <FileUploader
+                value={s.material_url}
+                onChange={(url) => set({ material_url: url ?? "" })}
+              />
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={s.es_en_vivo} onCheckedChange={(c) => set({ es_en_vivo: c })} />

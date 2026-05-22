@@ -345,6 +345,13 @@ function CursoPlayer() {
                 </div>
               )}
 
+              {activeModule.audio_url && (
+                <div className="mb-6 rounded-lg border bg-muted/30 p-4">
+                  <p className="mb-2 text-sm font-medium">🎧 Audio de la lección</p>
+                  <audio controls src={activeModule.audio_url} className="w-full" />
+                </div>
+              )}
+
               {activeModule.descripcion && (
                 <div className="prose prose-sm max-w-none whitespace-pre-wrap text-foreground/90">
                   {activeModule.descripcion}
