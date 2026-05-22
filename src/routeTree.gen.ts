@@ -36,6 +36,7 @@ import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
 import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
+import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
 import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
@@ -184,6 +185,12 @@ const AuthenticatedAdminHeroRoute = AuthenticatedAdminHeroRouteImport.update({
   path: '/hero',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminFinanzasRoute =
+  AuthenticatedAdminFinanzasRouteImport.update({
+    id: '/finanzas',
+    path: '/finanzas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDocentesRoute =
   AuthenticatedAdminDocentesRouteImport.update({
     id: '/docentes',
@@ -228,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
@@ -259,6 +267,7 @@ export interface FileRoutesByTo {
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
@@ -293,6 +302,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
+  '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/_authenticated/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
   '/_authenticated/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/admin/blog'
     | '/admin/categorias'
     | '/admin/docentes'
+    | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
     | '/admin/mensajes'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/blog'
     | '/admin/categorias'
     | '/admin/docentes'
+    | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
     | '/admin/mensajes'
@@ -391,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
     | '/_authenticated/admin/docentes'
+    | '/_authenticated/admin/finanzas'
     | '/_authenticated/admin/hero'
     | '/_authenticated/admin/inscripciones'
     | '/_authenticated/admin/mensajes'
@@ -609,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminHeroRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/finanzas': {
+      id: '/_authenticated/admin/finanzas'
+      path: '/finanzas'
+      fullPath: '/admin/finanzas'
+      preLoaderRoute: typeof AuthenticatedAdminFinanzasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/docentes': {
       id: '/_authenticated/admin/docentes'
       path: '/docentes'
@@ -645,6 +665,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
+  AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
   AuthenticatedAdminInscripcionesRoute: typeof AuthenticatedAdminInscripcionesRoute
   AuthenticatedAdminMensajesRoute: typeof AuthenticatedAdminMensajesRoute
@@ -661,6 +682,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
   AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
+  AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
   AuthenticatedAdminInscripcionesRoute: AuthenticatedAdminInscripcionesRoute,
   AuthenticatedAdminMensajesRoute: AuthenticatedAdminMensajesRoute,
