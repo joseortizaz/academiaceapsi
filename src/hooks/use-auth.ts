@@ -26,7 +26,13 @@ export function useAuth() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["auth", "profile"],
-    queryFn: fetchProfile,
+    queryFn: async () => {
+      try {
+        return await fetchProfile();
+      } catch {
+        return null;
+      }
+    },
     enabled: hasSession === true,
     retry: false,
     staleTime: 5 * 60 * 1000,
