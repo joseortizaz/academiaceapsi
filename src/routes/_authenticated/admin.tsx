@@ -61,12 +61,12 @@ function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-muted/30">
-      <aside className="hidden w-64 shrink-0 border-r bg-card md:block">
+      <aside className="hidden w-64 shrink-0 flex-col border-r bg-card md:flex">
         <div className="border-b p-4">
           <h2 className="text-lg font-bold">Administración</h2>
           <p className="text-xs text-muted-foreground">Academia Ceapsi RD</p>
         </div>
-        <nav className="flex flex-col gap-1 p-3">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
           {nav.map((item) => {
             const active = item.exact
               ? location.pathname === item.to
@@ -89,6 +89,16 @@ function AdminLayout() {
             );
           })}
         </nav>
+        <div className="border-t p-3">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Cerrar sesión
+          </Button>
+        </div>
       </aside>
       <div className="flex-1 overflow-x-auto">
         <div className="border-b bg-card p-3 md:hidden">
