@@ -206,12 +206,26 @@ function ModulosPage() {
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>URL del video grabado</Label>
-              <Input value={s.video_url ?? ""} onChange={(e) => set({ video_url: e.target.value })} />
+              <Label>Video grabado (URL de YouTube/Vimeo o video subido)</Label>
+              <Input
+                placeholder="https://..."
+                value={s.video_url ?? ""}
+                onChange={(e) => set({ video_url: e.target.value })}
+              />
             </div>
             <div className="grid gap-2">
-              <Label>URL de material complementario</Label>
-              <Input value={s.material_url ?? ""} onChange={(e) => set({ material_url: e.target.value })} />
+              <Label>Audio de la lección</Label>
+              <AudioUploader
+                value={s.audio_url}
+                onChange={(url) => set({ audio_url: url ?? "" })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Material complementario (PDF, Word, Excel, PPT)</Label>
+              <FileUploader
+                value={s.material_url}
+                onChange={(url) => set({ material_url: url ?? "" })}
+              />
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={s.es_en_vivo} onCheckedChange={(c) => set({ es_en_vivo: c })} />
