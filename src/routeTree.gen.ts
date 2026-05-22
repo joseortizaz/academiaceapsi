@@ -33,6 +33,8 @@ import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authen
 import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
 import { Route as AuthenticatedDocenteCursosRouteImport } from './routes/_authenticated/docente.cursos'
+import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
+import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
@@ -174,6 +176,18 @@ const AuthenticatedDocenteCursosRoute =
     path: '/cursos',
     getParentRoute: () => AuthenticatedDocenteRoute,
   } as any)
+const AuthenticatedDocenteComunidadRoute =
+  AuthenticatedDocenteComunidadRouteImport.update({
+    id: '/comunidad',
+    path: '/comunidad',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteCalificacionesRoute =
+  AuthenticatedDocenteCalificacionesRouteImport.update({
+    id: '/calificaciones',
+    path: '/calificaciones',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
     id: '/usuarios',
@@ -279,6 +293,8 @@ export interface FileRoutesByFullPath {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
@@ -314,6 +330,8 @@ export interface FileRoutesByTo {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
@@ -354,6 +372,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/_authenticated/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
   '/_authenticated/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/_authenticated/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
@@ -394,6 +414,8 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/docente/calificaciones'
+    | '/docente/comunidad'
     | '/docente/cursos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
@@ -429,6 +451,8 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/docente/calificaciones'
+    | '/docente/comunidad'
     | '/docente/cursos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
@@ -468,6 +492,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
+    | '/_authenticated/docente/calificaciones'
+    | '/_authenticated/docente/comunidad'
     | '/_authenticated/docente/cursos'
     | '/_authenticated/estudiante/cuenta'
     | '/_authenticated/estudiante/evaluaciones'
@@ -662,6 +688,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocenteCursosRouteImport
       parentRoute: typeof AuthenticatedDocenteRoute
     }
+    '/_authenticated/docente/comunidad': {
+      id: '/_authenticated/docente/comunidad'
+      path: '/comunidad'
+      fullPath: '/docente/comunidad'
+      preLoaderRoute: typeof AuthenticatedDocenteComunidadRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/calificaciones': {
+      id: '/_authenticated/docente/calificaciones'
+      path: '/calificaciones'
+      fullPath: '/docente/calificaciones'
+      preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
       path: '/usuarios'
@@ -794,11 +834,16 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedDocenteRouteChildren {
+  AuthenticatedDocenteCalificacionesRoute: typeof AuthenticatedDocenteCalificacionesRoute
+  AuthenticatedDocenteComunidadRoute: typeof AuthenticatedDocenteComunidadRoute
   AuthenticatedDocenteCursosRoute: typeof AuthenticatedDocenteCursosRoute
   AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
 }
 
 const AuthenticatedDocenteRouteChildren: AuthenticatedDocenteRouteChildren = {
+  AuthenticatedDocenteCalificacionesRoute:
+    AuthenticatedDocenteCalificacionesRoute,
+  AuthenticatedDocenteComunidadRoute: AuthenticatedDocenteComunidadRoute,
   AuthenticatedDocenteCursosRoute: AuthenticatedDocenteCursosRoute,
   AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
 }
@@ -875,3 +920,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
