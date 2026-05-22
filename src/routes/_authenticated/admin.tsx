@@ -18,6 +18,7 @@ import {
   Images,
   TrendingUp,
   LogOut,
+  Plug,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ const nav = [
   { to: "/admin/finanzas", label: "Finanzas", icon: TrendingUp },
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
+  { to: "/admin/integraciones", label: "Integraciones", icon: Plug },
 ];
 
 function AdminLayout() {
