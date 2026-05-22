@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import {
   AdminPageHeader,
   CreateButton,
@@ -67,7 +68,7 @@ const empty: Programa = {
   descripcion: "",
   resumen: "",
   tipo: "curso",
-  modalidad: "asincronico",
+  modalidad: "asincrono",
   categoria_id: null,
   docente_id: null,
   precio: 0,
@@ -251,7 +252,6 @@ function ProgramasPage() {
                   <SelectContent>
                     <SelectItem value="diplomado">Diplomado</SelectItem>
                     <SelectItem value="curso">Curso</SelectItem>
-                    <SelectItem value="taller">Taller</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -260,9 +260,9 @@ function ProgramasPage() {
                 <Select value={s.modalidad} onValueChange={(v) => set({ modalidad: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sincronico">Sincrónico (en vivo)</SelectItem>
-                    <SelectItem value="asincronico">Asincrónico</SelectItem>
-                    <SelectItem value="hibrido">Híbrido</SelectItem>
+                    <SelectItem value="sincrono">Sincrónico (en vivo)</SelectItem>
+                    <SelectItem value="asincrono">Asincrónico</SelectItem>
+                    <SelectItem value="mixto">Mixto (híbrido)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -380,8 +380,11 @@ function ProgramasPage() {
             </div>
 
             <div className="grid gap-2">
-              <Label>URL de imagen</Label>
-              <Input value={s.imagen_url ?? ""} onChange={(e) => set({ imagen_url: e.target.value })} />
+              <Label>Imagen del curso</Label>
+              <ImageUploader
+                value={s.imagen_url ?? ""}
+                onChange={(url) => set({ imagen_url: url })}
+              />
             </div>
             <div className="grid gap-2">
               <Label>URL del syllabus (PDF)</Label>
