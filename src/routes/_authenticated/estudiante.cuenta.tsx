@@ -47,17 +47,17 @@ function MiCuenta() {
     queryKey: ["mis-pagos", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data: enrolls } = await supabase
-        .from("enrollments")
-        .select("id, programa_id, fecha_inscripcion, monto_pagado, metodo_pago, estado")
+      const { data: pagos } = await supabase
+        .from("payments")
+        .select("id, programa_id, fecha_pago, created_at, monto, moneda, metodo, estado")
         .eq("user_id", user!.id)
-        .order("fecha_inscripcion", { ascending: false });
-      const ids = (enrolls ?? []).map((e) => e.programa_id);
+        .order("created_at", { ascending: false });
+      const ids = (pagos ?? []).map((p) => p.programa_id);
       const programas = ids.length
         ? (await supabase.from("programs").select("id,titulo").in("id", ids)).data ?? []
         : [];
       const map = new Map(programas.map((p) => [p.id, p]));
-      return (enrolls ?? []).map((e) => ({ ...e, programa: map.get(e.programa_id) }));
+      return (pagos ?? []).map((p) => ({ ...p, programa: map.get(p.programa_id) }));
     },
   });
 
