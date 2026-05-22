@@ -10,11 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Download, Save, KeyRound, Receipt } from "lucide-react";
+import { AvatarUploader } from "@/components/AvatarUploader";
 
 export const Route = createFileRoute("/_authenticated/estudiante/cuenta")({
   component: MiCuenta,
