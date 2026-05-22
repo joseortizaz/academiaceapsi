@@ -573,6 +573,7 @@ export type Database = {
       }
       program_modules: {
         Row: {
+          audio_url: string | null
           created_at: string
           descripcion: string | null
           docente_id: string | null
@@ -588,6 +589,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          audio_url?: string | null
           created_at?: string
           descripcion?: string | null
           docente_id?: string | null
@@ -603,6 +605,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          audio_url?: string | null
           created_at?: string
           descripcion?: string | null
           docente_id?: string | null
