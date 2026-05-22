@@ -45,6 +45,12 @@ const nav = [
 function AdminLayout() {
   const { isLoading, hasRole } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  };
 
   if (isLoading) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Cargando panel…</div>;
