@@ -238,6 +238,38 @@ function EstudianteDashboard() {
         </Card>
       </div>
 
+      {recordedZoom.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FileVideo className="h-4 w-4 text-primary" /> Grabaciones recientes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y">
+              {recordedZoom.map((c) => (
+                <li key={c.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{c.titulo}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {c.programaTitulo} · {c.recordingDurationMin} min · {new Date(c.startAt).toLocaleDateString("es-DO")}
+                    </p>
+                  </div>
+                  <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
+                    Grabación disponible
+                  </Badge>
+                  <Button asChild size="sm" variant="outline">
+                    <a href={c.recordingUrl} target="_blank" rel="noreferrer">
+                      <PlayCircle className="mr-1 h-3 w-3" /> Ver
+                    </a>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Anuncios */}
       {(data?.announcements ?? []).length > 0 && (
         <Card>
