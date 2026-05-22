@@ -249,6 +249,48 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          created_by: string | null
+          descripcion: string | null
+          fecha_expiracion: string | null
+          id: string
+          porcentaje_descuento: number
+          updated_at: string
+          usos_actuales: number
+          usos_maximos: number | null
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          fecha_expiracion?: string | null
+          id?: string
+          porcentaje_descuento: number
+          updated_at?: string
+          usos_actuales?: number
+          usos_maximos?: number | null
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          fecha_expiracion?: string | null
+          id?: string
+          porcentaje_descuento?: number
+          updated_at?: string
+          usos_actuales?: number
+          usos_maximos?: number | null
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           estado: string
