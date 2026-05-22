@@ -212,22 +212,20 @@ function MiCuenta() {
                 {pagos.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="text-muted-foreground">
-                      {new Date(p.fecha_inscripcion).toLocaleDateString("es-DO")}
+                      {new Date(p.fecha_pago ?? p.created_at).toLocaleDateString("es-DO")}
                     </TableCell>
                     <TableCell className="font-medium">{p.programa?.titulo ?? "—"}</TableCell>
                     <TableCell className="capitalize text-muted-foreground">
-                      {p.metodo_pago ?? "—"}
+                      {p.metodo ?? "—"}
                     </TableCell>
                     <TableCell className="text-right font-semibold">
-                      {p.monto_pagado != null
-                        ? `RD$ ${Number(p.monto_pagado).toLocaleString("es-DO")}`
-                        : "—"}
+                      {`${p.moneda ?? "RD$"} ${Number(p.monto ?? 0).toLocaleString("es-DO")}`}
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={p.estado === "activo" || p.estado === "completado" ? "default" : "secondary"}
+                        variant={p.estado === "verificado" ? "default" : "secondary"}
                         className={
-                          p.estado === "activo" || p.estado === "completado"
+                          p.estado === "verificado"
                             ? "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20"
                             : ""
                         }
