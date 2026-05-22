@@ -107,21 +107,16 @@ function MiCuenta() {
             <CardTitle>Datos personales</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={form.avatar_url} />
-                <AvatarFallback className="text-lg">{iniciales || "U"}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <Label htmlFor="avatar">URL de foto de perfil</Label>
-                <Input
-                  id="avatar"
-                  placeholder="https://…"
-                  value={form.avatar_url}
-                  onChange={(e) => setForm({ ...form, avatar_url: e.target.value })}
-                />
-              </div>
-            </div>
+            <AvatarUploader
+              userId={user!.id}
+              url={form.avatar_url}
+              fallback={iniciales || "U"}
+              onChange={async (newUrl) => {
+                setForm((f) => ({ ...f, avatar_url: newUrl ?? "" }));
+                qc.invalidateQueries({ queryKey: ["auth", "profile"] });
+              }}
+            />
+
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre" value={form.nombre} onChange={(v) => setForm({ ...form, nombre: v })} />
