@@ -27,10 +27,14 @@ import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authenticated/mis-cursos.index'
 import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
+import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
 import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
+import { Route as AuthenticatedDocenteCursosRouteImport } from './routes/_authenticated/docente.cursos'
+import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
+import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
@@ -137,6 +141,12 @@ const AuthenticatedEstudianteIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedEstudianteRoute,
   } as any)
+const AuthenticatedDocenteIndexRoute =
+  AuthenticatedDocenteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -159,6 +169,24 @@ const AuthenticatedEstudianteCuentaRoute =
     id: '/cuenta',
     path: '/cuenta',
     getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedDocenteCursosRoute =
+  AuthenticatedDocenteCursosRouteImport.update({
+    id: '/cursos',
+    path: '/cursos',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteComunidadRoute =
+  AuthenticatedDocenteComunidadRouteImport.update({
+    id: '/comunidad',
+    path: '/comunidad',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteCalificacionesRoute =
+  AuthenticatedDocenteCalificacionesRouteImport.update({
+    id: '/calificaciones',
+    path: '/calificaciones',
+    getParentRoute: () => AuthenticatedDocenteRoute,
   } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
@@ -248,7 +276,7 @@ export interface FileRoutesByFullPath {
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
-  '/docente': typeof AuthenticatedDocenteRoute
+  '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -265,10 +293,14 @@ export interface FileRoutesByFullPath {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
+  '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
 }
@@ -283,7 +315,6 @@ export interface FileRoutesByTo {
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
-  '/docente': typeof AuthenticatedDocenteRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
@@ -299,10 +330,14 @@ export interface FileRoutesByTo {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
+  '/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos': typeof AuthenticatedMisCursosIndexRoute
 }
@@ -320,7 +355,7 @@ export interface FileRoutesById {
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
-  '/_authenticated/docente': typeof AuthenticatedDocenteRoute
+  '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -337,10 +372,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
+  '/_authenticated/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
+  '/_authenticated/docente/cursos': typeof AuthenticatedDocenteCursosRoute
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/_authenticated/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/_authenticated/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
 }
@@ -375,10 +414,14 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/docente/calificaciones'
+    | '/docente/comunidad'
+    | '/docente/cursos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
     | '/admin/'
+    | '/docente/'
     | '/estudiante/'
     | '/mis-cursos/'
   fileRoutesByTo: FileRoutesByTo
@@ -393,7 +436,6 @@ export interface FileRouteTypes {
     | '/registro'
     | '/sobre-nosotros'
     | '/certificados'
-    | '/docente'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/admin/anuncios'
@@ -409,10 +451,14 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/docente/calificaciones'
+    | '/docente/comunidad'
+    | '/docente/cursos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
     | '/admin'
+    | '/docente'
     | '/estudiante'
     | '/mis-cursos'
   id:
@@ -446,10 +492,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
+    | '/_authenticated/docente/calificaciones'
+    | '/_authenticated/docente/comunidad'
+    | '/_authenticated/docente/cursos'
     | '/_authenticated/estudiante/cuenta'
     | '/_authenticated/estudiante/evaluaciones'
     | '/_authenticated/mis-cursos/$slug'
     | '/_authenticated/admin/'
+    | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
     | '/_authenticated/mis-cursos/'
   fileRoutesById: FileRoutesById
@@ -596,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEstudianteIndexRouteImport
       parentRoute: typeof AuthenticatedEstudianteRoute
     }
+    '/_authenticated/docente/': {
+      id: '/_authenticated/docente/'
+      path: '/'
+      fullPath: '/docente/'
+      preLoaderRoute: typeof AuthenticatedDocenteIndexRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -623,6 +680,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/estudiante/cuenta'
       preLoaderRoute: typeof AuthenticatedEstudianteCuentaRouteImport
       parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/docente/cursos': {
+      id: '/_authenticated/docente/cursos'
+      path: '/cursos'
+      fullPath: '/docente/cursos'
+      preLoaderRoute: typeof AuthenticatedDocenteCursosRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/comunidad': {
+      id: '/_authenticated/docente/comunidad'
+      path: '/comunidad'
+      fullPath: '/docente/comunidad'
+      preLoaderRoute: typeof AuthenticatedDocenteComunidadRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/calificaciones': {
+      id: '/_authenticated/docente/calificaciones'
+      path: '/calificaciones'
+      fullPath: '/docente/calificaciones'
+      preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
     }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
@@ -755,6 +833,24 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedDocenteRouteChildren {
+  AuthenticatedDocenteCalificacionesRoute: typeof AuthenticatedDocenteCalificacionesRoute
+  AuthenticatedDocenteComunidadRoute: typeof AuthenticatedDocenteComunidadRoute
+  AuthenticatedDocenteCursosRoute: typeof AuthenticatedDocenteCursosRoute
+  AuthenticatedDocenteIndexRoute: typeof AuthenticatedDocenteIndexRoute
+}
+
+const AuthenticatedDocenteRouteChildren: AuthenticatedDocenteRouteChildren = {
+  AuthenticatedDocenteCalificacionesRoute:
+    AuthenticatedDocenteCalificacionesRoute,
+  AuthenticatedDocenteComunidadRoute: AuthenticatedDocenteComunidadRoute,
+  AuthenticatedDocenteCursosRoute: AuthenticatedDocenteCursosRoute,
+  AuthenticatedDocenteIndexRoute: AuthenticatedDocenteIndexRoute,
+}
+
+const AuthenticatedDocenteRouteWithChildren =
+  AuthenticatedDocenteRoute._addFileChildren(AuthenticatedDocenteRouteChildren)
+
 interface AuthenticatedEstudianteRouteChildren {
   AuthenticatedEstudianteCuentaRoute: typeof AuthenticatedEstudianteCuentaRoute
   AuthenticatedEstudianteEvaluacionesRoute: typeof AuthenticatedEstudianteEvaluacionesRoute
@@ -777,7 +873,7 @@ const AuthenticatedEstudianteRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
-  AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRoute
+  AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRouteWithChildren
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRouteWithChildren
   AuthenticatedMisCursosSlugRoute: typeof AuthenticatedMisCursosSlugRoute
   AuthenticatedMisCursosIndexRoute: typeof AuthenticatedMisCursosIndexRoute
@@ -786,7 +882,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
-  AuthenticatedDocenteRoute: AuthenticatedDocenteRoute,
+  AuthenticatedDocenteRoute: AuthenticatedDocenteRouteWithChildren,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRouteWithChildren,
   AuthenticatedMisCursosSlugRoute: AuthenticatedMisCursosSlugRoute,
   AuthenticatedMisCursosIndexRoute: AuthenticatedMisCursosIndexRoute,
