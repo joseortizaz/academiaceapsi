@@ -10,6 +10,7 @@ import {
   LogOut,
   GraduationCap,
   Video,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const nav = [
   { to: "/docente/clases-vivo", label: "Clases en Vivo", icon: Video },
   { to: "/docente/calificaciones", label: "Calificaciones", icon: ClipboardCheck },
   { to: "/docente/comunidad", label: "Comunidad", icon: MessagesSquare },
+  { to: "/docente/cuenta", label: "Mi Cuenta", icon: UserCog },
 ];
 
 function DocenteLayout() {
