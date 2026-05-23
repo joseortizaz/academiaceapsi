@@ -64,6 +64,104 @@ export type Database = {
           },
         ]
       }
+      assessment_questions: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          enunciado: string
+          id: string
+          opciones: Json | null
+          orden: number
+          puntaje: number
+          respuesta_correcta: string | null
+          tipo: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          enunciado: string
+          id?: string
+          opciones?: Json | null
+          orden?: number
+          puntaje?: number
+          respuesta_correcta?: string | null
+          tipo?: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          enunciado?: string
+          id?: string
+          opciones?: Json | null
+          orden?: number
+          puntaje?: number
+          respuesta_correcta?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_questions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          created_at: string
+          created_by: string
+          descripcion: string | null
+          duracion_minutos: number | null
+          fecha_limite: string | null
+          id: string
+          instrucciones: string | null
+          modulo_id: string | null
+          peso_porcentaje: number
+          programa_id: string
+          publicado: boolean
+          puntaje_maximo: number
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          descripcion?: string | null
+          duracion_minutos?: number | null
+          fecha_limite?: string | null
+          id?: string
+          instrucciones?: string | null
+          modulo_id?: string | null
+          peso_porcentaje?: number
+          programa_id: string
+          publicado?: boolean
+          puntaje_maximo?: number
+          tipo?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          descripcion?: string | null
+          duracion_minutos?: number | null
+          fecha_limite?: string | null
+          id?: string
+          instrucciones?: string | null
+          modulo_id?: string | null
+          peso_porcentaje?: number
+          programa_id?: string
+          publicado?: boolean
+          puntaje_maximo?: number
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           autor_id: string
