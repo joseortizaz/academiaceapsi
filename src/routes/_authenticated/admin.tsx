@@ -19,6 +19,7 @@ import {
   TrendingUp,
   LogOut,
   Plug,
+  FileCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ const nav = [
   { to: "/admin/categorias", label: "Categorías", icon: FolderTree },
   { to: "/admin/docentes", label: "Docentes", icon: Users },
   { to: "/admin/modulos", label: "Módulos", icon: BookOpen },
+  { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
