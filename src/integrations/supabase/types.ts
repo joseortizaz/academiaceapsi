@@ -469,6 +469,50 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_comments: {
+        Row: {
+          contenido: string
+          created_at: string
+          es_respuesta_docente: boolean
+          id: string
+          modulo_id: string
+          parent_id: string | null
+          programa_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contenido: string
+          created_at?: string
+          es_respuesta_docente?: boolean
+          id?: string
+          modulo_id: string
+          parent_id?: string | null
+          programa_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contenido?: string
+          created_at?: string
+          es_respuesta_docente?: boolean
+          id?: string
+          modulo_id?: string
+          parent_id?: string | null
+          programa_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_progress: {
         Row: {
           completado: boolean | null

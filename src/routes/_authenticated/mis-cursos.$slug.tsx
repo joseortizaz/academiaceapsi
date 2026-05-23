@@ -11,6 +11,7 @@ import { generarCertificadoPDF } from "@/lib/certificate-pdf";
 import {
   ArrowLeft, CheckCircle2, Circle, Video, FileText, Download, Award,
 } from "lucide-react";
+import { LessonComments } from "@/components/LessonComments";
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
   component: CursoPlayer,
@@ -372,6 +373,12 @@ function CursoPlayer() {
                   {new Date(activeModule.fecha_sesion).toLocaleString("es-DO")}
                 </p>
               )}
+
+              <LessonComments
+                moduloId={activeModule.id}
+                programaId={programa.id}
+                docenteId={activeModule.docente_id ?? programa.docente_id}
+              />
             </article>
           ) : (
             <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
