@@ -373,6 +373,12 @@ function CursoPlayer() {
                   {new Date(activeModule.fecha_sesion).toLocaleString("es-DO")}
                 </p>
               )}
+
+              <LessonComments
+                moduloId={activeModule.id}
+                programaId={programa.id}
+                docenteId={activeModule.docente_id ?? programa.docente_id}
+              />
             </article>
           ) : (
             <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
