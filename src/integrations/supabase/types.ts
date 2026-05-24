@@ -798,8 +798,11 @@ export type Database = {
           max_estudiantes: number | null
           min_estudiantes: number | null
           modalidad: string
+          objetivos: string | null
           precio: number
           precio_descuento: number | null
+          publico_meta: string | null
+          resultados_esperados: string | null
           resumen: string | null
           slug: string
           syllabus_url: string | null
@@ -826,8 +829,11 @@ export type Database = {
           max_estudiantes?: number | null
           min_estudiantes?: number | null
           modalidad: string
+          objetivos?: string | null
           precio?: number
           precio_descuento?: number | null
+          publico_meta?: string | null
+          resultados_esperados?: string | null
           resumen?: string | null
           slug: string
           syllabus_url?: string | null
@@ -854,8 +860,11 @@ export type Database = {
           max_estudiantes?: number | null
           min_estudiantes?: number | null
           modalidad?: string
+          objetivos?: string | null
           precio?: number
           precio_descuento?: number | null
+          publico_meta?: string | null
+          resultados_esperados?: string | null
           resumen?: string | null
           slug?: string
           syllabus_url?: string | null
