@@ -60,6 +60,9 @@ type Programa = {
   estado: string;
   destacado: boolean;
   certificado_incluido: boolean;
+  objetivos: string;
+  publico_meta: string;
+  resultados_esperados: string;
 };
 
 const empty: Programa = {
@@ -84,6 +87,9 @@ const empty: Programa = {
   estado: "borrador",
   destacado: false,
   certificado_incluido: true,
+  objetivos: "",
+  publico_meta: "",
+  resultados_esperados: "",
 };
 
 const estadoColor: Record<string, string> = {
