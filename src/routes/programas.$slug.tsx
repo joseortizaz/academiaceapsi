@@ -256,6 +256,33 @@ function DetallePrograma() {
             </div>
           </div>
 
+          {(programa as any).objetivos && (
+            <div>
+              <h2 className="text-2xl font-bold">Objetivos</h2>
+              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
+                {(programa as any).objetivos}
+              </div>
+            </div>
+          )}
+
+          {(programa as any).publico_meta && (
+            <div>
+              <h2 className="text-2xl font-bold">Público meta</h2>
+              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
+                {(programa as any).publico_meta}
+              </div>
+            </div>
+          )}
+
+          {(programa as any).resultados_esperados && (
+            <div>
+              <h2 className="text-2xl font-bold">Resultados esperados</h2>
+              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
+                {(programa as any).resultados_esperados}
+              </div>
+            </div>
+          )}
+
           {modulos.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold">Contenido del programa</h2>
