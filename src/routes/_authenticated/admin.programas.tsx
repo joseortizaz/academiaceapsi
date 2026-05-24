@@ -250,6 +250,36 @@ function ProgramasPage() {
               />
             </div>
 
+            <div className="grid gap-2">
+              <Label>Objetivos</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿Qué aprenderá el estudiante? Un objetivo por línea."
+                value={s.objetivos ?? ""}
+                onChange={(e) => set({ objetivos: e.target.value })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Público meta</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿A quién está dirigido este programa?"
+                value={s.publico_meta ?? ""}
+                onChange={(e) => set({ publico_meta: e.target.value })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Resultados esperados</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿Qué competencias o resultados obtendrá al finalizar?"
+                value={s.resultados_esperados ?? ""}
+                onChange={(e) => set({ resultados_esperados: e.target.value })}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Tipo</Label>
