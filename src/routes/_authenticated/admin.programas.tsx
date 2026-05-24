@@ -60,6 +60,9 @@ type Programa = {
   estado: string;
   destacado: boolean;
   certificado_incluido: boolean;
+  objetivos: string;
+  publico_meta: string;
+  resultados_esperados: string;
 };
 
 const empty: Programa = {
@@ -84,6 +87,9 @@ const empty: Programa = {
   estado: "borrador",
   destacado: false,
   certificado_incluido: true,
+  objetivos: "",
+  publico_meta: "",
+  resultados_esperados: "",
 };
 
 const estadoColor: Record<string, string> = {
@@ -241,6 +247,36 @@ function ProgramasPage() {
                 value={s.descripcion}
                 onChange={(e) => set({ descripcion: e.target.value })}
                 required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Objetivos</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿Qué aprenderá el estudiante? Un objetivo por línea."
+                value={s.objetivos ?? ""}
+                onChange={(e) => set({ objetivos: e.target.value })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Público meta</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿A quién está dirigido este programa?"
+                value={s.publico_meta ?? ""}
+                onChange={(e) => set({ publico_meta: e.target.value })}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Resultados esperados</Label>
+              <Textarea
+                rows={3}
+                placeholder="¿Qué competencias o resultados obtendrá al finalizar?"
+                value={s.resultados_esperados ?? ""}
+                onChange={(e) => set({ resultados_esperados: e.target.value })}
               />
             </div>
 
