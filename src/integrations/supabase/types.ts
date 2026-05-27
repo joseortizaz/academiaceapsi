@@ -571,6 +571,13 @@ export type Database = {
             referencedRelation: "program_modules"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "module_progress_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules_catalog"
+            referencedColumns: ["id"]
+          },
         ]
       }
       payments: {
@@ -720,6 +727,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "program_access_links_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules_catalog"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "program_access_links_programa_id_fkey"
             columns: ["programa_id"]
             isOneToOne: false
@@ -783,6 +797,13 @@ export type Database = {
             columns: ["docente_id"]
             isOneToOne: false
             referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_modules_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers_public"
             referencedColumns: ["id"]
           },
           {
@@ -901,6 +922,13 @@ export type Database = {
             columns: ["docente_id"]
             isOneToOne: false
             referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "programs_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1032,7 +1060,189 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      assessment_questions_student: {
+        Row: {
+          assessment_id: string | null
+          created_at: string | null
+          enunciado: string | null
+          id: string | null
+          opciones: Json | null
+          orden: number | null
+          puntaje: number | null
+          tipo: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          created_at?: string | null
+          enunciado?: string | null
+          id?: string | null
+          opciones?: Json | null
+          orden?: number | null
+          puntaje?: number | null
+          tipo?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          created_at?: string | null
+          enunciado?: string | null
+          id?: string | null
+          opciones?: Json | null
+          orden?: number | null
+          puntaje?: number | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_questions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles_public: {
+        Row: {
+          apellido: string | null
+          avatar_url: string | null
+          bio: string | null
+          ciudad: string | null
+          especialidad: string | null
+          id: string | null
+          is_active: boolean | null
+          linkedin_url: string | null
+          nombre: string | null
+          pais: string | null
+        }
+        Insert: {
+          apellido?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          ciudad?: string | null
+          especialidad?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          linkedin_url?: string | null
+          nombre?: string | null
+          pais?: string | null
+        }
+        Update: {
+          apellido?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          ciudad?: string | null
+          especialidad?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          linkedin_url?: string | null
+          nombre?: string | null
+          pais?: string | null
+        }
+        Relationships: []
+      }
+      program_modules_catalog: {
+        Row: {
+          created_at: string | null
+          descripcion: string | null
+          docente_id: string | null
+          duracion_minutos: number | null
+          es_en_vivo: boolean | null
+          fecha_sesion: string | null
+          id: string | null
+          orden: number | null
+          programa_id: string | null
+          titulo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion?: string | null
+          docente_id?: string | null
+          duracion_minutos?: number | null
+          es_en_vivo?: boolean | null
+          fecha_sesion?: string | null
+          id?: string | null
+          orden?: number | null
+          programa_id?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string | null
+          docente_id?: string | null
+          duracion_minutos?: number | null
+          es_en_vivo?: boolean | null
+          fecha_sesion?: string | null
+          id?: string | null
+          orden?: number | null
+          programa_id?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_modules_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_modules_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_modules_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teachers_public: {
+        Row: {
+          apellido: string | null
+          avatar_url: string | null
+          biografia: string | null
+          especialidad: string | null
+          id: string | null
+          linkedin_url: string | null
+          nombre: string | null
+          orden: number | null
+          titulo: string | null
+          visible: boolean | null
+        }
+        Insert: {
+          apellido?: string | null
+          avatar_url?: string | null
+          biografia?: string | null
+          especialidad?: string | null
+          id?: string | null
+          linkedin_url?: string | null
+          nombre?: string | null
+          orden?: number | null
+          titulo?: string | null
+          visible?: boolean | null
+        }
+        Update: {
+          apellido?: string | null
+          avatar_url?: string | null
+          biografia?: string | null
+          especialidad?: string | null
+          id?: string | null
+          linkedin_url?: string | null
+          nombre?: string | null
+          orden?: number | null
+          titulo?: string | null
+          visible?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

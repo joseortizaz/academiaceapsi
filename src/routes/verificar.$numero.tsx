@@ -31,7 +31,7 @@ function VerificarCertificado() {
 
       const [{ data: programa }, { data: profile }] = await Promise.all([
         supabase.from("programs").select("titulo, duracion_horas").eq("id", cert.programa_id).maybeSingle(),
-        supabase.from("profiles").select("nombre, apellido").eq("id", cert.user_id).maybeSingle(),
+        (supabase.from as any)("profiles_public").select("nombre, apellido").eq("id", cert.user_id).maybeSingle(),
       ]);
 
       return { cert, programa, profile };

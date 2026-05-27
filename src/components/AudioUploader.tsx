@@ -32,8 +32,11 @@ export function AudioUploader({ value, onChange, folder = "audios" }: Props) {
         .from("course-materials")
         .upload(path, file, { upsert: true, contentType: type });
       if (error) throw error;
-      const { data } = supabase.storage.from("course-materials").getPublicUrl(path);
-      onChange(data.publicUrl);
+      const { data, error: signErr } = await supabase.storage
+        .from("course-materials")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr || !data?.signedUrl) throw signErr ?? new Error("No se pudo firmar URL");
+      onChange(data.signedUrl);
       toast.success("Audio guardado");
     } catch (e: any) {
       toast.error(e.message ?? "No se pudo subir el audio");

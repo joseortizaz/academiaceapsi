@@ -49,12 +49,12 @@ function DetallePrograma() {
     },
   });
 
-  const { data: modulos = [] } = useQuery({
+  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null };
+  const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
     queryKey: ["public", "modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("program_modules")
+      const { data, error } = await (supabase.from as any)("program_modules_catalog")
         .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion")
         .eq("programa_id", programa!.id)
         .order("orden");

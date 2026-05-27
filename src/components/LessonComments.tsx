@@ -56,15 +56,14 @@ export function LessonComments({ moduloId, programaId, docenteId }: Props) {
     [comments],
   );
 
-  const { data: profilesMap = new Map<string, Profile>() } = useQuery({
+  const { data: profilesMap = new Map<string, Profile>() } = useQuery<Map<string, Profile>>({
     queryKey: ["lesson-comments-profiles", userIds.join(",")],
     enabled: userIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
+      const { data } = await (supabase.from as any)("profiles_public")
         .select("id,nombre,apellido,avatar_url")
         .in("id", userIds);
-      return new Map((data ?? []).map((p) => [p.id, p as Profile]));
+      return new Map((data ?? []).map((p: any) => [p.id, p as Profile]));
     },
   });
 
