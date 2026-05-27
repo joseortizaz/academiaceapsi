@@ -121,38 +121,43 @@ function DetallePrograma() {
 
   const confirmarInscripcion = async () => {
     if (!user) return;
+    const nombre = form.nombre_completo.trim();
+    const documento = form.documento_identidad.replace(/[-\s]/g, "");
+    const email = form.email_contacto.trim();
+    const telefono = form.telefono_contacto.trim();
+    const area = form.area_profesional.trim();
+
+    if (!nombre || !documento || !email || !telefono || !area) {
+      toast.error("Por favor completa todos los campos del formulario.");
+      return;
+    }
+    if (!/^[0-9A-Z]{6,20}$/i.test(documento)) {
+      toast.error("Documento inválido. Ingresa cédula o pasaporte sin guiones.");
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Correo electrónico inválido.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const esGratis = Number(precio) === 0;
-
-      const { data: enr, error: enrErr } = await supabase
+      const { error: enrErr } = await supabase
         .from("enrollments")
         .insert({
           user_id: user.id,
           programa_id: programa.id,
-          estado: esGratis ? "activo" : "pendiente",
-        })
-        .select()
-        .single();
+          estado: "pendiente",
+          nombre_completo: nombre,
+          documento_identidad: documento,
+          email_contacto: email,
+          telefono_contacto: telefono,
+          area_profesional: area,
+        });
       if (enrErr) throw enrErr;
 
-      if (!esGratis) {
-        const { error: payErr } = await supabase.from("payments").insert({
-          user_id: user.id,
-          programa_id: programa.id,
-          monto: precio,
-          moneda: "DOP",
-          metodo,
-          referencia: referencia || null,
-          estado: "pendiente",
-        });
-        if (payErr) throw payErr;
-      }
-
       toast.success(
-        esGratis
-          ? "¡Te has inscrito! Ya puedes acceder al contenido."
-          : "Inscripción registrada. Tu pago está pendiente de verificación.",
+        "Solicitud de inscripción enviada. Un administrador la confirmará tras verificar el pago.",
       );
       setInscOpen(false);
       qc.invalidateQueries({ queryKey: ["enrollment", programa.id] });
@@ -163,6 +168,7 @@ function DetallePrograma() {
       setSubmitting(false);
     }
   };
+
 
   return (
     <PublicLayout>
