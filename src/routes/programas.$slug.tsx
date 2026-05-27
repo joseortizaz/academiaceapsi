@@ -10,9 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -29,9 +26,15 @@ function DetallePrograma() {
   const { isAuthenticated, user } = useAuth();
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
-  const [metodo, setMetodo] = useState("transferencia");
-  const [referencia, setReferencia] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    nombre_completo: "",
+    documento_identidad: "",
+    email_contacto: "",
+    telefono_contacto: "",
+    area_profesional: "",
+  });
+
 
   const { data: programa, isLoading } = useQuery({
     queryKey: ["public", "programa", slug],
@@ -118,38 +121,43 @@ function DetallePrograma() {
 
   const confirmarInscripcion = async () => {
     if (!user) return;
+    const nombre = form.nombre_completo.trim();
+    const documento = form.documento_identidad.replace(/[-\s]/g, "");
+    const email = form.email_contacto.trim();
+    const telefono = form.telefono_contacto.trim();
+    const area = form.area_profesional.trim();
+
+    if (!nombre || !documento || !email || !telefono || !area) {
+      toast.error("Por favor completa todos los campos del formulario.");
+      return;
+    }
+    if (!/^[0-9A-Z]{6,20}$/i.test(documento)) {
+      toast.error("Documento inválido. Ingresa cédula o pasaporte sin guiones.");
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Correo electrónico inválido.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const esGratis = Number(precio) === 0;
-
-      const { data: enr, error: enrErr } = await supabase
+      const { error: enrErr } = await supabase
         .from("enrollments")
         .insert({
           user_id: user.id,
           programa_id: programa.id,
-          estado: esGratis ? "activo" : "pendiente",
-        })
-        .select()
-        .single();
+          estado: "pendiente",
+          nombre_completo: nombre,
+          documento_identidad: documento,
+          email_contacto: email,
+          telefono_contacto: telefono,
+          area_profesional: area,
+        });
       if (enrErr) throw enrErr;
 
-      if (!esGratis) {
-        const { error: payErr } = await supabase.from("payments").insert({
-          user_id: user.id,
-          programa_id: programa.id,
-          monto: precio,
-          moneda: "DOP",
-          metodo,
-          referencia: referencia || null,
-          estado: "pendiente",
-        });
-        if (payErr) throw payErr;
-      }
-
       toast.success(
-        esGratis
-          ? "¡Te has inscrito! Ya puedes acceder al contenido."
-          : "Inscripción registrada. Tu pago está pendiente de verificación.",
+        "Solicitud de inscripción enviada. Un administrador la confirmará tras verificar el pago.",
       );
       setInscOpen(false);
       qc.invalidateQueries({ queryKey: ["enrollment", programa.id] });
@@ -160,6 +168,7 @@ function DetallePrograma() {
       setSubmitting(false);
     }
   };
+
 
   return (
     <PublicLayout>
@@ -366,45 +375,87 @@ function DetallePrograma() {
       </section>
 
       <Dialog open={inscOpen} onOpenChange={setInscOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Confirmar inscripción</DialogTitle>
+            <DialogTitle>Solicitud de inscripción</DialogTitle>
             <DialogDescription>
-              {Number(precio) === 0
-                ? "Este programa es gratuito. Confirma tu inscripción para acceder al contenido."
-                : `Monto a pagar: RD$ ${Number(precio).toLocaleString("es-DO")}. Tu acceso se activará una vez verifiquemos el pago.`}
+              Completa tus datos. Tu solicitud quedará en estado <strong>Pendiente</strong> hasta que un
+              administrador confirme tu inscripción tras verificar el pago.
             </DialogDescription>
           </DialogHeader>
 
-          {Number(precio) > 0 && (
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label>Método de pago</Label>
-                <Select value={metodo} onValueChange={setMetodo}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="transferencia">Transferencia bancaria</SelectItem>
-                    <SelectItem value="tarjeta">Tarjeta de crédito/débito</SelectItem>
-                    <SelectItem value="paypal">PayPal</SelectItem>
-                    <SelectItem value="efectivo">Efectivo en oficina</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label>Referencia o número de transacción (opcional)</Label>
-                <Input value={referencia} onChange={(e) => setReferencia(e.target.value)} maxLength={100} />
-              </div>
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="nombre">Nombre completo *</Label>
+              <Input
+                id="nombre"
+                value={form.nombre_completo}
+                onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+                maxLength={120}
+                required
+              />
             </div>
-          )}
+            <div className="grid gap-2">
+              <Label htmlFor="documento">Cédula o pasaporte * (sin guiones)</Label>
+              <Input
+                id="documento"
+                value={form.documento_identidad}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    documento_identidad: e.target.value.replace(/[-\s]/g, "").toUpperCase(),
+                  })
+                }
+                placeholder="00112345678"
+                maxLength={20}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Correo electrónico *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={form.email_contacto}
+                onChange={(e) => setForm({ ...form, email_contacto: e.target.value })}
+                maxLength={120}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="telefono">Número de contacto *</Label>
+              <Input
+                id="telefono"
+                type="tel"
+                value={form.telefono_contacto}
+                onChange={(e) => setForm({ ...form, telefono_contacto: e.target.value })}
+                placeholder="809-000-0000"
+                maxLength={30}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="area">Área profesional o de estudio *</Label>
+              <Input
+                id="area"
+                value={form.area_profesional}
+                onChange={(e) => setForm({ ...form, area_profesional: e.target.value })}
+                placeholder="Ej. Psicología clínica, Educación, Estudiante de medicina"
+                maxLength={120}
+                required
+              />
+            </div>
+          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setInscOpen(false)}>Cancelar</Button>
             <Button onClick={confirmarInscripcion} disabled={submitting}>
-              {submitting ? "Procesando…" : "Confirmar"}
+              {submitting ? "Enviando…" : "Enviar solicitud"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </PublicLayout>
   );
 }
