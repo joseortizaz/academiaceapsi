@@ -89,7 +89,8 @@ export function AiQuizGenerator({ assessmentId, startingOrder, onImported }: Pro
         <div className="space-y-4">
           <div>
             <Label>Material de apoyo (PDF)</Label>
-            <FileUploader value={pdfUrl} onChange={setPdfUrl} accept="application/pdf" />
+            <FileUploader value={pdfUrl} onChange={(u) => setPdfUrl(u ?? "")} accept="application/pdf" />
+            {preguntas.length > 0 && <Button size="sm" variant="ghost" onClick={() => setSelected(new Set(preguntas.map((_p: Generated, i: number) => i)))}>Re-seleccionar todas</Button>}
             <p className="mt-1 text-xs text-muted-foreground">Sube un PDF con el contenido base para la evaluación.</p>
           </div>
 
