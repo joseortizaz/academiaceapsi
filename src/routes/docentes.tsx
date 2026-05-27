@@ -50,13 +50,12 @@ function Docentes() {
   const { data: teachers = FALLBACK } = useQuery<Teacher[]>({
     queryKey: ["public", "teachers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("teachers")
-        .select("id, nombre, apellido, email, telefono, titulo, especialidad, biografia, avatar_url, linkedin_url")
-        .eq("visible", true)
+      const { data, error } = await (supabase.from as any)("teachers_public")
+        .select("id, nombre, apellido, titulo, especialidad, biografia, avatar_url, linkedin_url")
         .order("orden", { ascending: true });
       if (error) throw error;
-      return data && data.length > 0 ? (data as Teacher[]) : FALLBACK;
+      const rows = (data ?? []).map((t: any) => ({ ...t, email: null, telefono: null })) as Teacher[];
+      return rows.length > 0 ? rows : FALLBACK;
     },
   });
 
