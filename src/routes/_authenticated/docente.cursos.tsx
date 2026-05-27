@@ -66,7 +66,7 @@ function DocenteCursos() {
     queryKey: ["docente-cursos-alumnos", userIds],
     enabled: userIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id,nombre,apellido,avatar_url").in("id", userIds);
+      const { data } = await (supabase.from as any)("profiles_public").select("id,nombre,apellido,avatar_url").in("id", userIds);
       return data ?? [];
     },
   });
