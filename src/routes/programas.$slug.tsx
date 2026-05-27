@@ -53,8 +53,7 @@ function DetallePrograma() {
     queryKey: ["public", "modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("program_modules")
+      const { data, error } = await (supabase.from as any)("program_modules_catalog")
         .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion")
         .eq("programa_id", programa!.id)
         .order("orden");
