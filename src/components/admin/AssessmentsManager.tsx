@@ -352,6 +352,14 @@ function QuestionsDialog({ assessment, onClose }: { assessment: Assessment; onCl
           <DialogTitle>Preguntas — {assessment.titulo}</DialogTitle>
         </DialogHeader>
 
+        <div className="flex justify-end">
+          <AiQuizGenerator
+            assessmentId={assessment.id!}
+            startingOrder={(questionsQ.data?.length ?? 0) + 1}
+            onImported={() => qc.invalidateQueries({ queryKey: qkey })}
+          />
+        </div>
+
         <div className="space-y-3">
           {(questionsQ.data ?? []).map((q, i) => (
             <div key={q.id} className="rounded-md border p-3">
