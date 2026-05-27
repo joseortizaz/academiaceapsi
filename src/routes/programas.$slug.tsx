@@ -375,45 +375,87 @@ function DetallePrograma() {
       </section>
 
       <Dialog open={inscOpen} onOpenChange={setInscOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Confirmar inscripción</DialogTitle>
+            <DialogTitle>Solicitud de inscripción</DialogTitle>
             <DialogDescription>
-              {Number(precio) === 0
-                ? "Este programa es gratuito. Confirma tu inscripción para acceder al contenido."
-                : `Monto a pagar: RD$ ${Number(precio).toLocaleString("es-DO")}. Tu acceso se activará una vez verifiquemos el pago.`}
+              Completa tus datos. Tu solicitud quedará en estado <strong>Pendiente</strong> hasta que un
+              administrador confirme tu inscripción tras verificar el pago.
             </DialogDescription>
           </DialogHeader>
 
-          {Number(precio) > 0 && (
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label>Método de pago</Label>
-                <Select value={metodo} onValueChange={setMetodo}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="transferencia">Transferencia bancaria</SelectItem>
-                    <SelectItem value="tarjeta">Tarjeta de crédito/débito</SelectItem>
-                    <SelectItem value="paypal">PayPal</SelectItem>
-                    <SelectItem value="efectivo">Efectivo en oficina</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label>Referencia o número de transacción (opcional)</Label>
-                <Input value={referencia} onChange={(e) => setReferencia(e.target.value)} maxLength={100} />
-              </div>
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="nombre">Nombre completo *</Label>
+              <Input
+                id="nombre"
+                value={form.nombre_completo}
+                onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+                maxLength={120}
+                required
+              />
             </div>
-          )}
+            <div className="grid gap-2">
+              <Label htmlFor="documento">Cédula o pasaporte * (sin guiones)</Label>
+              <Input
+                id="documento"
+                value={form.documento_identidad}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    documento_identidad: e.target.value.replace(/[-\s]/g, "").toUpperCase(),
+                  })
+                }
+                placeholder="00112345678"
+                maxLength={20}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Correo electrónico *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={form.email_contacto}
+                onChange={(e) => setForm({ ...form, email_contacto: e.target.value })}
+                maxLength={120}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="telefono">Número de contacto *</Label>
+              <Input
+                id="telefono"
+                type="tel"
+                value={form.telefono_contacto}
+                onChange={(e) => setForm({ ...form, telefono_contacto: e.target.value })}
+                placeholder="809-000-0000"
+                maxLength={30}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="area">Área profesional o de estudio *</Label>
+              <Input
+                id="area"
+                value={form.area_profesional}
+                onChange={(e) => setForm({ ...form, area_profesional: e.target.value })}
+                placeholder="Ej. Psicología clínica, Educación, Estudiante de medicina"
+                maxLength={120}
+                required
+              />
+            </div>
+          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setInscOpen(false)}>Cancelar</Button>
             <Button onClick={confirmarInscripcion} disabled={submitting}>
-              {submitting ? "Procesando…" : "Confirmar"}
+              {submitting ? "Enviando…" : "Enviar solicitud"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </PublicLayout>
   );
 }
