@@ -119,7 +119,7 @@ export function AiQuizGenerator({ assessmentId, startingOrder, onImported }: Pro
             <div className="space-y-3 rounded-md border bg-muted/30 p-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-semibold">Previsualización ({selected.size}/{preguntas.length} seleccionadas)</h4>
-                <Button size="sm" variant="ghost" onClick={() => setSelected(new Set(preguntas.map((_, i) => i)))}>Todas</Button>
+                <Button size="sm" variant="ghost" onClick={() => setSelected(new Set(preguntas.map((_p: Generated, i: number) => i)))}>Todas</Button>
               </div>
               {preguntas.map((p, i) => (
                 <div key={i} className={`rounded border p-3 ${selected.has(i) ? "border-primary bg-background" : "border-border bg-muted/50 opacity-60"}`}>
