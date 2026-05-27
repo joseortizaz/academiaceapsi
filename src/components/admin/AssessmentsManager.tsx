@@ -22,6 +22,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { ListChecks, Trash2, Plus } from "lucide-react";
+import { AiQuizGenerator } from "@/components/ai/AiQuizGenerator";
 
 type Assessment = {
   id?: string;
