@@ -42,7 +42,7 @@ export function AiQuizGenerator({ assessmentId, startingOrder, onImported }: Pro
     try {
       const res = await runGenerate({ data: { pdfUrl, cantidad, tipo } });
       setPreguntas(res.preguntas);
-      setSelected(new Set(res.preguntas.map((_, i) => i)));
+      setSelected(new Set(res.preguntas.map((_: Generated, i: number) => i)));
       toast.success(`${res.preguntas.length} preguntas generadas. Revísalas y selecciona las que quieras importar.`);
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Error generando preguntas");
