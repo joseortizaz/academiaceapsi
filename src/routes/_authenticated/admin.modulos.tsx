@@ -17,6 +17,7 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { FileUploader } from "@/components/FileUploader";
+import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
 import { AudioUploader } from "@/components/AudioUploader";
 
 export const Route = createFileRoute("/_authenticated/admin/modulos")({
