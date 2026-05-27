@@ -49,7 +49,8 @@ function DetallePrograma() {
     },
   });
 
-  const { data: modulos = [] } = useQuery({
+  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null };
+  const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
     queryKey: ["public", "modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
