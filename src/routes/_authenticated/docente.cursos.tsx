@@ -62,16 +62,17 @@ function DocenteCursos() {
   });
 
   const userIds = Array.from(new Set(enrollments.map((e) => e.user_id)));
-  const { data: alumnos = [] } = useQuery({
+  type Alumno = { id: string; nombre: string | null; apellido: string | null; avatar_url: string | null };
+  const { data: alumnos = [] } = useQuery<Alumno[]>({
     queryKey: ["docente-cursos-alumnos", userIds],
     enabled: userIds.length > 0,
     queryFn: async () => {
       const { data } = await (supabase.from as any)("profiles_public").select("id,nombre,apellido,avatar_url").in("id", userIds);
-      return data ?? [];
+      return (data ?? []) as Alumno[];
     },
   });
 
-  const alumnoMap = new Map(alumnos.map((a) => [a.id, a]));
+  const alumnoMap = new Map<string, Alumno>(alumnos.map((a) => [a.id, a]));
 
   const handleCreateSession = (e: React.FormEvent<HTMLFormElement>, programaId: string) => {
     e.preventDefault();
