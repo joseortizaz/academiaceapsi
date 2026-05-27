@@ -391,39 +391,54 @@ export type Database = {
       }
       enrollments: {
         Row: {
+          area_profesional: string | null
+          documento_identidad: string | null
+          email_contacto: string | null
           estado: string
           fecha_completado: string | null
           fecha_inscripcion: string
           fecha_vencimiento: string | null
           id: string
+          nombre_completo: string | null
           notas: string | null
           pago_id: string | null
           programa_id: string
           progreso_porcentaje: number
+          telefono_contacto: string | null
           user_id: string
         }
         Insert: {
+          area_profesional?: string | null
+          documento_identidad?: string | null
+          email_contacto?: string | null
           estado?: string
           fecha_completado?: string | null
           fecha_inscripcion?: string
           fecha_vencimiento?: string | null
           id?: string
+          nombre_completo?: string | null
           notas?: string | null
           pago_id?: string | null
           programa_id: string
           progreso_porcentaje?: number
+          telefono_contacto?: string | null
           user_id: string
         }
         Update: {
+          area_profesional?: string | null
+          documento_identidad?: string | null
+          email_contacto?: string | null
           estado?: string
           fecha_completado?: string | null
           fecha_inscripcion?: string
           fecha_vencimiento?: string | null
           id?: string
+          nombre_completo?: string | null
           notas?: string | null
           pago_id?: string | null
           programa_id?: string
           progreso_porcentaje?: number
+          telefono_contacto?: string | null
           user_id?: string
         }
         Relationships: [
