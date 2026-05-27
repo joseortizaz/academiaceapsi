@@ -44,10 +44,10 @@ export function AiContentGenerator({ onApply, triggerLabel = "Generar con IA des
       setLesson(res);
       setEditTitulo(res.titulo ?? tema);
       const fuentesMd = res.fuentes?.length
-        ? "\n\n---\n\n**Fuentes:**\n" + res.fuentes.map((f) => `${f.n}. [${f.titulo}](${f.url})`).join("\n")
+        ? "\n\n---\n\n**Fuentes:**\n" + res.fuentes.map((f: { n: number; titulo: string; url: string }) => `${f.n}. [${f.titulo}](${f.url})`).join("\n")
         : "";
       const puntosMd = res.puntos_clave?.length
-        ? "\n\n**Puntos clave:**\n" + res.puntos_clave.map((p) => `- ${p}`).join("\n")
+        ? "\n\n**Puntos clave:**\n" + res.puntos_clave.map((p: string) => `- ${p}`).join("\n")
         : "";
       setEditContenido((res.introduccion ?? "") + "\n\n" + (res.contenido_markdown ?? "") + puntosMd + fuentesMd);
       if (!res._firecrawl_disponible) {
