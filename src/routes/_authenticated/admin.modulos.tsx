@@ -178,7 +178,7 @@ function ModulosPage() {
                 <Label>Descripción</Label>
                 <AiContentGenerator
                   triggerLabel="Generar con IA"
-                  onApply={({ titulo, contenido }) => set({
+                  onApply={({ titulo, contenido }: { titulo: string; contenido: string }) => set({
                     titulo: s.titulo || titulo,
                     descripcion: contenido,
                   })}
