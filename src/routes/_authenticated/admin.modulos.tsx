@@ -17,6 +17,7 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { FileUploader } from "@/components/FileUploader";
+import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
 import { AudioUploader } from "@/components/AudioUploader";
 
 export const Route = createFileRoute("/_authenticated/admin/modulos")({
@@ -173,8 +174,17 @@ function ModulosPage() {
               <Input value={s.titulo} onChange={(e) => set({ titulo: e.target.value })} required />
             </div>
             <div className="grid gap-2">
-              <Label>Descripción</Label>
-              <Textarea rows={3} value={s.descripcion ?? ""} onChange={(e) => set({ descripcion: e.target.value })} />
+              <div className="flex items-center justify-between">
+                <Label>Descripción</Label>
+                <AiContentGenerator
+                  triggerLabel="Generar con IA"
+                  onApply={({ titulo, contenido }: { titulo: string; contenido: string }) => set({
+                    titulo: s.titulo || titulo,
+                    descripcion: contenido,
+                  })}
+                />
+              </div>
+              <Textarea rows={6} value={s.descripcion ?? ""} onChange={(e) => set({ descripcion: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">

@@ -22,6 +22,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { ListChecks, Trash2, Plus } from "lucide-react";
+import { AiQuizGenerator } from "@/components/ai/AiQuizGenerator";
 
 type Assessment = {
   id?: string;
@@ -350,6 +351,14 @@ function QuestionsDialog({ assessment, onClose }: { assessment: Assessment; onCl
         <DialogHeader>
           <DialogTitle>Preguntas — {assessment.titulo}</DialogTitle>
         </DialogHeader>
+
+        <div className="flex justify-end">
+          <AiQuizGenerator
+            assessmentId={assessment.id!}
+            startingOrder={(questionsQ.data?.length ?? 0) + 1}
+            onImported={() => qc.invalidateQueries({ queryKey: qkey })}
+          />
+        </div>
 
         <div className="space-y-3">
           {(questionsQ.data ?? []).map((q, i) => (
