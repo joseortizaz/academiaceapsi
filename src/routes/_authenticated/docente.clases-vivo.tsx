@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -18,19 +19,49 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Video, Plus, PlayCircle, AlertTriangle, Radio, FileVideo, Copy, FlaskConical, Trash2,
+  Video, Plus, PlayCircle, Radio, FileVideo, Copy, Trash2, ExternalLink,
 } from "lucide-react";
-import { useZoomStore, zoomStore, isLiveNow, type ZoomClass } from "@/lib/zoom-mock";
+import {
+  createZoomMeeting,
+  deleteZoomMeeting,
+  listZoomMeetings,
+} from "@/lib/zoom.functions";
 
 export const Route = createFileRoute("/_authenticated/docente/clases-vivo")({
   component: DocenteClasesVivo,
 });
 
+type ZoomMeetingRow = {
+  id: string;
+  programa_id: string;
+  titulo: string;
+  docente_nombre: string | null;
+  zoom_meeting_id: string;
+  zoom_join_url: string;
+  zoom_start_url: string | null;
+  start_at: string;
+  duration_min: number;
+  status: "scheduled" | "live" | "ended" | "recorded";
+  recording_url: string | null;
+  recording_share_url: string | null;
+  recording_duration_min: number | null;
+};
+
+function isLiveNow(m: ZoomMeetingRow) {
+  const start = new Date(m.start_at).getTime();
+  const end = start + m.duration_min * 60 * 1000;
+  const now = Date.now();
+  return now >= start - 5 * 60 * 1000 && now <= end;
+}
+
 function DocenteClasesVivo() {
   const { user } = useAuth();
-  const { connection, classes } = useZoomStore();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [preview, setPreview] = useState<ZoomClass | null>(null);
+  const [preview, setPreview] = useState<ZoomMeetingRow | null>(null);
+
+  const listFn = useServerFn(listZoomMeetings);
+  const deleteFn = useServerFn(deleteZoomMeeting);
 
   const { data: teacher } = useQuery({
     queryKey: ["docente-record", user?.id],
@@ -50,12 +81,26 @@ function DocenteClasesVivo() {
     },
   });
 
+  const { data: classes = [] } = useQuery({
+    queryKey: ["zoom-meetings"],
+    queryFn: async () => (await listFn({ data: {} })) as ZoomMeetingRow[],
+    refetchInterval: 30_000,
+  });
+
+  const removeMut = useMutation({
+    mutationFn: async (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["zoom-meetings"] });
+      toast.success("Clase eliminada");
+    },
+  });
+
   const docenteNombre = useMemo(
     () => (user ? `${user.nombre ?? ""} ${user.apellido ?? ""}`.trim() : "Docente"),
     [user],
   );
 
-  const programados = classes.filter((c) => c.status === "scheduled");
+  const programados = classes.filter((c) => c.status === "scheduled" && !isLiveNow(c));
   const enVivo = classes.filter((c) => c.status === "live" || isLiveNow(c));
   const grabadas = classes.filter((c) => c.status === "recorded");
 
@@ -73,26 +118,14 @@ function DocenteClasesVivo() {
             <Button><Plus className="mr-2 h-4 w-4" /> Crear clase en vivo</Button>
           </DialogTrigger>
           <CreateClassDialog
-            programas={programas.length ? programas : [{ id: "demo-web", titulo: "Introducción a Desarrollo Web" }]}
+            programas={programas}
             docenteNombre={docenteNombre}
             onClose={() => setOpen(false)}
+            onCreated={() => qc.invalidateQueries({ queryKey: ["zoom-meetings"] })}
           />
         </Dialog>
       </div>
 
-      {!connection.connected && (
-        <Card className="border-amber-500/40 bg-amber-500/5">
-          <CardContent className="flex items-center gap-3 p-4">
-            <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <p className="text-sm">
-              Zoom aún no está conectado. Las reuniones se crearán en modo simulado.
-              Pide al administrador conectar la cuenta desde <span className="font-medium">Integraciones</span>.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* En vivo ahora */}
       {enVivo.length > 0 && (
         <Card className="border-red-500/40 bg-red-500/5">
           <CardHeader>
@@ -102,18 +135,31 @@ function DocenteClasesVivo() {
           </CardHeader>
           <CardContent className="space-y-3">
             {enVivo.map((c) => (
-              <ClassRow
-                key={c.id}
-                cls={c}
-                onSimulate={() => simulateEnd(c)}
-                onOpenPreview={() => setPreview(c)}
-              />
+              <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-card p-3">
+                <div>
+                  <p className="font-medium">{c.titulo}</p>
+                  <p className="text-xs text-muted-foreground">ID Zoom {c.zoom_meeting_id}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" asChild>
+                    <Link to="/clase-vivo/$meetingId" params={{ meetingId: c.id }}>
+                      <PlayCircle className="mr-1 h-3 w-3" /> Entrar a la sala
+                    </Link>
+                  </Button>
+                  {c.zoom_start_url && (
+                    <Button size="sm" variant="outline" asChild>
+                      <a href={c.zoom_start_url} target="_blank" rel="noreferrer">
+                        Abrir en Zoom <ExternalLink className="ml-1 h-3 w-3" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
             ))}
           </CardContent>
         </Card>
       )}
 
-      {/* Programadas */}
       <Card>
         <CardHeader>
           <CardTitle>Próximas clases</CardTitle>
@@ -123,50 +169,47 @@ function DocenteClasesVivo() {
           <ClassTable
             rows={programados}
             empty="No hay clases programadas."
-            onSimulate={simulateEnd}
-            onOpenPreview={setPreview}
+            onDelete={(id) => removeMut.mutate(id)}
           />
         </CardContent>
       </Card>
 
-      {/* Grabadas */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileVideo className="h-5 w-5 text-primary" /> Clases grabadas
           </CardTitle>
           <CardDescription>
-            Grabaciones procesadas por Zoom — verifica antes de publicar al alumnado.
+            Grabaciones procesadas por Zoom — disponibles cuando termina la clase.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <ClassTable
             rows={grabadas}
             empty="Aún no hay grabaciones disponibles."
-            onSimulate={simulateEnd}
-            onOpenPreview={setPreview}
+            onDelete={(id) => removeMut.mutate(id)}
+            onPreview={setPreview}
             showRecording
           />
         </CardContent>
       </Card>
 
-      {/* Recording preview */}
       <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{preview?.titulo}</DialogTitle>
           </DialogHeader>
-          {preview?.recordingUrl ? (
-            <div className="space-y-2">
-              <video
-                key={preview.id}
-                src={preview.recordingUrl}
-                controls
-                className="aspect-video w-full rounded-md bg-black"
-              />
-              <p className="text-xs text-muted-foreground">
-                Duración: {preview.recordingDurationMin} min · ID Zoom: {preview.zoomMeetingId}
+          {preview?.recording_share_url ? (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Las grabaciones de Zoom abren en una ventana externa.
+                {preview.recording_duration_min ? ` Duración: ${preview.recording_duration_min} min.` : ""}
               </p>
+              <Button asChild>
+                <a href={preview.recording_share_url} target="_blank" rel="noreferrer">
+                  Ver grabación en Zoom <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
             </div>
           ) : (
             <p className="py-6 text-center text-sm text-muted-foreground">
@@ -177,27 +220,15 @@ function DocenteClasesVivo() {
       </Dialog>
     </div>
   );
-
-  function simulateEnd(c: ZoomClass) {
-    toast.info("Procesando grabación de video…", {
-      description: `Webhook simulado: meeting.ended (${c.zoomMeetingId})`,
-    });
-    zoomStore.simulateMeetingEnd(c.id);
-    setTimeout(() => {
-      toast.success("Grabación disponible en el aula virtual", {
-        description: c.titulo,
-      });
-    }, 1700);
-  }
 }
 
 function ClassTable({
-  rows, empty, onSimulate, onOpenPreview, showRecording,
+  rows, empty, onDelete, onPreview, showRecording,
 }: {
-  rows: ZoomClass[];
+  rows: ZoomMeetingRow[];
   empty: string;
-  onSimulate: (c: ZoomClass) => void;
-  onOpenPreview: (c: ZoomClass) => void;
+  onDelete: (id: string) => void;
+  onPreview?: (c: ZoomMeetingRow) => void;
   showRecording?: boolean;
 }) {
   if (rows.length === 0) {
@@ -208,7 +239,6 @@ function ClassTable({
       <TableHeader>
         <TableRow>
           <TableHead>Clase</TableHead>
-          <TableHead>Programa</TableHead>
           <TableHead>Fecha</TableHead>
           <TableHead>Estado</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
@@ -218,46 +248,28 @@ function ClassTable({
         {rows.map((c) => (
           <TableRow key={c.id}>
             <TableCell className="font-medium">{c.titulo}</TableCell>
-            <TableCell className="text-sm text-muted-foreground">{c.programaTitulo}</TableCell>
             <TableCell className="whitespace-nowrap text-sm">
-              {new Date(c.startAt).toLocaleString("es-DO", {
+              {new Date(c.start_at).toLocaleString("es-DO", {
                 day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
               })}
             </TableCell>
-            <TableCell><StatusBadge cls={c} /></TableCell>
+            <TableCell><StatusBadge status={c.status} /></TableCell>
             <TableCell>
               <div className="flex justify-end gap-1">
-                {showRecording && c.recordingUrl && (
-                  <Button size="sm" variant="outline" onClick={() => onOpenPreview(c)}>
+                {showRecording && onPreview && (
+                  <Button size="sm" variant="outline" onClick={() => onPreview(c)}>
                     <PlayCircle className="mr-1 h-3 w-3" /> Ver
                   </Button>
                 )}
-                {c.status !== "recorded" && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => {
-                        zoomStore.startClass(c.id);
-                        if (c.zoomStartUrl) window.open(c.zoomStartUrl, "_blank");
-                        toast.success("Iniciando clase en Zoom…");
-                      }}
-                    >
-                      <PlayCircle className="mr-1 h-3 w-3" /> Iniciar
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => onSimulate(c)} title="Simular fin de reunión y carga de video">
-                      <FlaskConical className="h-3 w-3" />
-                    </Button>
-                  </>
+                {c.status === "scheduled" && (
+                  <Button size="sm" variant="ghost" onClick={() => {
+                    navigator.clipboard.writeText(c.zoom_join_url);
+                    toast.success("Enlace copiado");
+                  }}>
+                    <Copy className="h-3 w-3" />
+                  </Button>
                 )}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    zoomStore.deleteClass(c.id);
-                    toast.success("Clase eliminada");
-                  }}
-                >
+                <Button size="sm" variant="ghost" onClick={() => onDelete(c.id)}>
                   <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
@@ -269,77 +281,60 @@ function ClassTable({
   );
 }
 
-function ClassRow({
-  cls, onSimulate, onOpenPreview,
-}: { cls: ZoomClass; onSimulate: () => void; onOpenPreview: () => void }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-card p-3">
-      <div>
-        <p className="font-medium">{cls.titulo}</p>
-        <p className="text-xs text-muted-foreground">
-          {cls.programaTitulo} · ID Zoom {cls.zoomMeetingId}
-        </p>
-      </div>
-      <div className="flex gap-2">
-        <Button size="sm" asChild>
-          <a href={cls.zoomStartUrl || cls.zoomJoinUrl} target="_blank" rel="noreferrer">
-            <PlayCircle className="mr-1 h-3 w-3" /> Entrar como anfitrión
-          </a>
-        </Button>
-        <Button size="sm" variant="outline" onClick={onSimulate}>
-          <FlaskConical className="mr-1 h-3 w-3" /> Simular fin
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function StatusBadge({ cls }: { cls: ZoomClass }) {
-  if (cls.status === "recorded")
+function StatusBadge({ status }: { status: ZoomMeetingRow["status"] }) {
+  if (status === "recorded")
     return <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">Grabación disponible</Badge>;
-  if (cls.status === "live" || isLiveNow(cls))
+  if (status === "live")
     return <Badge className="animate-pulse bg-red-500/15 text-red-700 hover:bg-red-500/15">En vivo</Badge>;
+  if (status === "ended") return <Badge variant="outline">Finalizada</Badge>;
   return <Badge variant="outline">Planificada</Badge>;
 }
 
 function CreateClassDialog({
-  programas, docenteNombre, onClose,
-}: { programas: { id: string; titulo: string }[]; docenteNombre: string; onClose: () => void }) {
+  programas, docenteNombre, onClose, onCreated,
+}: {
+  programas: { id: string; titulo: string }[];
+  docenteNombre: string;
+  onClose: () => void;
+  onCreated: () => void;
+}) {
   const [titulo, setTitulo] = useState("");
   const [programaId, setProgramaId] = useState(programas[0]?.id ?? "");
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [duracion, setDuracion] = useState(60);
-  const [autoGenerate, setAutoGenerate] = useState(true);
   const [autoRecord, setAutoRecord] = useState(true);
+  const createFn = useServerFn(createZoomMeeting);
+
+  const mut = useMutation({
+    mutationFn: async () => {
+      const startAt = new Date(`${fecha}T${hora}`).toISOString();
+      return createFn({
+        data: {
+          programaId, titulo,
+          startAt, durationMin: duracion,
+          autoRecord, docenteNombre,
+        },
+      });
+    },
+    onSuccess: (m) => {
+      toast.success("Reunión creada en Zoom", {
+        description: `ID ${m.zoom_meeting_id}`,
+        action: { label: "Copiar enlace", onClick: () => navigator.clipboard.writeText(m.zoom_join_url) },
+      });
+      onCreated();
+      onClose();
+    },
+    onError: (e) => toast.error("No se pudo crear", { description: e instanceof Error ? e.message : String(e) }),
+  });
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const programa = programas.find((p) => p.id === programaId);
-    if (!programa) return;
-    const startAt = new Date(`${fecha}T${hora}`).toISOString();
-    const created = zoomStore.scheduleClass({
-      titulo,
-      programaId,
-      programaTitulo: programa.titulo,
-      docenteNombre,
-      startAt,
-      durationMin: duracion,
-      autoGenerate,
-      autoRecord,
-    });
-    if (autoGenerate) {
-      toast.success("Enlace de Zoom generado", {
-        description: `ID ${created.zoomMeetingId}`,
-        action: {
-          label: "Copiar",
-          onClick: () => navigator.clipboard.writeText(created.zoomJoinUrl),
-        },
-      });
-    } else {
-      toast.success("Clase guardada sin enlace de Zoom");
+    if (!programaId) {
+      toast.error("Selecciona un programa");
+      return;
     }
-    onClose();
+    mut.mutate();
   };
 
   return (
@@ -352,16 +347,13 @@ function CreateClassDialog({
       <form onSubmit={submit} className="space-y-3">
         <div>
           <Label htmlFor="cls-titulo">Título de la clase</Label>
-          <Input
-            id="cls-titulo" required value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            placeholder="Ej. Repaso Módulo 4 — Flexbox y Grid"
-          />
+          <Input id="cls-titulo" required value={titulo} onChange={(e) => setTitulo(e.target.value)}
+            placeholder="Ej. Repaso Módulo 4" />
         </div>
         <div>
           <Label>Programa</Label>
           <Select value={programaId} onValueChange={setProgramaId}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder="Selecciona un programa" /></SelectTrigger>
             <SelectContent>
               {programas.map((p) => (
                 <SelectItem key={p.id} value={p.id}>{p.titulo}</SelectItem>
@@ -384,25 +376,18 @@ function CreateClassDialog({
               onChange={(e) => setDuracion(Number(e.target.value))} />
           </div>
         </div>
-        <div className="space-y-2 rounded-md border bg-muted/30 p-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="cls-auto" className="cursor-pointer">Generar enlace de Zoom automáticamente</Label>
-              <p className="text-xs text-muted-foreground">Crea la reunión vía API de Zoom y comparte el enlace con los inscritos.</p>
-            </div>
-            <Switch id="cls-auto" checked={autoGenerate} onCheckedChange={setAutoGenerate} />
+        <div className="flex items-center justify-between rounded-md border bg-muted/30 p-3">
+          <div>
+            <Label htmlFor="cls-rec" className="cursor-pointer">Grabar en la nube</Label>
+            <p className="text-xs text-muted-foreground">La grabación se publica automáticamente al finalizar.</p>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="cls-rec" className="cursor-pointer">Grabar clase automáticamente en la nube</Label>
-              <p className="text-xs text-muted-foreground">La grabación se publicará en el aula virtual al finalizar.</p>
-            </div>
-            <Switch id="cls-rec" checked={autoRecord} onCheckedChange={setAutoRecord} />
-          </div>
+          <Switch id="cls-rec" checked={autoRecord} onCheckedChange={setAutoRecord} />
         </div>
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button type="submit"><Copy className="mr-2 h-4 w-4" /> Crear y generar enlace</Button>
+          <Button type="submit" disabled={mut.isPending}>
+            {mut.isPending ? "Creando…" : "Crear reunión"}
+          </Button>
         </DialogFooter>
       </form>
     </DialogContent>
