@@ -40,7 +40,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           meetingNumber,
           password: password || "",
           userName: `${user.nombre ?? "Usuario"} ${user.apellido ?? ""}`.trim(),
-          userEmail: user.email ?? undefined,
+          userEmail: undefined,
           // El role lo determina la firma JWT; aquí solo informativo.
         });
         if (!cancelled) setState("joined");
