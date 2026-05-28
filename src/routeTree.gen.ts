@@ -39,6 +39,7 @@ import { Route as AuthenticatedDocenteCuentaRouteImport } from './routes/_authen
 import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
 import { Route as AuthenticatedDocenteClasesVivoRouteImport } from './routes/_authenticated/docente.clases-vivo'
 import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
+import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_authenticated/clase-vivo.$meetingId'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
@@ -217,6 +218,12 @@ const AuthenticatedDocenteCalificacionesRoute =
     path: '/calificaciones',
     getParentRoute: () => AuthenticatedDocenteRoute,
   } as any)
+const AuthenticatedClaseVivoMeetingIdRoute =
+  AuthenticatedClaseVivoMeetingIdRouteImport.update({
+    id: '/clase-vivo/$meetingId',
+    path: '/clase-vivo/$meetingId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
     id: '/usuarios',
@@ -336,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -379,6 +387,7 @@ export interface FileRoutesByTo {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -427,6 +436,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/_authenticated/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/_authenticated/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/_authenticated/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -475,6 +485,7 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/clase-vivo/$meetingId'
     | '/docente/calificaciones'
     | '/docente/clases-vivo'
     | '/docente/comunidad'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/clase-vivo/$meetingId'
     | '/docente/calificaciones'
     | '/docente/clases-vivo'
     | '/docente/comunidad'
@@ -565,6 +577,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
+    | '/_authenticated/clase-vivo/$meetingId'
     | '/_authenticated/docente/calificaciones'
     | '/_authenticated/docente/clases-vivo'
     | '/_authenticated/docente/comunidad'
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
       parentRoute: typeof AuthenticatedDocenteRoute
     }
+    '/_authenticated/clase-vivo/$meetingId': {
+      id: '/_authenticated/clase-vivo/$meetingId'
+      path: '/clase-vivo/$meetingId'
+      fullPath: '/clase-vivo/$meetingId'
+      preLoaderRoute: typeof AuthenticatedClaseVivoMeetingIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
       path: '/usuarios'
@@ -1005,6 +1025,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRouteWithChildren
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRouteWithChildren
+  AuthenticatedClaseVivoMeetingIdRoute: typeof AuthenticatedClaseVivoMeetingIdRoute
   AuthenticatedMisCursosSlugRoute: typeof AuthenticatedMisCursosSlugRoute
   AuthenticatedMisCursosIndexRoute: typeof AuthenticatedMisCursosIndexRoute
 }
@@ -1014,6 +1035,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRouteWithChildren,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRouteWithChildren,
+  AuthenticatedClaseVivoMeetingIdRoute: AuthenticatedClaseVivoMeetingIdRoute,
   AuthenticatedMisCursosSlugRoute: AuthenticatedMisCursosSlugRoute,
   AuthenticatedMisCursosIndexRoute: AuthenticatedMisCursosIndexRoute,
 }
