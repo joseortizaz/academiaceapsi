@@ -11,7 +11,26 @@ import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
   Radio, Video, FileVideo,
 } from "lucide-react";
-import { useZoomStore, isLiveNow, type ZoomClass } from "@/lib/zoom-mock";
+
+type ZoomMeetingLite = {
+  id: string;
+  titulo: string;
+  start_at: string;
+  duration_min: number;
+  status: "scheduled" | "live" | "ended" | "recorded";
+  zoom_meeting_id: string;
+  docente_nombre: string | null;
+  recording_share_url: string | null;
+  recording_duration_min: number | null;
+  programa_id: string;
+};
+
+function isLiveZoom(c: ZoomMeetingLite) {
+  const start = new Date(c.start_at).getTime();
+  const end = start + c.duration_min * 60 * 1000;
+  const now = Date.now();
+  return c.status === "live" || (now >= start - 5 * 60 * 1000 && now <= end);
+}
 
 export const Route = createFileRoute("/_authenticated/estudiante/")({
   component: EstudianteDashboard,
@@ -19,13 +38,26 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 
 function EstudianteDashboard() {
   const { user } = useAuth();
-  const { classes: zoomClasses } = useZoomStore();
 
-  const liveZoomClass = zoomClasses.find((c) => c.status === "live" || isLiveNow(c));
+  const { data: zoomClasses = [] } = useQuery({
+    queryKey: ["estudiante-zoom-meetings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("zoom_meetings")
+        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,recording_share_url,recording_duration_min,programa_id")
+        .order("start_at", { ascending: false });
+      return (data ?? []) as ZoomMeetingLite[];
+    },
+    refetchInterval: 30_000,
+  });
+
+  const liveZoomClass = zoomClasses.find(isLiveZoom);
   const upcomingZoom = zoomClasses
-    .filter((c) => c.status === "scheduled" && new Date(c.startAt).getTime() > Date.now())
-    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())[0];
+    .filter((c) => c.status === "scheduled" && new Date(c.start_at).getTime() > Date.now())
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
   const recordedZoom = zoomClasses.filter((c) => c.status === "recorded").slice(0, 4);
+
 
   const { data } = useQuery({
     queryKey: ["estudiante-dash", user?.id],
