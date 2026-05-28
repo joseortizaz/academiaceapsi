@@ -57,7 +57,7 @@ export const Route = createFileRoute("/api/public/zoom-webhook")({
           event: body.event,
           event_ts: body.event_ts ?? null,
           zoom_meeting_id: meetingId,
-          payload: body as unknown as Record<string, unknown>,
+          payload: body as unknown as never,
           signature_valid: valid,
           processed: false,
         });
