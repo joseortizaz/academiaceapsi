@@ -347,7 +347,7 @@ function StatCard({
   );
 }
 
-function LiveZoomBanner({ cls }: { cls: ZoomClass }) {
+function LiveZoomBanner({ cls }: { cls: ZoomMeetingLite }) {
   return (
     <Card className="border-red-500/40 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent">
       <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
@@ -362,14 +362,14 @@ function LiveZoomBanner({ cls }: { cls: ZoomClass }) {
               <span className="text-sm font-semibold">{cls.titulo}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              {cls.programaTitulo} · {cls.docenteNombre} · ID Zoom {cls.zoomMeetingId}
+              {cls.docente_nombre ?? ""} · ID Zoom {cls.zoom_meeting_id}
             </p>
           </div>
         </div>
         <Button asChild size="lg" className="bg-red-600 hover:bg-red-700">
-          <a href={cls.zoomJoinUrl} target="_blank" rel="noreferrer">
+          <Link to="/clase-vivo/$meetingId" params={{ meetingId: cls.id }}>
             <Radio className="mr-2 h-4 w-4" /> Unirse a la clase
-          </a>
+          </Link>
         </Button>
       </CardContent>
     </Card>
