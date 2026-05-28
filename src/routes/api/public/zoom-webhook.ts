@@ -95,12 +95,12 @@ export const Route = createFileRoute("/api/public/zoom-webhook")({
           }
 
           await supabaseAdmin
-          await supabaseAdmin
             .from("zoom_webhook_logs")
             .update({ processed: true })
             .eq("event", body.event)
             .eq("event_ts", body.event_ts ?? 0)
             .eq("zoom_meeting_id", meetingId ?? "");
+        } catch (e) {
           await supabaseAdmin
             .from("zoom_webhook_logs")
             .update({ error: e instanceof Error ? e.message : String(e) })
