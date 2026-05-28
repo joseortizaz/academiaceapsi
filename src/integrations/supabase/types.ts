@@ -1058,6 +1058,111 @@ export type Database = {
         }
         Relationships: []
       }
+      zoom_meetings: {
+        Row: {
+          auto_record: boolean
+          created_at: string
+          created_by: string
+          docente_nombre: string | null
+          duration_min: number
+          id: string
+          modulo_id: string | null
+          programa_id: string
+          recording_duration_min: number | null
+          recording_password: string | null
+          recording_share_url: string | null
+          recording_url: string | null
+          start_at: string
+          status: string
+          titulo: string
+          updated_at: string
+          zoom_join_url: string
+          zoom_meeting_id: string
+          zoom_password: string | null
+          zoom_start_url: string | null
+        }
+        Insert: {
+          auto_record?: boolean
+          created_at?: string
+          created_by: string
+          docente_nombre?: string | null
+          duration_min?: number
+          id?: string
+          modulo_id?: string | null
+          programa_id: string
+          recording_duration_min?: number | null
+          recording_password?: string | null
+          recording_share_url?: string | null
+          recording_url?: string | null
+          start_at: string
+          status?: string
+          titulo: string
+          updated_at?: string
+          zoom_join_url: string
+          zoom_meeting_id: string
+          zoom_password?: string | null
+          zoom_start_url?: string | null
+        }
+        Update: {
+          auto_record?: boolean
+          created_at?: string
+          created_by?: string
+          docente_nombre?: string | null
+          duration_min?: number
+          id?: string
+          modulo_id?: string | null
+          programa_id?: string
+          recording_duration_min?: number | null
+          recording_password?: string | null
+          recording_share_url?: string | null
+          recording_url?: string | null
+          start_at?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+          zoom_join_url?: string
+          zoom_meeting_id?: string
+          zoom_password?: string | null
+          zoom_start_url?: string | null
+        }
+        Relationships: []
+      }
+      zoom_webhook_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          event: string
+          event_ts: number | null
+          id: string
+          payload: Json
+          processed: boolean
+          signature_valid: boolean
+          zoom_meeting_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event: string
+          event_ts?: number | null
+          id?: string
+          payload: Json
+          processed?: boolean
+          signature_valid?: boolean
+          zoom_meeting_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event?: string
+          event_ts?: number | null
+          id?: string
+          payload?: Json
+          processed?: boolean
+          signature_valid?: boolean
+          zoom_meeting_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       assessment_questions_student: {
