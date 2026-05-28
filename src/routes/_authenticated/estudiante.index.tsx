@@ -376,13 +376,13 @@ function LiveZoomBanner({ cls }: { cls: ZoomMeetingLite }) {
   );
 }
 
-function UpcomingZoomCountdown({ cls }: { cls: ZoomClass }) {
+function UpcomingZoomCountdown({ cls }: { cls: ZoomMeetingLite }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-  const ms = Math.max(0, new Date(cls.startAt).getTime() - now);
+  const ms = Math.max(0, new Date(cls.start_at).getTime() - now);
   const days = Math.floor(ms / 86400000);
   const hours = Math.floor((ms % 86400000) / 3600000);
   const minutes = Math.floor((ms % 3600000) / 60000);
