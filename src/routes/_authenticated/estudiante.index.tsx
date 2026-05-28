@@ -398,7 +398,7 @@ function UpcomingZoomCountdown({ cls }: { cls: ZoomMeetingLite }) {
           <div>
             <p className="text-sm font-semibold">Próxima clase en vivo</p>
             <p className="text-xs text-muted-foreground">
-              {cls.titulo} · {cls.programaTitulo}
+              {cls.titulo}{cls.docente_nombre ? ` · ${cls.docente_nombre}` : ""}
             </p>
           </div>
         </div>
