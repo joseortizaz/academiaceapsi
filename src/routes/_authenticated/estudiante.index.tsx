@@ -11,7 +11,26 @@ import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
   Radio, Video, FileVideo,
 } from "lucide-react";
-import { useZoomStore, isLiveNow, type ZoomClass } from "@/lib/zoom-mock";
+
+type ZoomMeetingLite = {
+  id: string;
+  titulo: string;
+  start_at: string;
+  duration_min: number;
+  status: "scheduled" | "live" | "ended" | "recorded";
+  zoom_meeting_id: string;
+  docente_nombre: string | null;
+  recording_share_url: string | null;
+  recording_duration_min: number | null;
+  programa_id: string;
+};
+
+function isLiveZoom(c: ZoomMeetingLite) {
+  const start = new Date(c.start_at).getTime();
+  const end = start + c.duration_min * 60 * 1000;
+  const now = Date.now();
+  return c.status === "live" || (now >= start - 5 * 60 * 1000 && now <= end);
+}
 
 export const Route = createFileRoute("/_authenticated/estudiante/")({
   component: EstudianteDashboard,
@@ -19,13 +38,26 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 
 function EstudianteDashboard() {
   const { user } = useAuth();
-  const { classes: zoomClasses } = useZoomStore();
 
-  const liveZoomClass = zoomClasses.find((c) => c.status === "live" || isLiveNow(c));
+  const { data: zoomClasses = [] } = useQuery({
+    queryKey: ["estudiante-zoom-meetings", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("zoom_meetings")
+        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,recording_share_url,recording_duration_min,programa_id")
+        .order("start_at", { ascending: false });
+      return (data ?? []) as ZoomMeetingLite[];
+    },
+    refetchInterval: 30_000,
+  });
+
+  const liveZoomClass = zoomClasses.find(isLiveZoom);
   const upcomingZoom = zoomClasses
-    .filter((c) => c.status === "scheduled" && new Date(c.startAt).getTime() > Date.now())
-    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime())[0];
+    .filter((c) => c.status === "scheduled" && new Date(c.start_at).getTime() > Date.now())
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
   const recordedZoom = zoomClasses.filter((c) => c.status === "recorded").slice(0, 4);
+
 
   const { data } = useQuery({
     queryKey: ["estudiante-dash", user?.id],
@@ -252,17 +284,19 @@ function EstudianteDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{c.titulo}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {c.programaTitulo} · {c.recordingDurationMin} min · {new Date(c.startAt).toLocaleDateString("es-DO")}
+                      {c.docente_nombre ?? ""}{c.recording_duration_min ? ` · ${c.recording_duration_min} min` : ""} · {new Date(c.start_at).toLocaleDateString("es-DO")}
                     </p>
                   </div>
                   <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
                     Grabación disponible
                   </Badge>
-                  <Button asChild size="sm" variant="outline">
-                    <a href={c.recordingUrl} target="_blank" rel="noreferrer">
-                      <PlayCircle className="mr-1 h-3 w-3" /> Ver
-                    </a>
-                  </Button>
+                  {c.recording_share_url && (
+                    <Button asChild size="sm" variant="outline">
+                      <a href={c.recording_share_url} target="_blank" rel="noreferrer">
+                        <PlayCircle className="mr-1 h-3 w-3" /> Ver
+                      </a>
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -313,7 +347,7 @@ function StatCard({
   );
 }
 
-function LiveZoomBanner({ cls }: { cls: ZoomClass }) {
+function LiveZoomBanner({ cls }: { cls: ZoomMeetingLite }) {
   return (
     <Card className="border-red-500/40 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent">
       <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
@@ -328,27 +362,27 @@ function LiveZoomBanner({ cls }: { cls: ZoomClass }) {
               <span className="text-sm font-semibold">{cls.titulo}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              {cls.programaTitulo} · {cls.docenteNombre} · ID Zoom {cls.zoomMeetingId}
+              {cls.docente_nombre ?? ""} · ID Zoom {cls.zoom_meeting_id}
             </p>
           </div>
         </div>
         <Button asChild size="lg" className="bg-red-600 hover:bg-red-700">
-          <a href={cls.zoomJoinUrl} target="_blank" rel="noreferrer">
+          <Link to="/clase-vivo/$meetingId" params={{ meetingId: cls.id }}>
             <Radio className="mr-2 h-4 w-4" /> Unirse a la clase
-          </a>
+          </Link>
         </Button>
       </CardContent>
     </Card>
   );
 }
 
-function UpcomingZoomCountdown({ cls }: { cls: ZoomClass }) {
+function UpcomingZoomCountdown({ cls }: { cls: ZoomMeetingLite }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-  const ms = Math.max(0, new Date(cls.startAt).getTime() - now);
+  const ms = Math.max(0, new Date(cls.start_at).getTime() - now);
   const days = Math.floor(ms / 86400000);
   const hours = Math.floor((ms % 86400000) / 3600000);
   const minutes = Math.floor((ms % 3600000) / 60000);
@@ -364,7 +398,7 @@ function UpcomingZoomCountdown({ cls }: { cls: ZoomClass }) {
           <div>
             <p className="text-sm font-semibold">Próxima clase en vivo</p>
             <p className="text-xs text-muted-foreground">
-              {cls.titulo} · {cls.programaTitulo}
+              {cls.titulo}{cls.docente_nombre ? ` · ${cls.docente_nombre}` : ""}
             </p>
           </div>
         </div>

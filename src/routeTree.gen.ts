@@ -29,6 +29,7 @@ import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
 import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
@@ -38,6 +39,7 @@ import { Route as AuthenticatedDocenteCuentaRouteImport } from './routes/_authen
 import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
 import { Route as AuthenticatedDocenteClasesVivoRouteImport } from './routes/_authenticated/docente.clases-vivo'
 import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
+import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_authenticated/clase-vivo.$meetingId'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
@@ -157,6 +159,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
+  id: '/api/public/zoom-webhook',
+  path: '/api/public/zoom-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMisCursosSlugRoute =
   AuthenticatedMisCursosSlugRouteImport.update({
     id: '/mis-cursos/$slug',
@@ -210,6 +217,12 @@ const AuthenticatedDocenteCalificacionesRoute =
     id: '/calificaciones',
     path: '/calificaciones',
     getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedClaseVivoMeetingIdRoute =
+  AuthenticatedClaseVivoMeetingIdRouteImport.update({
+    id: '/clase-vivo/$meetingId',
+    path: '/clase-vivo/$meetingId',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
@@ -330,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -339,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
@@ -372,6 +387,7 @@ export interface FileRoutesByTo {
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -381,6 +397,7 @@ export interface FileRoutesByTo {
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
@@ -419,6 +436,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
   '/_authenticated/docente/calificaciones': typeof AuthenticatedDocenteCalificacionesRoute
   '/_authenticated/docente/clases-vivo': typeof AuthenticatedDocenteClasesVivoRoute
   '/_authenticated/docente/comunidad': typeof AuthenticatedDocenteComunidadRoute
@@ -428,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/_authenticated/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
@@ -466,6 +485,7 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/clase-vivo/$meetingId'
     | '/docente/calificaciones'
     | '/docente/clases-vivo'
     | '/docente/comunidad'
@@ -475,6 +495,7 @@ export interface FileRouteTypes {
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
+    | '/api/public/zoom-webhook'
     | '/admin/'
     | '/docente/'
     | '/estudiante/'
@@ -508,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/programas'
     | '/admin/testimonios'
     | '/admin/usuarios'
+    | '/clase-vivo/$meetingId'
     | '/docente/calificaciones'
     | '/docente/clases-vivo'
     | '/docente/comunidad'
@@ -517,6 +539,7 @@ export interface FileRouteTypes {
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
+    | '/api/public/zoom-webhook'
     | '/admin'
     | '/docente'
     | '/estudiante'
@@ -554,6 +577,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
+    | '/_authenticated/clase-vivo/$meetingId'
     | '/_authenticated/docente/calificaciones'
     | '/_authenticated/docente/clases-vivo'
     | '/_authenticated/docente/comunidad'
@@ -563,6 +587,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante/cuenta'
     | '/_authenticated/estudiante/evaluaciones'
     | '/_authenticated/mis-cursos/$slug'
+    | '/api/public/zoom-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
@@ -581,6 +606,7 @@ export interface RootRouteChildren {
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
+  ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -725,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/zoom-webhook': {
+      id: '/api/public/zoom-webhook'
+      path: '/api/public/zoom-webhook'
+      fullPath: '/api/public/zoom-webhook'
+      preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/mis-cursos/$slug': {
       id: '/_authenticated/mis-cursos/$slug'
       path: '/mis-cursos/$slug'
@@ -787,6 +820,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docente/calificaciones'
       preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
       parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/clase-vivo/$meetingId': {
+      id: '/_authenticated/clase-vivo/$meetingId'
+      path: '/clase-vivo/$meetingId'
+      fullPath: '/clase-vivo/$meetingId'
+      preLoaderRoute: typeof AuthenticatedClaseVivoMeetingIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
@@ -985,6 +1025,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRouteWithChildren
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRouteWithChildren
+  AuthenticatedClaseVivoMeetingIdRoute: typeof AuthenticatedClaseVivoMeetingIdRoute
   AuthenticatedMisCursosSlugRoute: typeof AuthenticatedMisCursosSlugRoute
   AuthenticatedMisCursosIndexRoute: typeof AuthenticatedMisCursosIndexRoute
 }
@@ -994,6 +1035,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRouteWithChildren,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRouteWithChildren,
+  AuthenticatedClaseVivoMeetingIdRoute: AuthenticatedClaseVivoMeetingIdRoute,
   AuthenticatedMisCursosSlugRoute: AuthenticatedMisCursosSlugRoute,
   AuthenticatedMisCursosIndexRoute: AuthenticatedMisCursosIndexRoute,
 }
@@ -1026,17 +1068,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
+  ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
