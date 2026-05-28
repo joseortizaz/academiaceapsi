@@ -284,17 +284,19 @@ function EstudianteDashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{c.titulo}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {c.programaTitulo} · {c.recordingDurationMin} min · {new Date(c.startAt).toLocaleDateString("es-DO")}
+                      {c.docente_nombre ?? ""}{c.recording_duration_min ? ` · ${c.recording_duration_min} min` : ""} · {new Date(c.start_at).toLocaleDateString("es-DO")}
                     </p>
                   </div>
                   <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
                     Grabación disponible
                   </Badge>
-                  <Button asChild size="sm" variant="outline">
-                    <a href={c.recordingUrl} target="_blank" rel="noreferrer">
-                      <PlayCircle className="mr-1 h-3 w-3" /> Ver
-                    </a>
-                  </Button>
+                  {c.recording_share_url && (
+                    <Button asChild size="sm" variant="outline">
+                      <a href={c.recording_share_url} target="_blank" rel="noreferrer">
+                        <PlayCircle className="mr-1 h-3 w-3" /> Ver
+                      </a>
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>
