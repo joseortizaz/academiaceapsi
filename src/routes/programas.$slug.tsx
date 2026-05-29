@@ -67,8 +67,7 @@ function DetallePrograma() {
     queryKey: ["public", "docente", programa?.docente_id],
     enabled: !!programa?.docente_id,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("teachers")
+      const { data } = await (supabase.from as any)("teachers_public")
         .select("nombre,apellido,titulo,especialidad,avatar_url,biografia")
         .eq("id", programa!.docente_id!)
         .maybeSingle();
