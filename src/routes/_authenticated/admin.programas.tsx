@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import {
   AdminPageHeader,
   CreateButton,
@@ -242,41 +243,38 @@ function ProgramasPage() {
             </div>
             <div className="grid gap-2">
               <Label>Descripción</Label>
-              <Textarea
-                rows={4}
+              <RichTextEditor
                 value={s.descripcion}
-                onChange={(e) => set({ descripcion: e.target.value })}
-                required
+                onChange={(html) => set({ descripcion: html })}
+                placeholder="Describe el programa…"
+                minHeight={160}
               />
             </div>
 
             <div className="grid gap-2">
               <Label>Objetivos</Label>
-              <Textarea
-                rows={3}
-                placeholder="¿Qué aprenderá el estudiante? Un objetivo por línea."
+              <RichTextEditor
                 value={s.objetivos ?? ""}
-                onChange={(e) => set({ objetivos: e.target.value })}
+                onChange={(html) => set({ objetivos: html })}
+                placeholder="¿Qué aprenderá el estudiante?"
               />
             </div>
 
             <div className="grid gap-2">
               <Label>Público meta</Label>
-              <Textarea
-                rows={3}
-                placeholder="¿A quién está dirigido este programa?"
+              <RichTextEditor
                 value={s.publico_meta ?? ""}
-                onChange={(e) => set({ publico_meta: e.target.value })}
+                onChange={(html) => set({ publico_meta: html })}
+                placeholder="¿A quién está dirigido este programa?"
               />
             </div>
 
             <div className="grid gap-2">
               <Label>Resultados esperados</Label>
-              <Textarea
-                rows={3}
-                placeholder="¿Qué competencias o resultados obtendrá al finalizar?"
+              <RichTextEditor
                 value={s.resultados_esperados ?? ""}
-                onChange={(e) => set({ resultados_esperados: e.target.value })}
+                onChange={(html) => set({ resultados_esperados: html })}
+                placeholder="¿Qué competencias obtendrá al finalizar?"
               />
             </div>
 

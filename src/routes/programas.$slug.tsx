@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RichText } from "@/components/RichText";
 import {
   Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video,
 } from "lucide-react";
@@ -259,35 +260,27 @@ function DetallePrograma() {
         <div className="space-y-10">
           <div>
             <h2 className="text-2xl font-bold">Descripción del programa</h2>
-            <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
-              {programa.descripcion}
-            </div>
+            <RichText html={programa.descripcion} className="mt-3 text-foreground/90" />
           </div>
 
           {(programa as any).objetivos && (
             <div>
               <h2 className="text-2xl font-bold">Objetivos</h2>
-              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
-                {(programa as any).objetivos}
-              </div>
+              <RichText html={(programa as any).objetivos} className="mt-3 text-foreground/90" />
             </div>
           )}
 
           {(programa as any).publico_meta && (
             <div>
               <h2 className="text-2xl font-bold">Público meta</h2>
-              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
-                {(programa as any).publico_meta}
-              </div>
+              <RichText html={(programa as any).publico_meta} className="mt-3 text-foreground/90" />
             </div>
           )}
 
           {(programa as any).resultados_esperados && (
             <div>
               <h2 className="text-2xl font-bold">Resultados esperados</h2>
-              <div className="prose prose-sm mt-3 max-w-none whitespace-pre-wrap text-foreground/90">
-                {(programa as any).resultados_esperados}
-              </div>
+              <RichText html={(programa as any).resultados_esperados} className="mt-3 text-foreground/90" />
             </div>
           )}
 
