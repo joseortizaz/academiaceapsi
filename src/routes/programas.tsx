@@ -253,7 +253,8 @@ function DetailBlock({
         {icon}
         {title}
       </div>
-      <p className="whitespace-pre-wrap text-sm text-muted-foreground">{text}</p>
+      <RichText html={text} className="text-sm text-muted-foreground" />
     </div>
   );
 }
+
