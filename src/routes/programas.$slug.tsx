@@ -301,33 +301,84 @@ function DetallePrograma() {
           {modulos.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold">Contenido del programa</h2>
-              <ol className="mt-4 divide-y rounded-lg border bg-card">
-                {modulos.map((m, i) => (
-                  <li key={m.id} className="flex items-start gap-3 p-4">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold">{m.titulo}</h3>
-                        {m.es_en_vivo && (
-                          <Badge variant="outline" className="gap-1">
-                            <Video className="h-3 w-3" /> En vivo
-                          </Badge>
-                        )}
-                        {m.duracion_minutos && (
-                          <span className="text-xs text-muted-foreground">
-                            {m.duracion_minutos} min
-                          </span>
+              {programa.tipo === "diplomado" && courseModules.length > 0 ? (
+                <div className="mt-4 space-y-4">
+                  {courseModules.map((cm, idx) => {
+                    const leccionesMod = modulos.filter((m) => m.modulo_id === cm.id);
+                    return (
+                      <div key={cm.id} className="rounded-lg border bg-card">
+                        <div className="border-b bg-muted/40 px-4 py-3">
+                          <h3 className="font-bold">
+                            Módulo {idx + 1}: {cm.titulo}
+                          </h3>
+                          {cm.descripcion && (
+                            <p className="mt-1 text-sm text-muted-foreground">{cm.descripcion}</p>
+                          )}
+                        </div>
+                        {leccionesMod.length === 0 ? (
+                          <p className="px-4 py-3 text-sm text-muted-foreground">Próximamente</p>
+                        ) : (
+                          <ol className="divide-y">
+                            {leccionesMod.map((m, i) => (
+                              <li key={m.id} className="flex items-start gap-3 p-4">
+                                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                                  {i + 1}
+                                </span>
+                                <div className="flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="font-semibold">{m.titulo}</h4>
+                                    {m.es_en_vivo && (
+                                      <Badge variant="outline" className="gap-1">
+                                        <Video className="h-3 w-3" /> En vivo
+                                      </Badge>
+                                    )}
+                                    {m.duracion_minutos && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {m.duracion_minutos} min
+                                      </span>
+                                    )}
+                                  </div>
+                                  {m.descripcion && (
+                                    <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
+                                  )}
+                                </div>
+                              </li>
+                            ))}
+                          </ol>
                         )}
                       </div>
-                      {m.descripcion && (
-                        <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
+                    );
+                  })}
+                </div>
+              ) : (
+                <ol className="mt-4 divide-y rounded-lg border bg-card">
+                  {modulos.map((m, i) => (
+                    <li key={m.id} className="flex items-start gap-3 p-4">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold">{m.titulo}</h3>
+                          {m.es_en_vivo && (
+                            <Badge variant="outline" className="gap-1">
+                              <Video className="h-3 w-3" /> En vivo
+                            </Badge>
+                          )}
+                          {m.duracion_minutos && (
+                            <span className="text-xs text-muted-foreground">
+                              {m.duracion_minutos} min
+                            </span>
+                          )}
+                        </div>
+                        {m.descripcion && (
+                          <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </div>
           )}
         </div>
