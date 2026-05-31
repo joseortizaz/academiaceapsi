@@ -50,13 +50,27 @@ function DetallePrograma() {
     },
   });
 
-  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null };
+  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null; modulo_id: string | null };
   const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
     queryKey: ["public", "modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
       const { data, error } = await (supabase.from as any)("program_modules_catalog")
-        .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion")
+        .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion,modulo_id")
+        .eq("programa_id", programa!.id)
+        .order("orden");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  type CourseModule = { id: string; titulo: string; descripcion: string | null; orden: number };
+  const { data: courseModules = [] } = useQuery<CourseModule[]>({
+    queryKey: ["public", "course_modules", programa?.id],
+    enabled: !!programa?.id && programa?.tipo === "diplomado",
+    queryFn: async () => {
+      const { data, error } = await (supabase.from as any)("course_modules")
+        .select("id,titulo,descripcion,orden")
         .eq("programa_id", programa!.id)
         .order("orden");
       if (error) throw error;
