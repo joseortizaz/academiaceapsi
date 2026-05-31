@@ -59,6 +59,18 @@ function CursoPlayer() {
     },
   });
 
+  const { data: courseModules = [] } = useQuery({
+    queryKey: ["mc-course-modules", programa?.id],
+    enabled: !!programa?.id && programa?.tipo === "diplomado",
+    queryFn: async () => {
+      const { data } = await (supabase.from as any)("course_modules")
+        .select("id,titulo,orden")
+        .eq("programa_id", programa!.id)
+        .order("orden");
+      return (data as { id: string; titulo: string; orden: number }[]) ?? [];
+    },
+  });
+
   const { data: progresos = [] } = useQuery({
     queryKey: ["mc-progress", enrollment?.id],
     enabled: !!enrollment?.id,
