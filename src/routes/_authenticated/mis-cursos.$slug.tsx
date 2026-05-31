@@ -59,6 +59,18 @@ function CursoPlayer() {
     },
   });
 
+  const { data: courseModules = [] } = useQuery({
+    queryKey: ["mc-course-modules", programa?.id],
+    enabled: !!programa?.id && programa?.tipo === "diplomado",
+    queryFn: async () => {
+      const { data } = await (supabase.from as any)("course_modules")
+        .select("id,titulo,orden")
+        .eq("programa_id", programa!.id)
+        .order("orden");
+      return (data as { id: string; titulo: string; orden: number }[]) ?? [];
+    },
+  });
+
   const { data: progresos = [] } = useQuery({
     queryKey: ["mc-progress", enrollment?.id],
     enabled: !!enrollment?.id,
@@ -219,34 +231,81 @@ function CursoPlayer() {
             <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
               Contenido
             </h2>
-            <ol className="mt-3 space-y-1">
-              {modulos.map((m, i) => {
-                const done = progressMap.get(m.id)?.completado;
-                const isActive = activeModule?.id === m.id;
-                return (
-                  <li key={m.id}>
-                    <button
-                      onClick={() => setActiveModuleId(m.id)}
-                      className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
-                        isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                      }`}
-                    >
-                      {done ? (
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                      ) : (
-                        <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                      )}
-                      <span className="flex-1">
-                        <span className="font-medium">{i + 1}. {m.titulo}</span>
-                        {m.es_en_vivo && (
-                          <Video className="ml-1 inline h-3 w-3 text-primary" />
+            {programa.tipo === "diplomado" && courseModules.length > 0 ? (
+              <div className="mt-3 space-y-4">
+                {courseModules.map((cm, ci) => {
+                  const lecs = modulos.filter((m) => (m as any).modulo_id === cm.id);
+                  const doneCount = lecs.filter((m) => progressMap.get(m.id)?.completado).length;
+                  return (
+                    <div key={cm.id}>
+                      <p className="mb-1 text-xs font-bold uppercase tracking-wide text-foreground/70">
+                        Módulo {ci + 1}: {cm.titulo}
+                        <span className="ml-2 font-normal text-muted-foreground">
+                          {doneCount}/{lecs.length}
+                        </span>
+                      </p>
+                      <ol className="space-y-1">
+                        {lecs.map((m, i) => {
+                          const done = progressMap.get(m.id)?.completado;
+                          const isActive = activeModule?.id === m.id;
+                          return (
+                            <li key={m.id}>
+                              <button
+                                onClick={() => setActiveModuleId(m.id)}
+                                className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
+                                  isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                                }`}
+                              >
+                                {done ? (
+                                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                                ) : (
+                                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                                )}
+                                <span className="flex-1">
+                                  <span className="font-medium">{i + 1}. {m.titulo}</span>
+                                  {m.es_en_vivo && (
+                                    <Video className="ml-1 inline h-3 w-3 text-primary" />
+                                  )}
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <ol className="mt-3 space-y-1">
+                {modulos.map((m, i) => {
+                  const done = progressMap.get(m.id)?.completado;
+                  const isActive = activeModule?.id === m.id;
+                  return (
+                    <li key={m.id}>
+                      <button
+                        onClick={() => setActiveModuleId(m.id)}
+                        className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
+                          isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                        }`}
+                      >
+                        {done ? (
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                        ) : (
+                          <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                         )}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+                        <span className="flex-1">
+                          <span className="font-medium">{i + 1}. {m.titulo}</span>
+                          {m.es_en_vivo && (
+                            <Video className="ml-1 inline h-3 w-3 text-primary" />
+                          )}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
           </div>
 
           {links.length > 0 && (

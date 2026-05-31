@@ -33,7 +33,7 @@ const nav = [
   { to: "/admin/programas", label: "Programas", icon: GraduationCap },
   { to: "/admin/categorias", label: "Categorías", icon: FolderTree },
   { to: "/admin/docentes", label: "Docentes", icon: Users },
-  { to: "/admin/modulos", label: "Módulos", icon: BookOpen },
+  { to: "/admin/modulos", label: "Lecciones", icon: BookOpen },
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
