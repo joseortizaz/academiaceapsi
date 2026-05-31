@@ -1302,6 +1302,7 @@ export type Database = {
           es_en_vivo: boolean | null
           fecha_sesion: string | null
           id: string | null
+          modulo_id: string | null
           orden: number | null
           programa_id: string | null
           titulo: string | null
@@ -1315,6 +1316,7 @@ export type Database = {
           es_en_vivo?: boolean | null
           fecha_sesion?: string | null
           id?: string | null
+          modulo_id?: string | null
           orden?: number | null
           programa_id?: string | null
           titulo?: string | null
@@ -1328,6 +1330,7 @@ export type Database = {
           es_en_vivo?: boolean | null
           fecha_sesion?: string | null
           id?: string | null
+          modulo_id?: string | null
           orden?: number | null
           programa_id?: string | null
           titulo?: string | null
@@ -1346,6 +1349,13 @@ export type Database = {
             columns: ["docente_id"]
             isOneToOne: false
             referencedRelation: "teachers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_modules_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
             referencedColumns: ["id"]
           },
           {
