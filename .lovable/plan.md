@@ -1,140 +1,107 @@
-# Integración real con Zoom
+## Objetivo
 
-Reemplaza el mock actual (`src/lib/zoom-mock.ts`) por una integración real basada en tres piezas de Zoom que trabajan juntas:
+Reestructurar el contenido académico para soportar dos jerarquías distintas según el tipo de programa:
 
-1. **Meeting SDK (web)** — para embeber la videollamada dentro de la plataforma sin salir a zoom.us.
-2. **Server-to-Server OAuth App** — para crear/listar/borrar reuniones bajo la cuenta central de la academia.
-3. **Webhook de Zoom** — para recibir `recording.completed` y publicar la grabación automáticamente.
+- **Diplomados**: Programa → Módulos → Lecciones (3 niveles)
+- **Cursos**: Programa → Lecciones (2 niveles, sin módulos intermedios)
 
-> Necesitas **dos apps** en el Zoom Marketplace porque Meeting SDK y Server-to-Server OAuth son tipos distintos. Ambas viven bajo la misma cuenta administradora de la academia.
-
----
-
-## 1. Apps a crear en marketplace.zoom.us
-
-### App A — "Ceapsi Plataforma S2S" (Server-to-Server OAuth)
-Usada por el backend para crear reuniones y suscribirse a webhooks.
-
-Credenciales que entrega:
-- `ZOOM_ACCOUNT_ID`
-- `ZOOM_CLIENT_ID`
-- `ZOOM_CLIENT_SECRET`
-- `ZOOM_WEBHOOK_SECRET_TOKEN`
-
-Scopes mínimos:
-- `meeting:write:admin`, `meeting:read:admin`
-- `recording:read:admin`
-- `user:read:admin`
-
-Event Subscriptions (webhook):
-- URL: `https://project--574a587a-0476-4791-be9b-3d7e669d64c8.lovable.app/api/public/zoom-webhook`
-- Eventos: `recording.completed`, `meeting.started`, `meeting.ended`
-- Validación: URL Validation (CRC) automática.
-
-### App B — "Ceapsi Aula Virtual" (Meeting SDK)
-Usada por el frontend para embeber el cliente de Zoom.
-
-Credenciales:
-- `ZOOM_SDK_KEY` (public, va en `import.meta.env.VITE_ZOOM_SDK_KEY`)
-- `ZOOM_SDK_SECRET` (privado, solo backend, para firmar el JWT del SDK)
+Actualmente el sistema solo tiene `programs` → `program_modules` (donde "módulos" funcionan como lecciones), lo que no permite agrupar lecciones bajo módulos temáticos en diplomados.
 
 ---
 
-## 2. Secrets a registrar en Lovable Cloud
+## 1. Cambios en base de datos
 
-| Secret | Dónde se usa |
-|---|---|
-| `ZOOM_ACCOUNT_ID` | server fn (token S2S) |
-| `ZOOM_CLIENT_ID` | server fn |
-| `ZOOM_CLIENT_SECRET` | server fn |
-| `ZOOM_SDK_KEY` | server fn (firma JWT) — también expuesta como `VITE_ZOOM_SDK_KEY` en frontend |
-| `ZOOM_SDK_SECRET` | server fn (firma JWT) |
-| `ZOOM_WEBHOOK_SECRET_TOKEN` | ruta pública `/api/public/zoom-webhook` |
+### Nueva tabla `course_modules` (módulos agrupadores, solo para diplomados)
+Campos clave: `programa_id`, `titulo`, `descripcion`, `orden`.
+- RLS: admins gestionan; docentes del programa gestionan; estudiantes inscritos leen.
+- Grants estándar (`authenticated`, `service_role`).
 
-El secret existente `ZoomSDK` se renombra/divide según corresponda.
+### Renombrar concepto en `program_modules` → tabla de **lecciones**
+Opción recomendada (menos disruptiva): **mantener el nombre `program_modules` en SQL** pero tratarla como "lecciones" en UI/código. Añadir columna nullable:
 
----
+- `modulo_id uuid NULL` → referencia opcional a `course_modules.id`.
+  - En **diplomados** será obligatorio (validación a nivel app/trigger).
+  - En **cursos** queda NULL (lección directamente bajo el programa).
 
-## 3. Cambios en base de datos
+Alternativa más limpia (mayor refactor): renombrar `program_modules` a `program_lessons`. Recomiendo **NO hacerlo ahora** para no romper `module_progress`, `assessments.modulo_id`, `program_access_links.modulo_id`, `lesson_comments.modulo_id`, `zoom_meetings.modulo_id` y la regeneración de tipos. Mantener nombre físico, cambiar solo el label en UI.
 
-Nueva tabla `zoom_meetings` (acceso solo a roles `admin`/`docente`/inscritos):
-- `programa_id`, `modulo_id`
-- `titulo`, `docente_nombre`
-- `zoom_meeting_id`, `zoom_join_url`, `zoom_start_url`, `zoom_password`
-- `start_at`, `duration_min`
-- `status` (`scheduled` / `live` / `ended` / `recorded`)
-- `recording_url`, `recording_duration_min`, `recording_password`
-- `created_by`, timestamps
+### Trigger de validación
+Función que valida: si `programs.tipo = 'diplomado'` entonces `program_modules.modulo_id` debe ser NOT NULL; si `tipo = 'curso'` debe ser NULL.
 
-Una tabla de auditoría `zoom_webhook_logs` para guardar eventos recibidos (debug + idempotencia por `event_id`).
-
-RLS: admin/docente CRUD; estudiante SELECT solo si tiene inscripción `confirmado`/`activo` en el programa.
+### Migración de datos existentes
+Para cada diplomado existente: crear un `course_modules` por defecto ("Módulo 1") y asignar todas sus lecciones actuales a ese módulo. Cursos no requieren cambios.
 
 ---
 
-## 4. Backend — server functions y ruta pública
+## 2. Cambios en UI de administración
 
-### `src/lib/zoom.server.ts` (helpers)
-- `getZoomAccessToken()` — POST a `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=...` con Basic Auth. Cachea token en memoria (válido 1h).
-- `zoomApi(path, init)` — wrapper de `fetch` contra `https://api.zoom.us/v2`.
-- `signMeetingSdkJwt({ meetingNumber, role })` — firma JWT del Meeting SDK (HS256, payload `appKey/sdkKey/mn/role/iat/exp/tokenExp`).
+### `admin.programas.tsx` (formulario de crear/editar programa)
+- Sin cambios estructurales; el `tipo` (curso/diplomado) ya existe.
 
-### `src/lib/zoom.functions.ts` (server fns, middleware `requireSupabaseAuth` + check rol)
-- `createZoomMeeting({ titulo, programaId, startAt, durationMin, autoRecord })` → crea en Zoom, guarda en `zoom_meetings`.
-- `deleteZoomMeeting({ id })`
-- `listZoomMeetings({ programaId? })`
-- `getMeetingSdkSignature({ meetingId, role })` → devuelve `{ signature, sdkKey }` al frontend (role 1 = host docente, role 0 = estudiante; valida inscripción del estudiante antes de firmar).
+### Nueva pantalla / sección: gestor de **Módulos** (solo diplomados)
+- En la pantalla de edición del programa, si `tipo = 'diplomado'`: mostrar lista de módulos con CRUD (título, descripción, orden) y drag-to-reorder.
+- Botón "Agregar lección" dentro de cada módulo.
 
-### `src/routes/api/public/zoom-webhook.ts` (server route)
-- Maneja URL Validation challenge (`event === 'endpoint.url_validation'` → devolver `plainToken` + `encryptedToken` HMAC-SHA256 con `ZOOM_WEBHOOK_SECRET_TOKEN`).
-- Verifica firma de eventos: header `x-zm-signature` = `v0=HMAC_SHA256(secret, "v0:" + x-zm-request-timestamp + ":" + body)`.
-- Idempotencia por `payload.event_ts` + `payload.object.uuid`.
-- En `recording.completed`: extrae `share_url` / `play_url` de la primera grabación MP4 y actualiza `zoom_meetings.recording_url`, `status='recorded'`.
-- En `meeting.started` / `meeting.ended`: actualiza `status`.
+### `admin.modulos.tsx` (actualmente edita lo que hoy llamamos módulos = lecciones)
+- Renombrar a "Lecciones" en toda la UI (títulos, breadcrumbs, botones).
+- Añadir selector de **módulo padre** cuando el programa es diplomado.
+- Ocultar selector cuando es curso.
 
 ---
 
-## 5. Frontend
+## 3. Cambios en UI de estudiante / docente
 
-### Reemplazar `src/lib/zoom-mock.ts`
-Eliminar el store mock. Reemplazar por hooks basados en TanStack Query que llaman a las server fns reales.
+### `mis-cursos.$slug.tsx` (player del curso)
+- Sidebar de contenido:
+  - **Curso**: lista plana de lecciones (igual que hoy).
+  - **Diplomado**: lista agrupada por módulo (accordion con módulos expandibles, lecciones dentro). Progreso por módulo + global.
 
-### `src/routes/_authenticated/admin.integraciones.tsx`
-- Quitar el flujo OAuth simulado.
-- Mostrar estado real: ping a una server fn `getZoomConnectionStatus()` que pide `/users/me` con el token S2S — si responde 200, "Conectado a {account}".
-- Botón "Probar conexión" + "Ver logs" (lectura de `zoom_webhook_logs`).
+### `programas.$slug.tsx` (página pública del programa)
+- Curso: muestra temario como lista de lecciones.
+- Diplomado: muestra temario agrupado por módulos con sus lecciones.
 
-### `src/routes/_authenticated/docente.clases-vivo.tsx`
-- `CreateClassDialog` llama a `createZoomMeeting` real.
-- Botón "Iniciar" abre una nueva vista embebida (ver abajo) en lugar de `window.open(zoomStartUrl)`.
-
-### Nueva ruta `src/routes/_authenticated/clase-vivo.$meetingId.tsx`
-Embed del Meeting SDK:
-- Instalar `@zoom/meetingsdk` (`bun add @zoom/meetingsdk`).
-- Cargar el cliente vía `ZoomMtgEmbedded.createClient()`, pedir signature a `getMeetingSdkSignature`, hacer `client.join({ sdkKey, signature, meetingNumber, password, userName, role })`.
-- Resolver role automáticamente: si el usuario es el docente del programa → host; si es estudiante inscrito confirmado → attendee; si no → 403.
-
-### Vista de grabaciones (alumnos)
-En `mis-cursos.$slug.tsx`, listar grabaciones (`status='recorded'`) con `<video>` apuntando al `recording_url` (vía proxy server fn si Zoom requiere auth) o link al `share_url` con `recording_password`.
+### `docente.cursos.tsx` y vistas docentes
+- Misma lógica: agrupar por módulos en diplomados.
 
 ---
 
-## 6. Pasos en orden de implementación
+## 4. Cambios en lógica relacionada
 
-1. Crear migración para `zoom_meetings` + `zoom_webhook_logs` con RLS.
-2. Registrar los 6 secrets (te pediré que los pegues una vez creadas las apps en Zoom).
-3. Implementar `zoom.server.ts` + `zoom.functions.ts`.
-4. Implementar `/api/public/zoom-webhook.ts` y probar URL Validation desde Zoom Marketplace.
-5. Reemplazar UI de admin/integraciones y docente/clases-vivo (sin el mock).
-6. Agregar dependencia `@zoom/meetingsdk` y crear la ruta de clase embebida.
-7. Borrar `src/lib/zoom-mock.ts` cuando todo funcione.
+- **Progreso (`module_progress`)**: sigue ligado a `modulo_id` (= lección). El % por módulo agrupador se calcula sumando lecciones completadas dentro del módulo.
+- **Evaluaciones (`assessments.modulo_id`)**: puede seguir apuntando a una lección. Opcionalmente se puede permitir asignar a un módulo entero (fuera de scope para este plan).
+- **Zoom (`zoom_meetings.modulo_id`)**, **comentarios (`lesson_comments.modulo_id`)**, **accesos (`program_access_links.modulo_id`)**: sin cambios, siguen ligados a lección.
+- **Certificados**: sin cambios.
 
 ---
 
-## Notas técnicas
+## 5. Detalles técnicos
 
-- **Server-to-Server OAuth** no requiere flujo de redirección — el token se genera con credenciales y dura 1h. Lo refresca el backend automáticamente.
-- **Meeting SDK signature** es un JWT HS256 firmado en el backend; nunca expongas `ZOOM_SDK_SECRET` al cliente.
-- **Webhook**: la URL debe estar pública antes de poder validarla en el Marketplace. El proyecto ya tiene URL estable (`project--<id>.lovable.app`), no cambia al renombrar.
-- **Grabación en la nube** requiere que la cuenta Zoom tenga plan Pro o superior (Basic solo permite grabación local, sin webhook `recording.completed`).
-- El bucket privado existente `course-materials` puede servir como respaldo si decides descargar las grabaciones de Zoom y rehospedarlas (no incluido en este plan; usa el `share_url` de Zoom por simplicidad).
+```text
+programs (tipo: curso|diplomado)
+  ├── course_modules           (NUEVO — solo diplomados)
+  │     └── program_modules    (= lecciones, modulo_id → course_modules.id)
+  └── program_modules          (= lecciones, modulo_id NULL para cursos)
+```
+
+- Trigger `validate_lesson_hierarchy()` en `program_modules` antes de INSERT/UPDATE.
+- Índices: `course_modules(programa_id, orden)`, `program_modules(modulo_id, orden)`.
+- Tipos TypeScript: se regeneran automáticamente tras la migración.
+
+---
+
+## 6. Orden de implementación
+
+1. Migración SQL: crear `course_modules`, agregar `modulo_id` a `program_modules`, trigger de validación, migrar datos existentes, GRANTs y RLS.
+2. Actualizar `admin.programas.tsx` con gestor de módulos embebido para diplomados.
+3. Actualizar `admin.modulos.tsx` → renombrar a "Lecciones" + selector de módulo padre.
+4. Actualizar `mis-cursos.$slug.tsx` con sidebar agrupado para diplomados.
+5. Actualizar `programas.$slug.tsx` (página pública) con temario agrupado.
+6. QA: crear un diplomado de prueba con 2 módulos y 3 lecciones cada uno; crear un curso de prueba con 4 lecciones planas; verificar progreso, comentarios y Zoom en ambos.
+
+---
+
+## Preguntas de confirmación antes de implementar
+
+1. ¿Migramos los diplomados existentes creando un único "Módulo 1" que contenga todas sus lecciones actuales, o prefieres hacerlo manualmente luego?
+2. ¿Las **evaluaciones** deben poder asignarse a un módulo completo (no solo a una lección), o se mantienen siempre a nivel lección?
+3. ¿En la página pública de diplomados quieres que los módulos aparezcan **expandidos por defecto** o colapsados (accordion)?

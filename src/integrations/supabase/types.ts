@@ -389,6 +389,44 @@ export type Database = {
         }
         Relationships: []
       }
+      course_modules: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          id: string
+          orden: number
+          programa_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          orden?: number
+          programa_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          orden?: number
+          programa_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_modules_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enrollments: {
         Row: {
           area_profesional: string | null
@@ -753,6 +791,7 @@ export type Database = {
           fecha_sesion: string | null
           id: string
           material_url: string | null
+          modulo_id: string | null
           orden: number
           programa_id: string
           titulo: string
@@ -769,6 +808,7 @@ export type Database = {
           fecha_sesion?: string | null
           id?: string
           material_url?: string | null
+          modulo_id?: string | null
           orden?: number
           programa_id: string
           titulo: string
@@ -785,6 +825,7 @@ export type Database = {
           fecha_sesion?: string | null
           id?: string
           material_url?: string | null
+          modulo_id?: string | null
           orden?: number
           programa_id?: string
           titulo?: string
@@ -804,6 +845,13 @@ export type Database = {
             columns: ["docente_id"]
             isOneToOne: false
             referencedRelation: "teachers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_modules_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
             referencedColumns: ["id"]
           },
           {
