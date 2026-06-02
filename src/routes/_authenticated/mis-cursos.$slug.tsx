@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { generarCertificadoPDF } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, FileText, Download, Award,
+  ArrowLeft, CheckCircle2, Circle, Video, Download, Award,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
