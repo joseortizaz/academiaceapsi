@@ -16,10 +16,11 @@ import {
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
-import { FileUploader } from "@/components/FileUploader";
 import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
 import { AudioUploader } from "@/components/AudioUploader";
 import { Badge } from "@/components/ui/badge";
+import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+
 
 export const Route = createFileRoute("/_authenticated/admin/modulos")({
   component: LeccionesPage,
