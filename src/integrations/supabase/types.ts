@@ -566,6 +566,64 @@ export type Database = {
           },
         ]
       }
+      lesson_materials: {
+        Row: {
+          created_at: string
+          id: string
+          modulo_id: string
+          nombre: string
+          orden: number
+          programa_id: string
+          tamano_bytes: number | null
+          tipo: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          modulo_id: string
+          nombre: string
+          orden?: number
+          programa_id: string
+          tamano_bytes?: number | null
+          tipo?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          modulo_id?: string
+          nombre?: string
+          orden?: number
+          programa_id?: string
+          tamano_bytes?: number | null
+          tipo?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_materials_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_materials_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_materials_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_progress: {
         Row: {
           completado: boolean | null
