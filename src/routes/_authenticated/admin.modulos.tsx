@@ -493,12 +493,19 @@ function LeccionesPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label>Material complementario (PDF, Word, Excel, PPT)</Label>
-              <FileUploader
-                value={s.material_url}
-                onChange={(url) => set({ material_url: url ?? "" })}
-              />
+              <Label>Materiales complementarios</Label>
+              {s.id ? (
+                <LessonMaterialsManager
+                  moduloId={s.id}
+                  programaId={s.programa_id}
+                />
+              ) : (
+                <p className="rounded-md border border-dashed bg-muted/40 p-3 text-xs text-muted-foreground">
+                  Guarda primero la lección para poder adjuntar uno o varios documentos (PDF, Word, Excel, PowerPoint).
+                </p>
+              )}
             </div>
+
             <div className="flex items-center gap-2">
               <Switch checked={s.es_en_vivo} onCheckedChange={(c) => set({ es_en_vivo: c })} />
               <span className="text-sm">Sesión en vivo por Zoom</span>
