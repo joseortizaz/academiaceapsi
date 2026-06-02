@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { generarCertificadoPDF } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, FileText, Download, Award,
+  ArrowLeft, CheckCircle2, Circle, Video, Download, Award,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
+import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
   component: CursoPlayer,
@@ -418,13 +420,15 @@ function CursoPlayer() {
                 </div>
               )}
 
-              {activeModule.material_url && (
-                <Button asChild variant="outline" className="mt-6">
-                  <a href={activeModule.material_url} target="_blank" rel="noopener noreferrer">
-                    <FileText className="mr-2 h-4 w-4" /> Material complementario
-                  </a>
-                </Button>
-              )}
+              <div className="mt-6">
+                <h4 className="mb-2 text-sm font-semibold">Material complementario</h4>
+                <LessonMaterialsManager
+                  moduloId={activeModule.id}
+                  programaId={programa.id}
+                  editable={false}
+                />
+              </div>
+
 
               {activeModule.fecha_sesion && (
                 <p className="mt-4 text-sm text-muted-foreground">
