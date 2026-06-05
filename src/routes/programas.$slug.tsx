@@ -28,8 +28,10 @@ export const Route = createFileRoute("/programas/$slug")({
 
 function DetallePrograma() {
   const { slug } = Route.useParams();
+  const { inscribir } = Route.useSearch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
