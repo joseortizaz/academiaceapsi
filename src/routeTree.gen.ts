@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as RegistroRouteImport } from './routes/registro'
-import { Route as ProgramasRouteImport } from './routes/programas'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as DocentesRouteImport } from './routes/docentes'
 import { Route as ContactosRouteImport } from './routes/contactos'
@@ -66,11 +65,6 @@ const RegistroRoute = RegistroRouteImport.update({
   path: '/registro',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramasRoute = ProgramasRouteImport.update({
-  id: '/programas',
-  path: '/programas',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GaleriaRoute = GaleriaRouteImport.update({
   id: '/galeria',
   path: '/galeria',
@@ -111,9 +105,9 @@ const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => ProgramasRoute,
+  id: '/programas/$slug',
+  path: '/programas/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   id: '/estudiante',
@@ -319,7 +313,6 @@ export interface FileRoutesByFullPath {
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
-  '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -366,7 +359,6 @@ export interface FileRoutesByTo {
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
-  '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
@@ -412,7 +404,6 @@ export interface FileRoutesById {
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
-  '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -461,7 +452,6 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/docentes'
     | '/galeria'
-    | '/programas'
     | '/registro'
     | '/sobre-nosotros'
     | '/admin'
@@ -508,7 +498,6 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/docentes'
     | '/galeria'
-    | '/programas'
     | '/registro'
     | '/sobre-nosotros'
     | '/certificados'
@@ -553,7 +542,6 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/docentes'
     | '/galeria'
-    | '/programas'
     | '/registro'
     | '/sobre-nosotros'
     | '/_authenticated/admin'
@@ -602,9 +590,9 @@ export interface RootRouteChildren {
   ContactosRoute: typeof ContactosRoute
   DocentesRoute: typeof DocentesRoute
   GaleriaRoute: typeof GaleriaRoute
-  ProgramasRoute: typeof ProgramasRouteWithChildren
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
+  ProgramasSlugRoute: typeof ProgramasSlugRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
 }
@@ -623,13 +611,6 @@ declare module '@tanstack/react-router' {
       path: '/registro'
       fullPath: '/registro'
       preLoaderRoute: typeof RegistroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programas': {
-      id: '/programas'
-      path: '/programas'
-      fullPath: '/programas'
-      preLoaderRoute: typeof ProgramasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/galeria': {
@@ -690,10 +671,10 @@ declare module '@tanstack/react-router' {
     }
     '/programas/$slug': {
       id: '/programas/$slug'
-      path: '/$slug'
+      path: '/programas/$slug'
       fullPath: '/programas/$slug'
       preLoaderRoute: typeof ProgramasSlugRouteImport
-      parentRoute: typeof ProgramasRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/estudiante': {
       id: '/_authenticated/estudiante'
@@ -1044,18 +1025,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface ProgramasRouteChildren {
-  ProgramasSlugRoute: typeof ProgramasSlugRoute
-}
-
-const ProgramasRouteChildren: ProgramasRouteChildren = {
-  ProgramasSlugRoute: ProgramasSlugRoute,
-}
-
-const ProgramasRouteWithChildren = ProgramasRoute._addFileChildren(
-  ProgramasRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1064,9 +1033,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactosRoute: ContactosRoute,
   DocentesRoute: DocentesRoute,
   GaleriaRoute: GaleriaRoute,
-  ProgramasRoute: ProgramasRouteWithChildren,
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
+  ProgramasSlugRoute: ProgramasSlugRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
 }
