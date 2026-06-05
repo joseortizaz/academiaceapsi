@@ -113,15 +113,7 @@ function DocenteResumen() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {tareasPendientes.map((t) => (
-              <div key={t.id} className="flex items-start justify-between gap-3 rounded-md border p-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">{t.titulo}</p>
-                  <p className="text-xs text-muted-foreground">{t.curso} · {t.alumno}</p>
-                </div>
-                <Badge variant={t.vence === "Hoy" ? "destructive" : "outline"}>{t.vence}</Badge>
-              </div>
-            ))}
+            <p className="text-sm text-muted-foreground">No tienes tareas pendientes por ahora.</p>
           </CardContent>
         </Card>
 
