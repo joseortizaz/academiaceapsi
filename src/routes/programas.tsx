@@ -285,7 +285,11 @@ function ProgramasPage() {
                     onClick={() => {
                       const slug = selected.slug;
                       setSelected(null);
-                      navigate({ to: "/programas/$slug", params: { slug } });
+                      navigate({
+                        to: "/programas/$slug",
+                        params: { slug },
+                        search: { inscribir: 1 },
+                      });
                     }}
                   >
                     Inscribirme
