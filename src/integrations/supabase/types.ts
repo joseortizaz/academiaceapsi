@@ -1473,6 +1473,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_coupon: {
+        Args: { _codigo: string }
+        Returns: {
+          porcentaje_descuento: number
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "docente" | "estudiante"
