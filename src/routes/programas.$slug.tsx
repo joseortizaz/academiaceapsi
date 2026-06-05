@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -18,13 +19,19 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/programas/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    inscribir: search.inscribir === 1 || search.inscribir === "1" ? 1 : undefined,
+  }),
   component: DetallePrograma,
 });
 
+
 function DetallePrograma() {
   const { slug } = Route.useParams();
+  const { inscribir } = Route.useSearch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -132,6 +139,23 @@ function DetallePrograma() {
     }
     setInscOpen(true);
   };
+
+  useEffect(() => {
+    if (inscribir === 1 && programa && !existing) {
+      if (!isAuthenticated || !user) {
+        navigate({ to: "/acceder" });
+        return;
+      }
+      setInscOpen(true);
+      navigate({
+        to: "/programas/$slug",
+        params: { slug },
+        search: {},
+        replace: true,
+      });
+    }
+  }, [inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
+
 
   const confirmarInscripcion = async () => {
     if (!user) return;
