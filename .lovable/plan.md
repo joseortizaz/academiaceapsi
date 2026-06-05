@@ -1,46 +1,39 @@
 ## Objetivo
-Permitir que cada lección tenga **múltiples materiales adjuntos** (PDF, Word, Excel, PPT, etc.) en lugar de uno solo.
+Hacer que el portal público de docentes tome como fuente los datos que el propio docente actualiza en su perfil dentro de la plataforma, sin perder los campos de visibilidad/orden/configuración que hoy maneja administración.
 
-## 1. Base de datos
-Nueva tabla `lesson_materials` para guardar N archivos por lección:
+## Plan
+1. **Unificar la fuente de datos pública**
+   - Cambiar el flujo para que el listado público de docentes no dependa solo de datos manuales cargados por administración.
+   - Mantener en la tabla de docentes solo los campos administrativos y profesionales que deban seguir controlándose desde el panel (por ejemplo: visibilidad, orden, título, especialidad, LinkedIn y vínculo con el usuario).
+   - Hacer que nombre, apellido, biografía y foto pública salgan del perfil personal del docente.
 
-- `id`, `modulo_id` (FK a `program_modules`), `programa_id` (para RLS rápida)
-- `nombre` (etiqueta visible, ej. "Guía del módulo 1")
-- `url` (archivo subido)
-- `tipo` (pdf/word/excel/ppt/otro, derivado de la extensión)
-- `tamano_bytes` (opcional, para mostrar peso)
-- `orden`, `created_at`
+2. **Corregir la sincronización entre perfil y portal público**
+   - Implementar sincronización automática entre el perfil personal y el registro docente vinculado.
+   - Asegurar que al guardar nombre, apellido, biografía o foto en el perfil, esos cambios queden disponibles inmediatamente para el portal público.
+   - Verificar el caso en que el docente aún no esté vinculado a un registro docente y dejar resuelto ese enlace.
 
-RLS:
-- Admins: gestión total.
-- Docentes del programa: gestión sobre los materiales de sus lecciones.
-- Estudiantes inscritos: solo lectura.
+3. **Resolver el problema de vinculación actual**
+   - Revisar y corregir los registros de docentes que hoy no tienen `user_id` asociado, porque así el sistema no puede saber qué perfil personal corresponde a cada ficha pública.
+   - Definir una estrategia segura de enlace para que cada docente autenticado actualice su propia ficha pública y no la de otro usuario.
 
-**Migración de datos:** los `material_url` existentes en `program_modules` se copian como primer registro de `lesson_materials` para no perder nada. La columna `material_url` se conserva (deprecated) por compatibilidad, pero la UI deja de usarla.
+4. **Ajustar refresco e invalidación de caché**
+   - Mantener e integrar la invalidación de consultas del perfil y del portal público para que el cambio se vea al instante tras guardar o subir una foto.
+   - Revisar el `queryKey` del portal público para confirmar que se refresque contra la fuente correcta.
 
-## 2. Administración (`admin.modulos.tsx`)
-En el diálogo de lección, reemplazar el bloque actual "Material complementario" por un **gestor de lista**:
+5. **Validar fotografía y render del avatar**
+   - Confirmar que la subida de imagen actualiza la URL persistida y que el portal público renderiza esa misma URL actualizada.
+   - Mantener el corte de caché del navegador para fotos nuevas.
 
-- Lista de materiales ya cargados con: nombre editable, ícono según tipo, botón eliminar, drag para reordenar.
-- Botón **"Agregar material"** que abre el `FileUploader` y, al terminar, añade una fila nueva con nombre por defecto = nombre del archivo.
-- Los cambios se guardan al guardar la lección (un solo `upsert` + `delete` de los removidos), o inmediatamente si la lección ya existe.
+## Hallazgo principal
+Hoy el portal público lee desde `teachers_public` (que sale de `teachers`), pero el docente edita `profiles`. Además, en los registros actuales de `teachers` visibles el `user_id` está vacío, por lo que no existe vínculo real entre la ficha pública y la cuenta del docente. Por eso el portal sigue mostrando lo cargado por administración.
 
-## 3. Vista del estudiante (`mis-cursos.$slug.tsx`)
-En el panel de la lección activa, sustituir el único botón "Descargar material" por una **lista de materiales** con nombre, ícono por tipo y enlace de descarga. Si no hay materiales, no mostrar la sección.
+## Detalles técnicos
+- **Portal público actual:** `src/routes/docentes.tsx` consulta `teachers_public` con `queryKey: ["public", "teachers"]`.
+- **Edición del docente:** `src/routes/_authenticated/docente.cuenta.tsx` guarda en `profiles`.
+- **Foto:** `src/components/AvatarUploader.tsx` sube al bucket público `avatars` y guarda `avatar_url` en `profiles`.
+- **Problema estructural detectado:** la vista `teachers_public` sale de `teachers`, no de `profiles`, y no hay trigger activo en base de datos que sincronice `profiles` -> `teachers`.
 
-## 4. Vista del docente
-La pantalla donde el docente revisa su lección (si existe en `docente.cursos.tsx`/clase) también muestra la lista en vez del único enlace.
-
-## 5. Vista pública del programa (`programas.$slug.tsx`)
-No cambia: los materiales siguen siendo privados (solo para inscritos).
-
-## 6. Orden de ejecución
-1. Migración SQL (tabla + RLS + copia de datos existentes).
-2. `admin.modulos.tsx` — gestor multi-archivo.
-3. `mis-cursos.$slug.tsx` — render de lista.
-4. QA: subir varios archivos, reordenar, eliminar, verificar que un alumno inscrito los ve y un visitante no.
-
-## Preguntas
-1. ¿Quieres que cada material tenga **nombre personalizable** (ej. "Guía teórica.pdf" → "Guía teórica del módulo 1") o basta con el nombre original del archivo?
-2. ¿Algún **límite** de materiales por lección o tamaño máximo por archivo (hoy el bucket `course-materials` no impone uno desde la UI)?
-3. ¿Mantener `program_modules.material_url` por compatibilidad o **eliminarlo** después de migrar los datos?
+## Validación final
+- Probar edición de nombre, biografía y foto desde la cuenta docente.
+- Confirmar reflejo inmediato en `/docentes` y en la ficha pública del programa.
+- Verificar que solo aparezcan docentes visibles y correctamente vinculados.
