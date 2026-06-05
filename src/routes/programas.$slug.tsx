@@ -30,7 +30,7 @@ function DetallePrograma() {
   const { slug } = Route.useParams();
   const { inscribir } = Route.useSearch();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
 
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
@@ -133,6 +133,9 @@ function DetallePrograma() {
   const precio = programa.precio_descuento ?? programa.precio;
 
   const inscribirse = async () => {
+    if (authLoading) {
+      return;
+    }
     if (!isAuthenticated || !user) {
       navigate({ to: "/acceder" });
       return;
@@ -142,6 +145,9 @@ function DetallePrograma() {
 
   useEffect(() => {
     if (inscribir === 1 && programa && !existing) {
+      if (authLoading) {
+        return;
+      }
       if (!isAuthenticated || !user) {
         navigate({ to: "/acceder" });
         return;
@@ -154,7 +160,7 @@ function DetallePrograma() {
         replace: true,
       });
     }
-  }, [inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
+  }, [authLoading, inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
 
 
   const confirmarInscripcion = async () => {
@@ -279,8 +285,12 @@ function DetallePrograma() {
                 <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
               </Button>
             ) : (
-              <Button className="mt-4 w-full" onClick={inscribirse}>
-                {isAuthenticated ? "Inscribirme ahora" : "Acceder para inscribirme"}
+              <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading}>
+                {authLoading
+                  ? "Cargando…"
+                  : isAuthenticated
+                    ? "Inscribirme ahora"
+                    : "Acceder para inscribirme"}
               </Button>
             )}
             {programa.syllabus_url && (
