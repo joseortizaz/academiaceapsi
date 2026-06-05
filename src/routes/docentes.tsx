@@ -29,14 +29,8 @@ type Teacher = {
   linkedin_url: string | null;
 };
 
-const FALLBACK: Teacher[] = [
-  { id: "1", nombre: "Carolina", apellido: "Rosario", email: null, telefono: null, titulo: "Dra.", especialidad: "Psicología Clínica", biografia: "Doctora en Psicología por la UASD. 15 años de experiencia clínica en Santo Domingo.", avatar_url: null, linkedin_url: null },
-  { id: "2", nombre: "José Manuel", apellido: "Báez", email: null, telefono: null, titulo: "Dr.", especialidad: "Neuropsicología", biografia: "Especialista en evaluación neuropsicológica infantil. Docente universitario en Santiago.", avatar_url: null, linkedin_url: null },
-  { id: "3", nombre: "Patricia", apellido: "Núñez", email: null, telefono: null, titulo: "Mtra.", especialidad: "Psicología Educativa", biografia: "Magíster en Educación. Asesora del Ministerio de Educación de RD.", avatar_url: null, linkedin_url: null },
-  { id: "4", nombre: "Rafael", apellido: "Espinal", email: null, telefono: null, titulo: "Dr.", especialidad: "Terapia Cognitivo-Conductual", biografia: "Formador internacional, 20 años en práctica clínica y docencia.", avatar_url: null, linkedin_url: null },
-  { id: "5", nombre: "Luz", apellido: "Vásquez", email: null, telefono: null, titulo: "Mtra.", especialidad: "Psicología Infantil", biografia: "Especialista en desarrollo infantil temprano y trastornos del neurodesarrollo.", avatar_url: null, linkedin_url: null },
-  { id: "6", nombre: "Antonio", apellido: "Mejía", email: null, telefono: null, titulo: "Dr.", especialidad: "Psicología Organizacional", biografia: "Consultor en gestión del talento humano para empresas dominicanas.", avatar_url: null, linkedin_url: null },
-];
+
+
 
 const fullName = (t: Teacher) =>
   [t.titulo, t.nombre, t.apellido].filter(Boolean).join(" ").trim();
