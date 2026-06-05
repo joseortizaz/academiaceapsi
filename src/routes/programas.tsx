@@ -177,30 +177,30 @@ function ProgramasPage() {
         <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-3xl">
           {selected && (
             <>
-              <div className="aspect-video w-full overflow-hidden bg-muted">
-                {selected.imagen_url ? (
+              {selected.imagen_url ? (
+                <div className="aspect-[16/7] w-full overflow-hidden bg-muted">
                   <img
                     src={selected.imagen_url}
                     alt={selected.titulo}
                     className="h-full w-full object-cover"
                   />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-primary/30">
-                    <GraduationCap className="h-16 w-16" />
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex aspect-[16/7] w-full items-center justify-center bg-muted text-primary/30">
+                  <GraduationCap className="h-16 w-16" />
+                </div>
+              )}
 
-              <div className="space-y-5 p-6">
+              <div className="space-y-5 bg-background p-6">
                 <DialogHeader className="space-y-3 text-left">
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline" className="capitalize">{selected.tipo}</Badge>
                     <Badge variant="secondary" className="capitalize">{selected.modalidad}</Badge>
                     {selected.destacado && <Badge>Destacado</Badge>}
                   </div>
-                  <DialogTitle className="text-2xl md:text-3xl">{selected.titulo}</DialogTitle>
+                  <DialogTitle className="text-2xl text-foreground md:text-3xl">{selected.titulo}</DialogTitle>
                   {selected.resumen && (
-                    <p className="text-sm text-muted-foreground">{selected.resumen}</p>
+                    <p className="text-base text-muted-foreground">{selected.resumen}</p>
                   )}
                 </DialogHeader>
 
