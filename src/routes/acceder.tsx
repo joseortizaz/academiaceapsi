@@ -10,14 +10,23 @@ import { lovable } from "@/integrations/lovable";
 import { useState } from "react";
 
 export const Route = createFileRoute("/acceder")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect:
+      typeof search.redirect === "string" && search.redirect.startsWith("/")
+        ? search.redirect
+        : undefined,
+  }),
   component: Acceder,
 });
 
 function Acceder() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const continueTo = redirect ?? "/estudiante";
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,12 +38,12 @@ function Acceder() {
       return;
     }
     toast.success("¡Bienvenido!");
-    navigate({ to: "/estudiante" });
+    window.location.assign(continueTo);
   };
 
   const handleGoogleLogin = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}${continueTo}`,
     });
     if (result.error) {
       toast.error("Error con Google", { description: result.error.message });
@@ -42,7 +51,7 @@ function Acceder() {
     }
     if (result.redirected) return;
     toast.success("¡Bienvenido!");
-    navigate({ to: "/estudiante" });
+    window.location.assign(continueTo);
   };
 
   return (
@@ -116,7 +125,11 @@ function Acceder() {
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
               ¿No tienes cuenta?{" "}
-              <Link to="/registro" className="font-semibold text-primary hover:text-accent">
+              <Link
+                to="/registro"
+                search={redirect ? { redirect } : undefined}
+                className="font-semibold text-primary hover:text-accent"
+              >
                 Regístrate aquí
               </Link>
             </p>

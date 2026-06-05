@@ -31,6 +31,7 @@ function DetallePrograma() {
   const { inscribir } = Route.useSearch();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const enrollmentRedirect = `/programas/${slug}?inscribir=1`;
 
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
@@ -119,7 +120,10 @@ function DetallePrograma() {
       return;
     }
     if (!isAuthenticated || !user) {
-      navigate({ to: "/acceder" });
+      navigate({
+        to: "/acceder",
+        search: { redirect: enrollmentRedirect },
+      });
       return;
     }
     setInscOpen(true);
@@ -157,7 +161,10 @@ function DetallePrograma() {
       return;
     }
     if (!isAuthenticated || !user) {
-      navigate({ to: "/acceder" });
+      navigate({
+        to: "/acceder",
+        search: { redirect: enrollmentRedirect },
+      });
       return;
     }
     setInscOpen(true);

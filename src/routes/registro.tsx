@@ -10,17 +10,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 export const Route = createFileRoute("/registro")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect:
+      typeof search.redirect === "string" && search.redirect.startsWith("/")
+        ? search.redirect
+        : undefined,
+  }),
   component: Registro,
 });
 
 function Registro() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const continueTo = redirect ?? "/estudiante";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +48,14 @@ function Registro() {
     }
     if (data.user && !data.session) {
       toast.success("Registro exitoso", { description: "Revisa tu correo para confirmar tu cuenta." });
+      navigate({
+        to: "/acceder",
+        search: redirect ? { redirect } : undefined,
+      });
       return;
     }
     toast.success("¡Bienvenido a Ceapsi RD!");
-    navigate({ to: "/estudiante" });
+    window.location.assign(continueTo);
   };
 
   return (
@@ -95,7 +108,11 @@ function Registro() {
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
               ¿Ya tienes cuenta?{" "}
-              <Link to="/acceder" className="font-semibold text-primary hover:text-accent">
+              <Link
+                to="/acceder"
+                search={redirect ? { redirect } : undefined}
+                className="font-semibold text-primary hover:text-accent"
+              >
                 Accede aquí
               </Link>
             </p>
