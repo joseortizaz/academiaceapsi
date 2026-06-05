@@ -13,13 +13,6 @@ export const Route = createFileRoute("/_authenticated/docente/")({
   component: DocenteResumen,
 });
 
-// Mock pending tasks & questions (no tables yet)
-const tareasPendientes = [
-  { id: "t1", titulo: "Revisar entrega: Proyecto Final HTML/CSS", curso: "Introducción a Desarrollo Web", alumno: "María Pérez", vence: "Hoy" },
-  { id: "t2", titulo: "Calificar Quiz Módulo 3", curso: "Marketing Digital Avanzado", alumno: "Carlos Rodríguez", vence: "Mañana" },
-  { id: "t3", titulo: "Responder duda sobre Flexbox", curso: "Introducción a Desarrollo Web", alumno: "Lucía Fernández", vence: "Hoy" },
-  { id: "t4", titulo: "Aprobar trabajo final", curso: "Psicología Organizacional", alumno: "Pedro Gómez", vence: "2 días" },
-];
 
 function DocenteResumen() {
   const { user } = useAuth();
