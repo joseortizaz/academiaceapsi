@@ -290,7 +290,7 @@ function ProgramasPage() {
                   </Button>
                 </DialogFooter>
               </div>
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>
