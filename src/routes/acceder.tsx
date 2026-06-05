@@ -26,22 +26,35 @@ function Acceder() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const continueTo = redirect ?? "/estudiante";
+  const resolveDestination = async (userId: string): Promise<string> => {
+    if (redirect) return redirect;
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const roleList = (roles ?? []).map((r) => r.role as string);
+    if (roleList.includes("admin")) return "/admin";
+    if (roleList.includes("docente")) return "/docente";
+    return "/estudiante";
+  };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error("Error de acceso", { description: error.message });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
+      setLoading(false);
+      toast.error("Error de acceso", { description: error?.message ?? "No se pudo iniciar sesión" });
       return;
     }
+    const destination = await resolveDestination(data.user.id);
+    setLoading(false);
     toast.success("¡Bienvenido!");
-    window.location.assign(continueTo);
+    window.location.assign(destination);
   };
 
   const handleGoogleLogin = async () => {
+    const continueTo = redirect ?? "/estudiante";
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}${continueTo}`,
     });
@@ -51,7 +64,9 @@ function Acceder() {
     }
     if (result.redirected) return;
     toast.success("¡Bienvenido!");
-    window.location.assign(continueTo);
+    const { data } = await supabase.auth.getUser();
+    const destination = data.user ? await resolveDestination(data.user.id) : continueTo;
+    window.location.assign(destination);
   };
 
   return (
