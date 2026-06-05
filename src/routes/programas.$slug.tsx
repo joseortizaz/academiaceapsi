@@ -111,6 +111,26 @@ function DetallePrograma() {
     },
   });
 
+  useEffect(() => {
+    if (inscribir !== 1 || !programa || existing) {
+      return;
+    }
+    if (authLoading) {
+      return;
+    }
+    if (!isAuthenticated || !user) {
+      navigate({ to: "/acceder" });
+      return;
+    }
+    setInscOpen(true);
+    navigate({
+      to: "/programas/$slug",
+      params: { slug },
+      search: {},
+      replace: true,
+    });
+  }, [authLoading, existing, inscribir, isAuthenticated, navigate, programa, slug, user]);
+
   if (isLoading) {
     return (
       <PublicLayout>
@@ -142,25 +162,6 @@ function DetallePrograma() {
     }
     setInscOpen(true);
   };
-
-  useEffect(() => {
-    if (inscribir === 1 && programa && !existing) {
-      if (authLoading) {
-        return;
-      }
-      if (!isAuthenticated || !user) {
-        navigate({ to: "/acceder" });
-        return;
-      }
-      setInscOpen(true);
-      navigate({
-        to: "/programas/$slug",
-        params: { slug },
-        search: {},
-        replace: true,
-      });
-    }
-  }, [authLoading, inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
 
 
   const confirmarInscripcion = async () => {
