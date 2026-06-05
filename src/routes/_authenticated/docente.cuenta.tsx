@@ -91,6 +91,8 @@ function CuentaDocente() {
               onChange={async (newUrl) => {
                 setForm((f) => ({ ...f, avatar_url: newUrl ?? "" }));
                 qc.invalidateQueries({ queryKey: ["auth", "profile"] });
+                qc.invalidateQueries({ queryKey: ["public", "teachers"] });
+                qc.invalidateQueries({ queryKey: ["admin", "docentes"] });
               }}
             />
 
