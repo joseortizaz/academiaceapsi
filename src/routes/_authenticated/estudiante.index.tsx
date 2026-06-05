@@ -44,7 +44,7 @@ function EstudianteDashboard() {
     enabled: !!user?.id,
     queryFn: async () => {
       const { data } = await supabase
-        .from("zoom_meetings")
+        .from("zoom_meetings_student" as never)
         .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,recording_share_url,recording_duration_min,programa_id")
         .order("start_at", { ascending: false });
       return (data ?? []) as ZoomMeetingLite[];
