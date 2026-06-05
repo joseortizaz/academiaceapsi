@@ -1440,6 +1440,60 @@ export type Database = {
         }
         Relationships: []
       }
+      zoom_meetings_student: {
+        Row: {
+          created_at: string | null
+          docente_nombre: string | null
+          duration_min: number | null
+          id: string | null
+          modulo_id: string | null
+          programa_id: string | null
+          recording_duration_min: number | null
+          recording_share_url: string | null
+          start_at: string | null
+          status: string | null
+          titulo: string | null
+          updated_at: string | null
+          zoom_join_url: string | null
+          zoom_meeting_id: string | null
+          zoom_password: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          docente_nombre?: string | null
+          duration_min?: number | null
+          id?: string | null
+          modulo_id?: string | null
+          programa_id?: string | null
+          recording_duration_min?: number | null
+          recording_share_url?: string | null
+          start_at?: string | null
+          status?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+          zoom_join_url?: string | null
+          zoom_meeting_id?: string | null
+          zoom_password?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          docente_nombre?: string | null
+          duration_min?: number | null
+          id?: string | null
+          modulo_id?: string | null
+          programa_id?: string | null
+          recording_duration_min?: number | null
+          recording_share_url?: string | null
+          start_at?: string | null
+          status?: string | null
+          titulo?: string | null
+          updated_at?: string | null
+          zoom_join_url?: string | null
+          zoom_meeting_id?: string | null
+          zoom_password?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
