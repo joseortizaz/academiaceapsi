@@ -140,6 +140,23 @@ function DetallePrograma() {
     setInscOpen(true);
   };
 
+  useEffect(() => {
+    if (inscribir === 1 && programa && !existing) {
+      if (!isAuthenticated || !user) {
+        navigate({ to: "/acceder" });
+        return;
+      }
+      setInscOpen(true);
+      navigate({
+        to: "/programas/$slug",
+        params: { slug },
+        search: {},
+        replace: true,
+      });
+    }
+  }, [inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
+
+
   const confirmarInscripcion = async () => {
     if (!user) return;
     const nombre = form.nombre_completo.trim();
