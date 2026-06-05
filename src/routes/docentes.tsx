@@ -47,17 +47,17 @@ const initials = (t: Teacher) =>
 function Docentes() {
   const [selected, setSelected] = useState<Teacher | null>(null);
 
-  const { data: teachers = FALLBACK } = useQuery<Teacher[]>({
+  const { data: teachers = [] } = useQuery<Teacher[]>({
     queryKey: ["public", "teachers"],
     queryFn: async () => {
       const { data, error } = await (supabase.from as any)("teachers_public")
         .select("id, nombre, apellido, titulo, especialidad, biografia, avatar_url, linkedin_url")
         .order("orden", { ascending: true });
       if (error) throw error;
-      const rows = (data ?? []).map((t: any) => ({ ...t, email: null, telefono: null })) as Teacher[];
-      return rows.length > 0 ? rows : FALLBACK;
+      return (data ?? []).map((t: any) => ({ ...t, email: null, telefono: null })) as Teacher[];
     },
   });
+
 
   return (
     <PublicLayout>
