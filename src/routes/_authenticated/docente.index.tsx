@@ -73,8 +73,8 @@ function DocenteResumen() {
   const kpis = [
     { label: "Alumnos asignados", value: totalAlumnos, icon: Users, color: "text-blue-600" },
     { label: "Cursos activos", value: cursosActivos, icon: BookOpen, color: "text-emerald-600" },
-    { label: "Calificaciones por revisar", value: 7, icon: ClipboardCheck, color: "text-amber-600" },
-    { label: "Mensajes pendientes", value: 4, icon: MessageCircle, color: "text-rose-600" },
+    { label: "Calificaciones por revisar", value: 0, icon: ClipboardCheck, color: "text-amber-600" },
+    { label: "Mensajes pendientes", value: 0, icon: MessageCircle, color: "text-rose-600" },
   ];
 
   return (
