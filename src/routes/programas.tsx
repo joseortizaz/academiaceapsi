@@ -62,6 +62,14 @@ function ProgramasPage() {
     },
   });
 
+  const openEnrollmentFlow = (slug: string) => {
+    navigate({
+      to: "/programas/$slug",
+      params: { slug },
+      search: { inscribir: 1 },
+    });
+  };
+
   return (
     <PublicLayout>
       <section className="border-b bg-gradient-to-b from-primary/5 to-background py-14">
@@ -283,13 +291,8 @@ function ProgramasPage() {
                   </Button>
                   <Button
                     onClick={() => {
-                      const slug = selected.slug;
-                      setSelected(null);
-                      navigate({
-                        to: "/programas/$slug",
-                        params: { slug },
-                        search: { inscribir: 1 },
-                      });
+                      if (!selected?.slug) return;
+                      openEnrollmentFlow(selected.slug);
                     }}
                   >
                     Inscribirme
