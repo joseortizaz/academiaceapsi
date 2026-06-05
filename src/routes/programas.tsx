@@ -282,9 +282,11 @@ function ProgramasPage() {
                     Cerrar
                   </Button>
                   <Button
-                    onClick={() =>
-                      navigate({ to: "/programas/$slug", params: { slug: selected.slug } })
-                    }
+                    onClick={() => {
+                      const slug = selected.slug;
+                      setSelected(null);
+                      navigate({ to: "/programas/$slug", params: { slug } });
+                    }}
                   >
                     Inscribirme
                   </Button>
