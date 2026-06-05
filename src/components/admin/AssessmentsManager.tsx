@@ -78,7 +78,12 @@ export function AssessmentsManager({ scope }: Props) {
     queryKey: ["assessments-programs", scope, user?.id],
     queryFn: async () => {
       let q = supabase.from("programs").select("id, titulo, docente_id").order("titulo");
-      if (scope === "docente" && user?.id) q = q.eq("docente_id", user.id);
+      if (scope === "docente" && user?.id) {
+        const { data: teacher } = await supabase
+          .from("teachers").select("id").eq("user_id", user.id).maybeSingle();
+        if (!teacher?.id) return [];
+        q = q.eq("docente_id", teacher.id);
+      }
       const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
