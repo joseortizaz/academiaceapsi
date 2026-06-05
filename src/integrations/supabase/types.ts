@@ -1438,30 +1438,6 @@ export type Database = {
           titulo: string | null
           visible: boolean | null
         }
-        Insert: {
-          apellido?: string | null
-          avatar_url?: string | null
-          biografia?: string | null
-          especialidad?: string | null
-          id?: string | null
-          linkedin_url?: string | null
-          nombre?: string | null
-          orden?: number | null
-          titulo?: string | null
-          visible?: boolean | null
-        }
-        Update: {
-          apellido?: string | null
-          avatar_url?: string | null
-          biografia?: string | null
-          especialidad?: string | null
-          id?: string | null
-          linkedin_url?: string | null
-          nombre?: string | null
-          orden?: number | null
-          titulo?: string | null
-          visible?: boolean | null
-        }
         Relationships: []
       }
     }
