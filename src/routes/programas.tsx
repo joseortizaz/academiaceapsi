@@ -176,7 +176,7 @@ function ProgramasPage() {
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-3xl">
           {selected && (
-            <>
+            <div className="flex flex-col">
               {selected.imagen_url ? (
                 <div className="aspect-[16/7] w-full overflow-hidden bg-muted">
                   <img
