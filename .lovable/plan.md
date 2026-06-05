@@ -1,39 +1,32 @@
-## Objetivo
-Hacer que el portal público de docentes tome como fuente los datos que el propio docente actualiza en su perfil dentro de la plataforma, sin perder los campos de visibilidad/orden/configuración que hoy maneja administración.
+# Retirar datos de ejemplo del panel Docente
 
-## Plan
-1. **Unificar la fuente de datos pública**
-   - Cambiar el flujo para que el listado público de docentes no dependa solo de datos manuales cargados por administración.
-   - Mantener en la tabla de docentes solo los campos administrativos y profesionales que deban seguir controlándose desde el panel (por ejemplo: visibilidad, orden, título, especialidad, LinkedIn y vínculo con el usuario).
-   - Hacer que nombre, apellido, biografía y foto pública salgan del perfil personal del docente.
+Las secciones **Resumen**, **Calificaciones** y **Comunidad** del panel del docente actualmente muestran datos ficticios codificados en el frontend (nombres como "María Pérez", "Carlos Rodríguez", tareas inventadas, preguntas de ejemplo, etc.). Estos datos no provienen de la base de datos: están hardcodeados como arrays constantes dentro de cada archivo.
 
-2. **Corregir la sincronización entre perfil y portal público**
-   - Implementar sincronización automática entre el perfil personal y el registro docente vinculado.
-   - Asegurar que al guardar nombre, apellido, biografía o foto en el perfil, esos cambios queden disponibles inmediatamente para el portal público.
-   - Verificar el caso en que el docente aún no esté vinculado a un registro docente y dejar resuelto ese enlace.
+## Cambios propuestos
 
-3. **Resolver el problema de vinculación actual**
-   - Revisar y corregir los registros de docentes que hoy no tienen `user_id` asociado, porque así el sistema no puede saber qué perfil personal corresponde a cada ficha pública.
-   - Definir una estrategia segura de enlace para que cada docente autenticado actualice su propia ficha pública y no la de otro usuario.
+### 1. Resumen del Docente (`src/routes/_authenticated/docente.index.tsx`)
+- **Eliminar** el array `tareasPendientes` con las 4 tareas ficticias.
+- **Eliminar** los KPIs hardcodeados "Calificaciones por revisar: 7" y "Mensajes pendientes: 4" — sustituir por `0` o por un valor real si hay una fuente; por ahora `0` ya que no existe tabla de entregas/mensajes.
+- **Reemplazar** la tarjeta "Tareas pendientes" por un estado vacío ("No tienes tareas pendientes por ahora.") manteniendo el enlace a Calificaciones.
+- **Conservar intacto**: el saludo al docente, los KPIs reales (Alumnos asignados, Cursos activos) que sí vienen de Supabase, y la tarjeta "Próximas clases en vivo" que ya consulta `program_modules`.
 
-4. **Ajustar refresco e invalidación de caché**
-   - Mantener e integrar la invalidación de consultas del perfil y del portal público para que el cambio se vea al instante tras guardar o subir una foto.
-   - Revisar el `queryKey` del portal público para confirmar que se refresque contra la fuente correcta.
+### 2. Calificaciones (`src/routes/_authenticated/docente.calificaciones.tsx`)
+- **Eliminar** el array `initialEntregas` con las 6 entregas ficticias.
+- Mantener la UI completa (buscador, filtros, tabla, diálogo de calificación) pero arrancar con lista vacía.
+- Mostrar un estado vacío informativo: "Aún no hay entregas para calificar." (el componente ya tiene la fila "Sin entregas." en la tabla, así que el cambio principal es inicializar `entregas` como `[]`).
+- **No tocar** la lógica de filtros, edición ni el diálogo: queda lista para conectarse a una tabla real cuando exista.
 
-5. **Validar fotografía y render del avatar**
-   - Confirmar que la subida de imagen actualiza la URL persistida y que el portal público renderiza esa misma URL actualizada.
-   - Mantener el corte de caché del navegador para fotos nuevas.
+### 3. Comunidad y Soporte (`src/routes/_authenticated/docente.comunidad.tsx`)
+- **Eliminar** el array `initialPreguntas` con las 5 preguntas ficticias.
+- Inicializar `preguntas` como `[]` y `selected` como `null`.
+- El panel derecho ya muestra correctamente el estado vacío ("Selecciona una pregunta para responder."); se ajustará el texto a algo como "Aún no hay preguntas de alumnos." cuando el inbox esté vacío.
+- **No tocar** la lógica de respuesta, filtros, ni la UI: queda lista para conectarse a una tabla real más adelante.
 
-## Hallazgo principal
-Hoy el portal público lee desde `teachers_public` (que sale de `teachers`), pero el docente edita `profiles`. Además, en los registros actuales de `teachers` visibles el `user_id` está vacío, por lo que no existe vínculo real entre la ficha pública y la cuenta del docente. Por eso el portal sigue mostrando lo cargado por administración.
+## Lo que NO se modifica
+- Datos reales que ya vienen de Supabase (docente, programas, inscripciones, módulos en vivo, perfil público).
+- Funcionalidad de los formularios, diálogos, filtros y navegación.
+- Rutas, esquema de base de datos, ni políticas RLS.
+- Otras secciones del panel docente (Cursos, Clases en vivo, Evaluaciones, Cuenta).
 
-## Detalles técnicos
-- **Portal público actual:** `src/routes/docentes.tsx` consulta `teachers_public` con `queryKey: ["public", "teachers"]`.
-- **Edición del docente:** `src/routes/_authenticated/docente.cuenta.tsx` guarda en `profiles`.
-- **Foto:** `src/components/AvatarUploader.tsx` sube al bucket público `avatars` y guarda `avatar_url` en `profiles`.
-- **Problema estructural detectado:** la vista `teachers_public` sale de `teachers`, no de `profiles`, y no hay trigger activo en base de datos que sincronice `profiles` -> `teachers`.
-
-## Validación final
-- Probar edición de nombre, biografía y foto desde la cuenta docente.
-- Confirmar reflejo inmediato en `/docentes` y en la ficha pública del programa.
-- Verificar que solo aparezcan docentes visibles y correctamente vinculados.
+## Notas técnicas
+Las tres páginas usan estado local con `useState(initialX)`. El cambio es puramente frontend: reemplazar los arrays seed por `[]` y eliminar las constantes mock. No se requiere migración ni cambios de backend.

@@ -31,14 +31,7 @@ type Entrega = {
   contenido: string;
 };
 
-const initialEntregas: Entrega[] = [
-  { id: "e1", alumno: "María Pérez", curso: "Introducción a Desarrollo Web", tarea: "Proyecto Final HTML/CSS", fechaEntrega: "2026-05-18", estado: "pendiente", contenido: "Repositorio: github.com/mperez/portfolio-final con landing responsive." },
-  { id: "e2", alumno: "Carlos Rodríguez", curso: "Marketing Digital Avanzado", tarea: "Plan de campaña SEM", fechaEntrega: "2026-05-19", estado: "pendiente", contenido: "Documento de 12 páginas con estrategia, presupuesto y KPIs." },
-  { id: "e3", alumno: "Lucía Fernández", curso: "Introducción a Desarrollo Web", tarea: "Ejercicio Flexbox", fechaEntrega: "2026-05-17", estado: "pendiente", contenido: "Codepen con grid de tarjetas responsive." },
-  { id: "e4", alumno: "Pedro Gómez", curso: "Psicología Organizacional", tarea: "Caso clínico módulo 2", fechaEntrega: "2026-05-15", estado: "calificado", nota: 92, feedback: "Excelente análisis del caso.", contenido: "Documento con análisis detallado." },
-  { id: "e5", alumno: "Ana Jiménez", curso: "Marketing Digital Avanzado", tarea: "Análisis de competencia", fechaEntrega: "2026-05-20", estado: "pendiente", contenido: "Matriz comparativa con 5 competidores principales." },
-  { id: "e6", alumno: "Roberto Silva", curso: "Introducción a Desarrollo Web", tarea: "Landing responsive", fechaEntrega: "2026-05-14", estado: "calificado", nota: 78, feedback: "Buen trabajo, mejorar accesibilidad.", contenido: "Sitio publicado en netlify." },
-];
+const initialEntregas: Entrega[] = [];
 
 function DocenteCalificaciones() {
   const [entregas, setEntregas] = useState<Entrega[]>(initialEntregas);
