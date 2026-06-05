@@ -19,6 +19,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
@@ -104,6 +105,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProgramasRoute,
 } as any)
 const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
   id: '/verificar/$numero',
@@ -328,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/programas/': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -366,12 +373,12 @@ export interface FileRoutesByTo {
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
-  '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/programas': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -421,6 +428,7 @@ export interface FileRoutesById {
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/programas/': typeof ProgramasIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -470,6 +478,7 @@ export interface FileRouteTypes {
     | '/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/programas/'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -508,12 +517,12 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/docentes'
     | '/galeria'
-    | '/programas'
     | '/registro'
     | '/sobre-nosotros'
     | '/certificados'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/programas'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -562,6 +571,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/programas/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
@@ -680,6 +690,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/programas/': {
+      id: '/programas/'
+      path: '/'
+      fullPath: '/programas/'
+      preLoaderRoute: typeof ProgramasIndexRouteImport
+      parentRoute: typeof ProgramasRoute
     }
     '/verificar/$numero': {
       id: '/verificar/$numero'
@@ -1046,10 +1063,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface ProgramasRouteChildren {
   ProgramasSlugRoute: typeof ProgramasSlugRoute
+  ProgramasIndexRoute: typeof ProgramasIndexRoute
 }
 
 const ProgramasRouteChildren: ProgramasRouteChildren = {
   ProgramasSlugRoute: ProgramasSlugRoute,
+  ProgramasIndexRoute: ProgramasIndexRoute,
 }
 
 const ProgramasRouteWithChildren = ProgramasRoute._addFileChildren(

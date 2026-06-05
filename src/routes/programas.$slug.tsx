@@ -30,7 +30,8 @@ function DetallePrograma() {
   const { slug } = Route.useParams();
   const { inscribir } = Route.useSearch();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const enrollmentRedirect = `/programas/${slug}?inscribir=1`;
 
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
@@ -111,6 +112,29 @@ function DetallePrograma() {
     },
   });
 
+  useEffect(() => {
+    if (inscribir !== 1 || !programa || existing) {
+      return;
+    }
+    if (authLoading) {
+      return;
+    }
+    if (!isAuthenticated || !user) {
+      navigate({
+        to: "/acceder",
+        search: { redirect: enrollmentRedirect },
+      });
+      return;
+    }
+    setInscOpen(true);
+    navigate({
+      to: "/programas/$slug",
+      params: { slug },
+      search: {},
+      replace: true,
+    });
+  }, [authLoading, existing, inscribir, isAuthenticated, navigate, programa, slug, user]);
+
   if (isLoading) {
     return (
       <PublicLayout>
@@ -133,28 +157,18 @@ function DetallePrograma() {
   const precio = programa.precio_descuento ?? programa.precio;
 
   const inscribirse = async () => {
+    if (authLoading) {
+      return;
+    }
     if (!isAuthenticated || !user) {
-      navigate({ to: "/acceder" });
+      navigate({
+        to: "/acceder",
+        search: { redirect: enrollmentRedirect },
+      });
       return;
     }
     setInscOpen(true);
   };
-
-  useEffect(() => {
-    if (inscribir === 1 && programa && !existing) {
-      if (!isAuthenticated || !user) {
-        navigate({ to: "/acceder" });
-        return;
-      }
-      setInscOpen(true);
-      navigate({
-        to: "/programas/$slug",
-        params: { slug },
-        search: {},
-        replace: true,
-      });
-    }
-  }, [inscribir, programa, existing, isAuthenticated, user, navigate, slug]);
 
 
   const confirmarInscripcion = async () => {
@@ -279,8 +293,12 @@ function DetallePrograma() {
                 <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
               </Button>
             ) : (
-              <Button className="mt-4 w-full" onClick={inscribirse}>
-                {isAuthenticated ? "Inscribirme ahora" : "Acceder para inscribirme"}
+              <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading}>
+                {authLoading
+                  ? "Cargando…"
+                  : isAuthenticated
+                    ? "Inscribirme ahora"
+                    : "Acceder para inscribirme"}
               </Button>
             )}
             {programa.syllabus_url && (
