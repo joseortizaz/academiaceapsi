@@ -13,13 +13,6 @@ export const Route = createFileRoute("/_authenticated/docente/")({
   component: DocenteResumen,
 });
 
-// Mock pending tasks & questions (no tables yet)
-const tareasPendientes = [
-  { id: "t1", titulo: "Revisar entrega: Proyecto Final HTML/CSS", curso: "Introducción a Desarrollo Web", alumno: "María Pérez", vence: "Hoy" },
-  { id: "t2", titulo: "Calificar Quiz Módulo 3", curso: "Marketing Digital Avanzado", alumno: "Carlos Rodríguez", vence: "Mañana" },
-  { id: "t3", titulo: "Responder duda sobre Flexbox", curso: "Introducción a Desarrollo Web", alumno: "Lucía Fernández", vence: "Hoy" },
-  { id: "t4", titulo: "Aprobar trabajo final", curso: "Psicología Organizacional", alumno: "Pedro Gómez", vence: "2 días" },
-];
 
 function DocenteResumen() {
   const { user } = useAuth();
@@ -80,8 +73,8 @@ function DocenteResumen() {
   const kpis = [
     { label: "Alumnos asignados", value: totalAlumnos, icon: Users, color: "text-blue-600" },
     { label: "Cursos activos", value: cursosActivos, icon: BookOpen, color: "text-emerald-600" },
-    { label: "Calificaciones por revisar", value: 7, icon: ClipboardCheck, color: "text-amber-600" },
-    { label: "Mensajes pendientes", value: 4, icon: MessageCircle, color: "text-rose-600" },
+    { label: "Calificaciones por revisar", value: 0, icon: ClipboardCheck, color: "text-amber-600" },
+    { label: "Mensajes pendientes", value: 0, icon: MessageCircle, color: "text-rose-600" },
   ];
 
   return (
@@ -120,15 +113,7 @@ function DocenteResumen() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {tareasPendientes.map((t) => (
-              <div key={t.id} className="flex items-start justify-between gap-3 rounded-md border p-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">{t.titulo}</p>
-                  <p className="text-xs text-muted-foreground">{t.curso} · {t.alumno}</p>
-                </div>
-                <Badge variant={t.vence === "Hoy" ? "destructive" : "outline"}>{t.vence}</Badge>
-              </div>
-            ))}
+            <p className="text-sm text-muted-foreground">No tienes tareas pendientes por ahora.</p>
           </CardContent>
         </Card>
 

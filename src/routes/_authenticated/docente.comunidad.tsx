@@ -24,13 +24,7 @@ type Pregunta = {
   respuesta?: string;
 };
 
-const initialPreguntas: Pregunta[] = [
-  { id: "p1", alumno: "María Pérez", curso: "Introducción a Desarrollo Web", modulo: "Módulo 3 · Flexbox", pregunta: "¿Cuál es la diferencia entre justify-content y align-items en Flexbox?", fecha: "Hace 2 horas", resuelto: false },
-  { id: "p2", alumno: "Carlos Rodríguez", curso: "Marketing Digital Avanzado", modulo: "Módulo 5 · Google Ads", pregunta: "¿Cómo calculo el ROAS correctamente cuando hay conversiones asistidas?", fecha: "Hace 5 horas", resuelto: false },
-  { id: "p3", alumno: "Lucía Fernández", curso: "Introducción a Desarrollo Web", modulo: "Módulo 4 · JS Básico", pregunta: "Me da error 'undefined' al usar map sobre un array vacío. ¿Por qué?", fecha: "Ayer", resuelto: false },
-  { id: "p4", alumno: "Pedro Gómez", curso: "Psicología Organizacional", modulo: "Módulo 2 · Liderazgo", pregunta: "¿Recomienda algún libro complementario sobre liderazgo situacional?", fecha: "Hace 2 días", resuelto: true, respuesta: "Te recomiendo 'Leadership and the One Minute Manager' de Ken Blanchard." },
-  { id: "p5", alumno: "Ana Jiménez", curso: "Marketing Digital Avanzado", modulo: "Módulo 1 · Funnels", pregunta: "¿El TOFU se trabaja mejor con contenido educativo o emocional?", fecha: "Hace 3 días", resuelto: true, respuesta: "Depende del público — en B2B funciona mejor educativo, en B2C el emocional." },
-];
+const initialPreguntas: Pregunta[] = [];
 
 function DocenteComunidad() {
   const [preguntas, setPreguntas] = useState<Pregunta[]>(initialPreguntas);
