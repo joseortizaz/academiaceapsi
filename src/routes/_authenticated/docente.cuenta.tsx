@@ -54,10 +54,13 @@ function CuentaDocente() {
       if (error) throw error;
       toast.success("Perfil actualizado");
       qc.invalidateQueries({ queryKey: ["auth", "profile"] });
+      qc.invalidateQueries({ queryKey: ["public", "teachers"] });
+      qc.invalidateQueries({ queryKey: ["admin", "docentes"] });
     } catch (e: any) {
       toast.error(e.message ?? "No se pudo actualizar");
     } finally { setSaving(false); }
   };
+
 
   const handleChangePassword = async () => {
     if (pw.nueva.length < 6) return toast.error("Mínimo 6 caracteres");
@@ -88,6 +91,8 @@ function CuentaDocente() {
               onChange={async (newUrl) => {
                 setForm((f) => ({ ...f, avatar_url: newUrl ?? "" }));
                 qc.invalidateQueries({ queryKey: ["auth", "profile"] });
+                qc.invalidateQueries({ queryKey: ["public", "teachers"] });
+                qc.invalidateQueries({ queryKey: ["admin", "docentes"] });
               }}
             />
 
