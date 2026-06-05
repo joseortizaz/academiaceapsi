@@ -1,0 +1,1 @@
+GRANT SELECT ON public.teachers_public TO anon, authenticated;
