@@ -27,66 +27,16 @@ type Quiz = {
   preguntas: Pregunta[];
 };
 
-const QUIZZES: Quiz[] = [
-  {
-    id: "q1",
-    titulo: "Fundamentos de Psicología Clínica",
-    curso: "Introducción a la Psicología",
-    duracion: "10 min",
-    preguntas: [
-      {
-        pregunta: "¿Qué corriente psicológica enfatiza el estudio del comportamiento observable?",
-        opciones: ["Psicoanálisis", "Conductismo", "Humanismo", "Gestalt"],
-        correcta: 1,
-      },
-      {
-        pregunta: "¿Quién es considerado el padre del psicoanálisis?",
-        opciones: ["Carl Jung", "B. F. Skinner", "Sigmund Freud", "Iván Pávlov"],
-        correcta: 2,
-      },
-      {
-        pregunta: "El refuerzo positivo busca:",
-        opciones: [
-          "Eliminar una conducta",
-          "Aumentar la probabilidad de una conducta",
-          "Castigar una respuesta",
-          "Ignorar el estímulo",
-        ],
-        correcta: 1,
-      },
-    ],
-  },
-  {
-    id: "q2",
-    titulo: "Marketing Digital Avanzado",
-    curso: "Estrategias de Marketing",
-    duracion: "15 min",
-    preguntas: [
-      {
-        pregunta: "¿Qué significa SEO?",
-        opciones: [
-          "Search Engine Optimization",
-          "Social Engagement Online",
-          "Sales Easy Operations",
-          "System Encoded Output",
-        ],
-        correcta: 0,
-      },
-      {
-        pregunta: "Un embudo de conversión empieza típicamente con:",
-        opciones: ["Compra", "Atención", "Lealtad", "Recomendación"],
-        correcta: 1,
-      },
-    ],
-  },
-];
+type HistorialItem = {
+  curso: string;
+  quiz: string;
+  nota: number;
+  fecha: string;
+  estado: "Aprobado" | "Reprobado";
+};
 
-const HISTORIAL = [
-  { curso: "Introducción al Desarrollo Web", quiz: "Examen final HTML/CSS", nota: 95, fecha: "2026-04-12", estado: "Aprobado" },
-  { curso: "Marketing Digital Avanzado", quiz: "Módulo 3: SEO Técnico", nota: 88, fecha: "2026-03-28", estado: "Aprobado" },
-  { curso: "Psicología Organizacional", quiz: "Quiz - Liderazgo", nota: 72, fecha: "2026-03-10", estado: "Aprobado" },
-  { curso: "Diseño UX/UI", quiz: "Heurísticas de Nielsen", nota: 58, fecha: "2026-02-22", estado: "Reprobado" },
-];
+const QUIZZES: Quiz[] = [];
+const HISTORIAL: HistorialItem[] = [];
 
 function Evaluaciones() {
   const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null);
@@ -106,27 +56,39 @@ function Evaluaciones() {
         <>
           <section>
             <h2 className="mb-3 text-lg font-bold">Quizzes disponibles</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {QUIZZES.map((q) => (
-                <Card key={q.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-base">{q.titulo}</CardTitle>
-                      <Badge variant="outline">{q.duracion}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{q.curso}</p>
-                  </CardHeader>
-                  <CardContent className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {q.preguntas.length} preguntas
-                    </span>
-                    <Button onClick={() => setActiveQuiz(q)} size="sm">
-                      <ClipboardCheck className="mr-2 h-4 w-4" /> Iniciar quiz
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {QUIZZES.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                  <ClipboardCheck className="h-10 w-10 text-muted-foreground" />
+                  <p className="font-medium">No tienes evaluaciones disponibles</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cuando tus docentes publiquen quizzes, aparecerán aquí.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {QUIZZES.map((q) => (
+                  <Card key={q.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-2">
+                        <CardTitle className="text-base">{q.titulo}</CardTitle>
+                        <Badge variant="outline">{q.duracion}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{q.curso}</p>
+                    </CardHeader>
+                    <CardContent className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        {q.preguntas.length} preguntas
+                      </span>
+                      <Button onClick={() => setActiveQuiz(q)} size="sm">
+                        <ClipboardCheck className="mr-2 h-4 w-4" /> Iniciar quiz
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </section>
 
           <section>
@@ -137,37 +99,43 @@ function Evaluaciones() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Curso</TableHead>
-                      <TableHead>Evaluación</TableHead>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead className="text-right">Nota</TableHead>
-                      <TableHead>Estado</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {HISTORIAL.map((h, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">{h.curso}</TableCell>
-                        <TableCell className="text-muted-foreground">{h.quiz}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {new Date(h.fecha).toLocaleDateString("es-DO")}
-                        </TableCell>
-                        <TableCell className="text-right font-bold">{h.nota}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={h.estado === "Aprobado" ? "default" : "destructive"}
-                            className={h.estado === "Aprobado" ? "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20" : ""}
-                          >
-                            {h.estado}
-                          </Badge>
-                        </TableCell>
+                {HISTORIAL.length === 0 ? (
+                  <p className="py-8 text-center text-sm text-muted-foreground">
+                    Aún no tienes calificaciones registradas.
+                  </p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Curso</TableHead>
+                        <TableHead>Evaluación</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead className="text-right">Nota</TableHead>
+                        <TableHead>Estado</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {HISTORIAL.map((h, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-medium">{h.curso}</TableCell>
+                          <TableCell className="text-muted-foreground">{h.quiz}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {new Date(h.fecha).toLocaleDateString("es-DO")}
+                          </TableCell>
+                          <TableCell className="text-right font-bold">{h.nota}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={h.estado === "Aprobado" ? "default" : "destructive"}
+                              className={h.estado === "Aprobado" ? "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20" : ""}
+                            >
+                              {h.estado}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </section>
