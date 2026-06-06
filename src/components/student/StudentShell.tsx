@@ -101,7 +101,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
           <select
             className="w-full rounded-md border bg-background p-2 text-sm"
             value={nav.find((n) => location.pathname.startsWith(n.to))?.to ?? "/estudiante"}
-            onChange={(e) => navigate({ to: e.target.value })}
+            onChange={(e) => { window.location.href = e.target.value; }}
           >
             {nav.map((item) => (
               <option key={item.to} value={item.to}>{item.label}</option>
