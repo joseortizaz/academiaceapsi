@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { GraduationCap, BookOpen } from "lucide-react";
+import { StudentShell } from "@/components/student/StudentShell";
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/")({
   component: MisCursos,
@@ -36,7 +37,7 @@ function MisCursos() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30 p-6">
+    <StudentShell>
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -103,6 +104,6 @@ function MisCursos() {
           </div>
         )}
       </div>
-    </div>
+    </StudentShell>
   );
 }
