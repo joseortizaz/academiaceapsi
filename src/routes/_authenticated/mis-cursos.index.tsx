@@ -104,6 +104,6 @@ function MisCursos() {
           </div>
         )}
       </div>
-    </div>
+    </StudentShell>
   );
 }
