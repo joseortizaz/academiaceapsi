@@ -74,12 +74,12 @@ function MisCursos() {
                 </div>
                 <div className="space-y-3 p-4">
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="capitalize">{e.programa?.tipo}</Badge>
+                    <Badge variant="outline" className="capitalize">{e.programa?.tipo ?? "Programa"}</Badge>
                     <Badge variant={e.estado === "activo" ? "default" : "secondary"}>
                       {e.estado}
                     </Badge>
                   </div>
-                  <h2 className="line-clamp-2 font-bold">{e.programa?.titulo}</h2>
+                  <h2 className="line-clamp-2 font-bold">{e.programa?.titulo ?? "Curso no disponible"}</h2>
                   <div>
                     <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                       <span>Progreso</span>
@@ -91,11 +91,15 @@ function MisCursos() {
                     <Button disabled className="w-full" variant="secondary">
                       Pago pendiente de verificación
                     </Button>
-                  ) : (
+                  ) : e.programa?.slug ? (
                     <Button asChild className="w-full">
-                      <Link to="/mis-cursos/$slug" params={{ slug: e.programa!.slug }}>
+                      <Link to="/mis-cursos/$slug" params={{ slug: e.programa.slug }}>
                         Continuar curso
                       </Link>
+                    </Button>
+                  ) : (
+                    <Button disabled className="w-full" variant="secondary">
+                      Curso temporalmente no disponible
                     </Button>
                   )}
                 </div>
