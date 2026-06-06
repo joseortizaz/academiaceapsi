@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { GraduationCap, BookOpen } from "lucide-react";
+import { StudentShell } from "@/components/student/StudentShell";
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/")({
   component: MisCursos,
