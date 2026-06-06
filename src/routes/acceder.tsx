@@ -7,7 +7,7 @@ import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/acceder")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -38,6 +38,33 @@ function Acceder() {
     return "/estudiante";
   };
 
+  const redirectAuthenticatedUser = async (userId: string) => {
+    const destination = await resolveDestination(userId);
+    await navigate({ to: destination as never, replace: true });
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (!active || error || !data.user) return;
+      void redirectAuthenticatedUser(data.user.id);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session?.user) {
+        void redirectAuthenticatedUser(session.user.id);
+      }
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, redirect]);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -47,16 +74,17 @@ function Acceder() {
       toast.error("Error de acceso", { description: error?.message ?? "No se pudo iniciar sesión" });
       return;
     }
-    const destination = await resolveDestination(data.user.id);
-    setLoading(false);
     toast.success("¡Bienvenido!");
-    window.location.assign(destination);
+    await redirectAuthenticatedUser(data.user.id);
+    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
-    const continueTo = redirect ?? "/estudiante";
+    const callbackUrl = new URL("/acceder", window.location.origin);
+    if (redirect) callbackUrl.searchParams.set("redirect", redirect);
+
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}${continueTo}`,
+      redirect_uri: callbackUrl.toString(),
     });
     if (result.error) {
       toast.error("Error con Google", { description: result.error.message });
@@ -65,8 +93,12 @@ function Acceder() {
     if (result.redirected) return;
     toast.success("¡Bienvenido!");
     const { data } = await supabase.auth.getUser();
-    const destination = data.user ? await resolveDestination(data.user.id) : continueTo;
-    window.location.assign(destination);
+    if (data.user) {
+      await redirectAuthenticatedUser(data.user.id);
+      return;
+    }
+
+    await navigate({ to: (redirect ?? "/estudiante") as never, replace: true });
   };
 
   return (
