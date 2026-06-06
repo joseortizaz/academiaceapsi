@@ -37,7 +37,7 @@ function MisCursos() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30 p-6">
+    <StudentShell>
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
