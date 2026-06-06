@@ -27,6 +27,11 @@ export function useAuth() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["auth", "profile"],
     queryFn: async () => {
+      // Re-check session right before the call — avoids calling the
+      // protected serverFn with no/expired bearer token, which would
+      // surface as a runtime error overlay in dev.
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session?.access_token) return null;
       try {
         return await fetchProfile();
       } catch {
