@@ -9,13 +9,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+};
+
+const nav: NavItem[] = [
   { to: "/estudiante", label: "Mi Aprendizaje", icon: LayoutDashboard, exact: true },
   { to: "/mis-cursos", label: "Mis Cursos", icon: BookOpen },
   { to: "/estudiante/evaluaciones", label: "Evaluaciones", icon: ClipboardCheck },
   { to: "/certificados", label: "Certificados", icon: Award },
   { to: "/estudiante/cuenta", label: "Mi Cuenta", icon: UserCog },
-] as const;
+];
 
 export function StudentShell({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
