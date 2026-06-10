@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMeetingSdkSignature } from "@/lib/zoom.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import "@zoom/meetingsdk/dist/css/bootstrap.css";
+import "@zoom/meetingsdk/dist/css/react-select.css";
 
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const { user } = useAuth();
