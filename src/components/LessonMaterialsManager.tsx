@@ -167,53 +167,64 @@ export function LessonMaterialsManager({ moduloId, programaId, editable = true }
       ) : (
         <ul className="space-y-2">
           {materials.map((m, idx) => (
-            <li key={m.id} className="flex items-center gap-2 rounded-md border bg-muted/30 p-2">
-              {iconFor(m.tipo)}
-              {editingId === m.id ? (
-                <Input
-                  autoFocus
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  onBlur={() => saveName(m.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveName(m.id);
-                    if (e.key === "Escape") setEditingId(null);
-                  }}
-                  className="h-8 flex-1"
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="flex-1 truncate text-left text-sm hover:underline"
-                  onClick={() => { if (editable) { setEditingId(m.id); setEditingName(m.nombre); } }}
-                  title={editable ? "Click para renombrar" : m.nombre}
-                >
-                  {m.nombre}
-                </button>
+            <li key={m.id} className="space-y-2 rounded-md border bg-muted/30 p-2">
+              <div className="flex items-center gap-2">
+                {iconFor(m.tipo)}
+                {editingId === m.id ? (
+                  <Input
+                    autoFocus
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onBlur={() => saveName(m.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveName(m.id);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    className="h-8 flex-1"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="flex-1 truncate text-left text-sm hover:underline"
+                    onClick={() => { if (editable) { setEditingId(m.id); setEditingName(m.nombre); } }}
+                    title={editable ? "Click para renombrar" : m.nombre}
+                  >
+                    {m.nombre}
+                  </button>
+                )}
+                {m.tamano_bytes ? (
+                  <span className="text-xs text-muted-foreground">{formatSize(m.tamano_bytes)}</span>
+                ) : null}
+                <Button type="button" size="sm" variant="ghost" asChild>
+                  <a href={m.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+                {editable && (
+                  <>
+                    <Button type="button" size="sm" variant="ghost"
+                      disabled={idx === 0} onClick={() => move(idx, -1)}>
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost"
+                      disabled={idx === materials.length - 1} onClick={() => move(idx, 1)}>
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost"
+                      className="text-destructive" onClick={() => removeMaterial(m.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
+              {m.tipo === "video" && (
+                <video src={m.url} controls preload="metadata" className="w-full max-h-64 rounded" />
               )}
-              {m.tamano_bytes ? (
-                <span className="text-xs text-muted-foreground">{formatSize(m.tamano_bytes)}</span>
-              ) : null}
-              <Button type="button" size="sm" variant="ghost" asChild>
-                <a href={m.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
-              {editable && (
-                <>
-                  <Button type="button" size="sm" variant="ghost"
-                    disabled={idx === 0} onClick={() => move(idx, -1)}>
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost"
-                    disabled={idx === materials.length - 1} onClick={() => move(idx, 1)}>
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost"
-                    className="text-destructive" onClick={() => removeMaterial(m.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
+              {m.tipo === "audio" && (
+                <audio src={m.url} controls preload="metadata" className="w-full" />
+              )}
+              {m.tipo === "pdf" && (
+                <iframe src={m.url} className="h-72 w-full rounded border" title={m.nombre} />
               )}
             </li>
           ))}
