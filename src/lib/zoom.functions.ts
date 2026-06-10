@@ -75,7 +75,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     }).parse,
   )
   .handler(async ({ data, context }) => {
-    await assertAdminOrDocente(context.userId);
+    await assertCanManageProgram(context.userId, data.programaId);
 
     const meeting = await zoomApi<{
       id: number;
@@ -129,12 +129,13 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid() }).parse)
   .handler(async ({ data, context }) => {
-    await assertAdminOrDocente(context.userId);
     const { data: row } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("zoom_meeting_id")
+      .select("zoom_meeting_id, programa_id")
       .eq("id", data.id)
       .maybeSingle();
+    if (!row) throw new Error("Reunión no encontrada.");
+    await assertCanManageProgram(context.userId, row.programa_id);
     if (row?.zoom_meeting_id) {
       try {
         await zoomApi(`/meetings/${row.zoom_meeting_id}`, { method: "DELETE" });
