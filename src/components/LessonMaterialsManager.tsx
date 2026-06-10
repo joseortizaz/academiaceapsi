@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   FileText, FileSpreadsheet, Presentation, File as FileIcon,
   Loader2, Trash2, Upload, ExternalLink, ArrowUp, ArrowDown,
+  Video, Music,
 } from "lucide-react";
 
 type Material = {
@@ -28,9 +29,11 @@ type Props = {
 };
 
 const ACCEPT =
-  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.zip";
+  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.zip," +
+  ".mp4,.webm,.mov,.m4v,.ogv," +
+  ".mp3,.wav,.m4a,.ogg,.aac";
 
-const MAX_MB = 25;
+const MAX_MB = 200;
 
 function detectTipo(name: string): string {
   const n = name.toLowerCase();
@@ -38,6 +41,8 @@ function detectTipo(name: string): string {
   if (n.endsWith(".doc") || n.endsWith(".docx")) return "word";
   if (n.endsWith(".xls") || n.endsWith(".xlsx") || n.endsWith(".csv")) return "excel";
   if (n.endsWith(".ppt") || n.endsWith(".pptx")) return "ppt";
+  if (/\.(mp4|webm|mov|m4v|ogv)$/.test(n)) return "video";
+  if (/\.(mp3|wav|m4a|ogg|aac)$/.test(n)) return "audio";
   return "otro";
 }
 
@@ -47,6 +52,8 @@ function iconFor(tipo: string) {
     case "word": return <FileText className="h-4 w-4 text-blue-500" />;
     case "excel": return <FileSpreadsheet className="h-4 w-4 text-emerald-600" />;
     case "ppt": return <Presentation className="h-4 w-4 text-orange-500" />;
+    case "video": return <Video className="h-4 w-4 text-purple-500" />;
+    case "audio": return <Music className="h-4 w-4 text-pink-500" />;
     default: return <FileIcon className="h-4 w-4 text-muted-foreground" />;
   }
 }
