@@ -37,13 +37,16 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           patchJsMedia: true,
         });
 
+        const { data: userData } = await supabase.auth.getUser();
+        const email = userData.user?.email;
+
         await c.join({
           sdkKey,
           signature,
           meetingNumber,
           password: password || "",
           userName: `${user.nombre ?? "Usuario"} ${user.apellido ?? ""}`.trim(),
-          userEmail: undefined,
+          userEmail: email,
           // El role lo determina la firma JWT; aquí solo informativo.
         });
         if (!cancelled) setState("joined");
