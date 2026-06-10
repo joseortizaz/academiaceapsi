@@ -245,7 +245,7 @@ export function LessonMaterialsManager({ moduloId, programaId, editable = true }
             {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
             Agregar material
           </Button>
-          <p className="text-xs text-muted-foreground">PDF, Word, Excel, PowerPoint · máx. {MAX_MB} MB</p>
+          <p className="text-xs text-muted-foreground">Videos, PDFs, Audios y documentos · máx. {MAX_MB} MB</p>
         </div>
       )}
     </div>
