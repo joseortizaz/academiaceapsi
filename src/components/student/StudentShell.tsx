@@ -8,6 +8,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 type NavItem = {
   to: string;
