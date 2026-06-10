@@ -53,14 +53,18 @@ export const Route = createFileRoute("/api/public/zoom-webhook")({
         const valid = verifyZoomWebhookSignature({ signature, timestamp, rawBody });
         const meetingId = body.payload?.object?.id ? String(body.payload.object.id) : null;
 
-        await supabaseAdmin.from("zoom_webhook_logs").insert({
-          event: body.event,
-          event_ts: body.event_ts ?? null,
-          zoom_meeting_id: meetingId,
-          payload: body as unknown as never,
-          signature_valid: valid,
-          processed: false,
-        });
+        const { data: logRow } = await supabaseAdmin
+          .from("zoom_webhook_logs")
+          .insert({
+            event: body.event,
+            event_ts: body.event_ts ?? null,
+            zoom_meeting_id: meetingId,
+            payload: body as unknown as never,
+            signature_valid: valid,
+            processed: false,
+          })
+          .select("id")
+          .single();
 
         if (!valid) {
           return new Response("Invalid signature", { status: 401 });
@@ -94,18 +98,19 @@ export const Route = createFileRoute("/api/public/zoom-webhook")({
               .eq("zoom_meeting_id", meetingId);
           }
 
-          await supabaseAdmin
-            .from("zoom_webhook_logs")
-            .update({ processed: true })
-            .eq("event", body.event)
-            .eq("event_ts", body.event_ts ?? 0)
-            .eq("zoom_meeting_id", meetingId ?? "");
+          if (logRow?.id) {
+            await supabaseAdmin
+              .from("zoom_webhook_logs")
+              .update({ processed: true })
+              .eq("id", logRow.id);
+          }
         } catch (e) {
-          await supabaseAdmin
-            .from("zoom_webhook_logs")
-            .update({ error: e instanceof Error ? e.message : String(e) })
-            .eq("event", body.event)
-            .eq("event_ts", body.event_ts ?? 0);
+          if (logRow?.id) {
+            await supabaseAdmin
+              .from("zoom_webhook_logs")
+              .update({ error: e instanceof Error ? e.message : String(e) })
+              .eq("id", logRow.id);
+          }
           return new Response("Processing error", { status: 500 });
         }
 

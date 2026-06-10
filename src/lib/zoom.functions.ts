@@ -19,6 +19,28 @@ async function assertAdminOrDocente(userId: string) {
   }
 }
 
+async function assertCanManageProgram(userId: string, programaId: string) {
+  const roles = await getUserRoles(userId);
+  if (roles.includes("admin")) return;
+  if (!roles.includes("docente")) {
+    throw new Error("No autorizado: se requiere rol admin o docente.");
+  }
+  const { data: teacher } = await supabaseAdmin
+    .from("teachers")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!teacher) throw new Error("No se encontró tu perfil de docente.");
+  const { data: prog } = await supabaseAdmin
+    .from("programs")
+    .select("docente_id")
+    .eq("id", programaId)
+    .maybeSingle();
+  if (!prog || prog.docente_id !== teacher.id) {
+    throw new Error("No tienes permiso para gestionar reuniones de este programa.");
+  }
+}
+
 /** Diagnóstico simple: pide /users/me con el token S2S. */
 export const getZoomConnectionStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -53,7 +75,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     }).parse,
   )
   .handler(async ({ data, context }) => {
-    await assertAdminOrDocente(context.userId);
+    await assertCanManageProgram(context.userId, data.programaId);
 
     const meeting = await zoomApi<{
       id: number;
@@ -107,12 +129,13 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid() }).parse)
   .handler(async ({ data, context }) => {
-    await assertAdminOrDocente(context.userId);
     const { data: row } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("zoom_meeting_id")
+      .select("zoom_meeting_id, programa_id")
       .eq("id", data.id)
       .maybeSingle();
+    if (!row) throw new Error("Reunión no encontrada.");
+    await assertCanManageProgram(context.userId, row.programa_id);
     if (row?.zoom_meeting_id) {
       try {
         await zoomApi(`/meetings/${row.zoom_meeting_id}`, { method: "DELETE" });
