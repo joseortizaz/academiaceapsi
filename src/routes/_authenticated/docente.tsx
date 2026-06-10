@@ -92,9 +92,9 @@ function DocenteLayout() {
         </div>
       </aside>
       <div className="flex-1 overflow-x-auto">
-        <div className="flex items-center gap-2 border-b bg-card p-3 md:hidden">
+        <div className="flex items-center gap-2 border-b bg-card p-3">
           <select
-            className="flex-1 rounded-md border bg-background p-2 text-sm"
+            className="flex-1 rounded-md border bg-background p-2 text-sm md:hidden"
             value={location.pathname}
             onChange={(e) => { window.location.href = e.target.value; }}
           >
@@ -102,10 +102,13 @@ function DocenteLayout() {
               <option key={item.to} value={item.to}>{item.label}</option>
             ))}
           </select>
-          <Button size="sm" variant="outline" onClick={handleLogout}>
+          <div className="hidden flex-1 md:block" />
+          <NotificationsBell />
+          <Button size="sm" variant="outline" onClick={handleLogout} className="md:hidden">
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
+
         <main className="p-4 md:p-8">
           <Outlet />
         </main>
