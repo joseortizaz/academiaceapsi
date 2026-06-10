@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   FileText, FileSpreadsheet, Presentation, File as FileIcon,
   Loader2, Trash2, Upload, ExternalLink, ArrowUp, ArrowDown,
+  Video, Music,
 } from "lucide-react";
 
 type Material = {
@@ -28,9 +29,11 @@ type Props = {
 };
 
 const ACCEPT =
-  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.zip";
+  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.zip," +
+  ".mp4,.webm,.mov,.m4v,.ogv," +
+  ".mp3,.wav,.m4a,.ogg,.aac";
 
-const MAX_MB = 25;
+const MAX_MB = 200;
 
 function detectTipo(name: string): string {
   const n = name.toLowerCase();
@@ -38,6 +41,8 @@ function detectTipo(name: string): string {
   if (n.endsWith(".doc") || n.endsWith(".docx")) return "word";
   if (n.endsWith(".xls") || n.endsWith(".xlsx") || n.endsWith(".csv")) return "excel";
   if (n.endsWith(".ppt") || n.endsWith(".pptx")) return "ppt";
+  if (/\.(mp4|webm|mov|m4v|ogv)$/.test(n)) return "video";
+  if (/\.(mp3|wav|m4a|ogg|aac)$/.test(n)) return "audio";
   return "otro";
 }
 
@@ -47,6 +52,8 @@ function iconFor(tipo: string) {
     case "word": return <FileText className="h-4 w-4 text-blue-500" />;
     case "excel": return <FileSpreadsheet className="h-4 w-4 text-emerald-600" />;
     case "ppt": return <Presentation className="h-4 w-4 text-orange-500" />;
+    case "video": return <Video className="h-4 w-4 text-purple-500" />;
+    case "audio": return <Music className="h-4 w-4 text-pink-500" />;
     default: return <FileIcon className="h-4 w-4 text-muted-foreground" />;
   }
 }
@@ -160,53 +167,64 @@ export function LessonMaterialsManager({ moduloId, programaId, editable = true }
       ) : (
         <ul className="space-y-2">
           {materials.map((m, idx) => (
-            <li key={m.id} className="flex items-center gap-2 rounded-md border bg-muted/30 p-2">
-              {iconFor(m.tipo)}
-              {editingId === m.id ? (
-                <Input
-                  autoFocus
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  onBlur={() => saveName(m.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveName(m.id);
-                    if (e.key === "Escape") setEditingId(null);
-                  }}
-                  className="h-8 flex-1"
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="flex-1 truncate text-left text-sm hover:underline"
-                  onClick={() => { if (editable) { setEditingId(m.id); setEditingName(m.nombre); } }}
-                  title={editable ? "Click para renombrar" : m.nombre}
-                >
-                  {m.nombre}
-                </button>
+            <li key={m.id} className="space-y-2 rounded-md border bg-muted/30 p-2">
+              <div className="flex items-center gap-2">
+                {iconFor(m.tipo)}
+                {editingId === m.id ? (
+                  <Input
+                    autoFocus
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onBlur={() => saveName(m.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveName(m.id);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    className="h-8 flex-1"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="flex-1 truncate text-left text-sm hover:underline"
+                    onClick={() => { if (editable) { setEditingId(m.id); setEditingName(m.nombre); } }}
+                    title={editable ? "Click para renombrar" : m.nombre}
+                  >
+                    {m.nombre}
+                  </button>
+                )}
+                {m.tamano_bytes ? (
+                  <span className="text-xs text-muted-foreground">{formatSize(m.tamano_bytes)}</span>
+                ) : null}
+                <Button type="button" size="sm" variant="ghost" asChild>
+                  <a href={m.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+                {editable && (
+                  <>
+                    <Button type="button" size="sm" variant="ghost"
+                      disabled={idx === 0} onClick={() => move(idx, -1)}>
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost"
+                      disabled={idx === materials.length - 1} onClick={() => move(idx, 1)}>
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost"
+                      className="text-destructive" onClick={() => removeMaterial(m.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
+              {m.tipo === "video" && (
+                <video src={m.url} controls preload="metadata" className="w-full max-h-64 rounded" />
               )}
-              {m.tamano_bytes ? (
-                <span className="text-xs text-muted-foreground">{formatSize(m.tamano_bytes)}</span>
-              ) : null}
-              <Button type="button" size="sm" variant="ghost" asChild>
-                <a href={m.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
-              {editable && (
-                <>
-                  <Button type="button" size="sm" variant="ghost"
-                    disabled={idx === 0} onClick={() => move(idx, -1)}>
-                    <ArrowUp className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost"
-                    disabled={idx === materials.length - 1} onClick={() => move(idx, 1)}>
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost"
-                    className="text-destructive" onClick={() => removeMaterial(m.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
+              {m.tipo === "audio" && (
+                <audio src={m.url} controls preload="metadata" className="w-full" />
+              )}
+              {m.tipo === "pdf" && (
+                <iframe src={m.url} className="h-72 w-full rounded border" title={m.nombre} />
               )}
             </li>
           ))}
@@ -227,7 +245,7 @@ export function LessonMaterialsManager({ moduloId, programaId, editable = true }
             {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
             Agregar material
           </Button>
-          <p className="text-xs text-muted-foreground">PDF, Word, Excel, PowerPoint · máx. {MAX_MB} MB</p>
+          <p className="text-xs text-muted-foreground">Videos, PDFs, Audios y documentos · máx. {MAX_MB} MB</p>
         </div>
       )}
     </div>
