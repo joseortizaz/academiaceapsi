@@ -1377,26 +1377,6 @@ export type Database = {
           puntaje: number | null
           tipo: string | null
         }
-        Insert: {
-          assessment_id?: string | null
-          created_at?: string | null
-          enunciado?: string | null
-          id?: string | null
-          opciones?: Json | null
-          orden?: number | null
-          puntaje?: number | null
-          tipo?: string | null
-        }
-        Update: {
-          assessment_id?: string | null
-          created_at?: string | null
-          enunciado?: string | null
-          id?: string | null
-          opciones?: Json | null
-          orden?: number | null
-          puntaje?: number | null
-          tipo?: string | null
-        }
         Relationships: [
           {
             foreignKeyName: "assessment_questions_assessment_id_fkey"
