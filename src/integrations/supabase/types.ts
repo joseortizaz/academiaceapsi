@@ -311,6 +311,47 @@ export type Database = {
           },
         ]
       }
+      community_posts: {
+        Row: {
+          autor_id: string
+          contenido: string
+          created_at: string
+          id: string
+          imagen_url: string | null
+          programa_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          autor_id: string
+          contenido: string
+          created_at?: string
+          id?: string
+          imagen_url?: string | null
+          programa_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          autor_id?: string
+          contenido?: string
+          created_at?: string
+          id?: string
+          imagen_url?: string | null
+          programa_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           asunto: string
@@ -672,6 +713,60 @@ export type Database = {
             columns: ["modulo_id"]
             isOneToOne: false
             referencedRelation: "program_modules_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          enlace: string | null
+          id: string
+          leida: boolean
+          mensaje: string | null
+          post_id: string | null
+          programa_id: string | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enlace?: string | null
+          id?: string
+          leida?: boolean
+          mensaje?: string | null
+          post_id?: string | null
+          programa_id?: string | null
+          tipo?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enlace?: string | null
+          id?: string
+          leida?: boolean
+          mensaje?: string | null
+          post_id?: string | null
+          programa_id?: string | null
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
             referencedColumns: ["id"]
           },
         ]
