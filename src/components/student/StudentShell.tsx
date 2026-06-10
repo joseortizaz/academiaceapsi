@@ -98,19 +98,24 @@ export function StudentShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex-1 overflow-x-auto">
-        <div className="border-b bg-card p-3 md:hidden">
-          <select
-            className="w-full rounded-md border bg-background p-2 text-sm"
-            value={nav.find((n) => location.pathname.startsWith(n.to))?.to ?? "/estudiante"}
-            onChange={(e) => { window.location.href = e.target.value; }}
-          >
-            {nav.map((item) => (
-              <option key={item.to} value={item.to}>{item.label}</option>
-            ))}
-          </select>
+        <div className="flex items-center justify-between gap-2 border-b bg-card p-3">
+          <div className="flex-1 md:hidden">
+            <select
+              className="w-full rounded-md border bg-background p-2 text-sm"
+              value={nav.find((n) => location.pathname.startsWith(n.to))?.to ?? "/estudiante"}
+              onChange={(e) => { window.location.href = e.target.value; }}
+            >
+              {nav.map((item) => (
+                <option key={item.to} value={item.to}>{item.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="hidden flex-1 md:block" />
+          <NotificationsBell />
         </div>
         <main className="p-4 md:p-8">{children}</main>
       </div>
+
     </div>
   );
 }
