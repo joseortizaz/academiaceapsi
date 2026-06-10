@@ -1503,6 +1503,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_teacher_of_program: {
+        Args: { _programa_id: string }
+        Returns: boolean
+      }
       validate_coupon: {
         Args: { _codigo: string }
         Returns: {
