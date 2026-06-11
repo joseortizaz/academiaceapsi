@@ -285,7 +285,7 @@ function IssueCertificateDialog({
         user_id: enr.user_id,
         programa_id: enr.programa_id,
         enrollment_id: enr.id,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
