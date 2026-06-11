@@ -185,7 +185,8 @@ export const generateLessonFromWeb = createServerFn({ method: "POST" })
     idioma?: string;
     nivel?: string;
   }) => input)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertAdminOrDocente(context.userId);
     const fcKey = process.env.FIRECRAWL_API_KEY;
     const idioma = data.idioma ?? "español";
     const nivel = data.nivel ?? "intermedio";
