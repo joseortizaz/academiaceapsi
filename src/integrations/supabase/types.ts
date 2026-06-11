@@ -267,6 +267,7 @@ export type Database = {
           programa_id: string
           url_pdf: string | null
           user_id: string
+          verification_code: string | null
         }
         Insert: {
           created_at?: string
@@ -280,6 +281,7 @@ export type Database = {
           programa_id: string
           url_pdf?: string | null
           user_id: string
+          verification_code?: string | null
         }
         Update: {
           created_at?: string
@@ -293,6 +295,7 @@ export type Database = {
           programa_id?: string
           url_pdf?: string | null
           user_id?: string
+          verification_code?: string | null
         }
         Relationships: [
           {
@@ -1571,6 +1574,7 @@ export type Database = {
       }
     }
     Functions: {
+      gen_verification_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1587,6 +1591,19 @@ export type Database = {
         Returns: {
           porcentaje_descuento: number
           valid: boolean
+        }[]
+      }
+      verify_certificate: {
+        Args: { _code: string }
+        Returns: {
+          estado: string
+          fecha_emision: string
+          numero_certificado: string
+          programa_duracion_horas: number
+          programa_tipo: string
+          programa_titulo: string
+          student_name: string
+          verification_code: string
         }[]
       }
     }
