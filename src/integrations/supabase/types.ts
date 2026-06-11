@@ -471,6 +471,60 @@ export type Database = {
           },
         ]
       }
+      course_requests: {
+        Row: {
+          codigo_pais: string
+          created_at: string
+          email: string
+          estado: string
+          id: string
+          nivel_estudios: string
+          nombre_completo: string
+          notas: string | null
+          numero_documento: string
+          programa: string
+          provincia: string
+          telefono: string
+          tipo_documento: string
+          tipo_formacion: string
+          updated_at: string
+        }
+        Insert: {
+          codigo_pais?: string
+          created_at?: string
+          email: string
+          estado?: string
+          id?: string
+          nivel_estudios: string
+          nombre_completo: string
+          notas?: string | null
+          numero_documento: string
+          programa: string
+          provincia: string
+          telefono: string
+          tipo_documento: string
+          tipo_formacion: string
+          updated_at?: string
+        }
+        Update: {
+          codigo_pais?: string
+          created_at?: string
+          email?: string
+          estado?: string
+          id?: string
+          nivel_estudios?: string
+          nombre_completo?: string
+          notas?: string | null
+          numero_documento?: string
+          programa?: string
+          provincia?: string
+          telefono?: string
+          tipo_documento?: string
+          tipo_formacion?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           area_profesional: string | null
