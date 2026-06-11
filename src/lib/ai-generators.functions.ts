@@ -107,14 +107,17 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     idioma?: string;
     nivel?: string;
   }) => input)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertAdminOrDocente(context.userId);
+    assertSafePdfUrl(data.pdfUrl);
+
     const cantidad = Math.min(Math.max(data.cantidad ?? 5, 1), 20);
     const tipo = data.tipo ?? "mixto";
     const idioma = data.idioma ?? "español";
     const nivel = data.nivel ?? "intermedio";
 
     // Descargar PDF
-    const pdfRes = await fetch(data.pdfUrl);
+    const pdfRes = await fetch(data.pdfUrl, { redirect: "error" });
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
 
