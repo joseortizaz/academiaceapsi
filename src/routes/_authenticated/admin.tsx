@@ -67,7 +67,7 @@ function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-muted/30">
-      <aside className="hidden w-64 shrink-0 flex-col border-r bg-card md:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:flex">
         <div className="border-b p-4">
           <h2 className="text-lg font-bold">Administración</h2>
           <p className="text-xs text-muted-foreground">Academia Ceapsi RD</p>
