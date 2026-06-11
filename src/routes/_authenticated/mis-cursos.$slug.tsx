@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { generarCertificadoPDF } from "@/lib/certificate-pdf";
+import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
+import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
   ArrowLeft, CheckCircle2, Circle, Video, Download, Award,
 } from "lucide-react";
