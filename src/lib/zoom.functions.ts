@@ -152,12 +152,38 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
   .inputValidator(
     z.object({ programaId: z.string().uuid().optional() }).parse,
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    // Authorization: admin ve todo; docente solo sus programas; resto: denegado.
+    const roles = await getUserRoles(context.userId);
+    const isAdmin = roles.includes("admin");
+    const isDocente = roles.includes("docente");
+    if (!isAdmin && !isDocente) {
+      throw new Error("No autorizado.");
+    }
+
     let q = supabaseAdmin
       .from("zoom_meetings")
       .select("*")
       .order("start_at", { ascending: false });
     if (data.programaId) q = q.eq("programa_id", data.programaId);
+
+    if (!isAdmin) {
+      // Docente: limitar a programas de los que es titular.
+      const { data: teacher } = await supabaseAdmin
+        .from("teachers")
+        .select("id")
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      if (!teacher) return [];
+      const { data: progs } = await supabaseAdmin
+        .from("programs")
+        .select("id")
+        .eq("docente_id", teacher.id);
+      const ids = (progs ?? []).map((p) => p.id);
+      if (ids.length === 0) return [];
+      q = q.in("programa_id", ids);
+    }
+
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
