@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { generarCertificadoPDF } from "@/lib/certificate-pdf";
+import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
+import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
   ArrowLeft, CheckCircle2, Circle, Video, Download, Award,
 } from "lucide-react";
@@ -24,6 +25,7 @@ function CursoPlayer() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
+  const [certPreviewOpen, setCertPreviewOpen] = useState(false);
 
   const { data: programa } = useQuery({
     queryKey: ["mc-programa", slug],
@@ -345,24 +347,35 @@ function CursoPlayer() {
                 <Button
                   className="mt-3 w-full"
                   size="sm"
-                  onClick={() =>
-                    generarCertificadoPDF({
-                      numero: certificate.numero_certificado,
-                      nombreCompleto: `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim() || "Estudiante",
-                      tituloPrograma: programa.titulo,
-                      duracionHoras: programa.duracion_horas,
-                      fechaEmision: certificate.fecha_emision,
-                      verificacionUrl: `${window.location.origin}/verificar/${certificate.numero_certificado}`,
-                    })
-                  }
+                  onClick={() => setCertPreviewOpen(true)}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Descargar certificado
+                  Ver / descargar certificado
                 </Button>
               ) : (
                 <Button onClick={emitirCertificado} size="sm" className="mt-3 w-full">
                   Generar certificado
                 </Button>
+              )}
+              {certificate && (
+                <CertificatePreviewDialog
+                  open={certPreviewOpen}
+                  onOpenChange={setCertPreviewOpen}
+                  data={{
+                    studentName:
+                      `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim() || "Estudiante",
+                    programTitle: programa.titulo,
+                    programType: programa.tipo,
+                    durationHours: programa.duracion_horas,
+                    issueDate: certificate.fecha_emision,
+                    verificationCode:
+                      (certificate as any).verification_code ?? certificate.numero_certificado,
+                    certificateNumber: certificate.numero_certificado,
+                    verifyUrl: buildVerifyUrl(
+                      (certificate as any).verification_code ?? certificate.numero_certificado,
+                    ),
+                  }}
+                />
               )}
             </div>
           )}

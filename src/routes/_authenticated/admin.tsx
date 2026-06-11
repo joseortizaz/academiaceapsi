@@ -20,6 +20,7 @@ import {
   LogOut,
   Plug,
   FileCheck,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,7 @@ const nav = [
   { to: "/admin/docentes", label: "Docentes", icon: Users },
   { to: "/admin/modulos", label: "Lecciones", icon: BookOpen },
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
+  { to: "/admin/certificados", label: "Certificados", icon: Award },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },

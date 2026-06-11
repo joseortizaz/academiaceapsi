@@ -20,6 +20,7 @@ import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
@@ -53,6 +54,7 @@ import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
 import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
 import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
+import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
@@ -110,6 +112,11 @@ const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProgramasRoute,
+} as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
   id: '/verificar/$numero',
@@ -300,6 +307,12 @@ const AuthenticatedAdminDocentesRoute =
     path: '/docentes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCertificadosRoute =
+  AuthenticatedAdminCertificadosRouteImport.update({
+    id: '/certificados',
+    path: '/certificados',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCategoriasRoute =
   AuthenticatedAdminCategoriasRouteImport.update({
     id: '/categorias',
@@ -334,10 +347,12 @@ export interface FileRoutesByFullPath {
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
@@ -378,10 +393,12 @@ export interface FileRoutesByTo {
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
@@ -428,10 +445,12 @@ export interface FileRoutesById {
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/_authenticated/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/_authenticated/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
@@ -478,10 +497,12 @@ export interface FileRouteTypes {
     | '/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas/'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
+    | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
     | '/admin/finanzas'
@@ -522,10 +543,12 @@ export interface FileRouteTypes {
     | '/certificados'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
+    | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
     | '/admin/finanzas'
@@ -571,10 +594,12 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
+    | '/_authenticated/admin/certificados'
     | '/_authenticated/admin/docentes'
     | '/_authenticated/admin/evaluaciones'
     | '/_authenticated/admin/finanzas'
@@ -616,6 +641,7 @@ export interface RootRouteChildren {
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
 }
 
@@ -697,6 +723,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/programas/'
       preLoaderRoute: typeof ProgramasIndexRouteImport
       parentRoute: typeof ProgramasRoute
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/verificar/$numero': {
       id: '/verificar/$numero'
@@ -929,6 +962,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDocentesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/certificados': {
+      id: '/_authenticated/admin/certificados'
+      path: '/certificados'
+      fullPath: '/admin/certificados'
+      preLoaderRoute: typeof AuthenticatedAdminCertificadosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/categorias': {
       id: '/_authenticated/admin/categorias'
       path: '/categorias'
@@ -957,6 +997,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
   AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
+  AuthenticatedAdminCertificadosRoute: typeof AuthenticatedAdminCertificadosRoute
   AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
   AuthenticatedAdminEvaluacionesRoute: typeof AuthenticatedAdminEvaluacionesRoute
   AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
@@ -976,6 +1017,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
   AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
+  AuthenticatedAdminCertificadosRoute: AuthenticatedAdminCertificadosRoute,
   AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
   AuthenticatedAdminEvaluacionesRoute: AuthenticatedAdminEvaluacionesRoute,
   AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
@@ -1087,18 +1129,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
