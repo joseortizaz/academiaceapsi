@@ -20,6 +20,7 @@ import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
@@ -110,6 +111,11 @@ const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProgramasRoute,
+} as any)
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
   id: '/verificar/$numero',
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
@@ -378,6 +385,7 @@ export interface FileRoutesByTo {
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas': typeof ProgramasIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
+  '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
@@ -478,6 +487,7 @@ export interface FileRouteTypes {
     | '/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas/'
     | '/admin/anuncios'
     | '/admin/blog'
@@ -522,6 +532,7 @@ export interface FileRouteTypes {
     | '/certificados'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas'
     | '/admin/anuncios'
     | '/admin/blog'
@@ -571,6 +582,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante'
     | '/programas/$slug'
     | '/verificar/$numero'
+    | '/verify/$code'
     | '/programas/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/blog'
@@ -616,6 +628,7 @@ export interface RootRouteChildren {
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
+  VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
 }
 
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/programas/'
       preLoaderRoute: typeof ProgramasIndexRouteImport
       parentRoute: typeof ProgramasRoute
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/verificar/$numero': {
       id: '/verificar/$numero'
@@ -1087,18 +1107,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
+  VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
