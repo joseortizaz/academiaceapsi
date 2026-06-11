@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as ProgramasRouteImport } from './routes/programas'
@@ -59,6 +60,11 @@ import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 
+const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
+  id: '/solicitud-curso',
+  path: '/solicitud-curso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
   id: '/sobre-nosotros',
   path: '/sobre-nosotros',
@@ -341,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/solicitud-curso': typeof SolicitudCursoRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
@@ -390,6 +397,7 @@ export interface FileRoutesByTo {
   '/galeria': typeof GaleriaRoute
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/solicitud-curso': typeof SolicitudCursoRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -439,6 +447,7 @@ export interface FileRoutesById {
   '/programas': typeof ProgramasRouteWithChildren
   '/registro': typeof RegistroRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
+  '/solicitud-curso': typeof SolicitudCursoRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
@@ -491,6 +500,7 @@ export interface FileRouteTypes {
     | '/programas'
     | '/registro'
     | '/sobre-nosotros'
+    | '/solicitud-curso'
     | '/admin'
     | '/certificados'
     | '/docente'
@@ -540,6 +550,7 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/registro'
     | '/sobre-nosotros'
+    | '/solicitud-curso'
     | '/certificados'
     | '/programas/$slug'
     | '/verificar/$numero'
@@ -588,6 +599,7 @@ export interface FileRouteTypes {
     | '/programas'
     | '/registro'
     | '/sobre-nosotros'
+    | '/solicitud-curso'
     | '/_authenticated/admin'
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
@@ -640,6 +652,7 @@ export interface RootRouteChildren {
   ProgramasRoute: typeof ProgramasRouteWithChildren
   RegistroRoute: typeof RegistroRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
+  SolicitudCursoRoute: typeof SolicitudCursoRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
@@ -647,6 +660,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/solicitud-curso': {
+      id: '/solicitud-curso'
+      path: '/solicitud-curso'
+      fullPath: '/solicitud-curso'
+      preLoaderRoute: typeof SolicitudCursoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre-nosotros': {
       id: '/sobre-nosotros'
       path: '/sobre-nosotros'
@@ -1128,6 +1148,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramasRoute: ProgramasRouteWithChildren,
   RegistroRoute: RegistroRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
+  SolicitudCursoRoute: SolicitudCursoRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
