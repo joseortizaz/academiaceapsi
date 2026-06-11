@@ -1,6 +1,54 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { extractText, getDocumentProxy } from "unpdf";
+
+async function assertAdminOrDocente(userId: string) {
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+  const roles = (data ?? []).map((r) => r.role as string);
+  if (!roles.includes("admin") && !roles.includes("docente")) {
+    throw new Error("No autorizado: se requiere rol admin o docente.");
+  }
+}
+
+function assertSafePdfUrl(rawUrl: string) {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    throw new Error("URL de PDF inválida");
+  }
+  if (url.protocol !== "https:") {
+    throw new Error("Solo se permiten URLs HTTPS");
+  }
+  const host = url.hostname.toLowerCase();
+  const supabaseHost = (process.env.SUPABASE_URL ?? "").replace(/^https?:\/\//, "").split("/")[0];
+  const allowedSuffixes = [
+    ".supabase.co",
+    ".supabase.in",
+  ];
+  const isSupabase = supabaseHost && host === supabaseHost;
+  const isAllowed = isSupabase || allowedSuffixes.some((s) => host.endsWith(s));
+  if (!isAllowed) {
+    throw new Error("Dominio de URL no permitido");
+  }
+  // Bloquear hosts internos por seguridad
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host.startsWith("169.254.") ||
+    host.startsWith("10.") ||
+    host.startsWith("192.168.") ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host)
+  ) {
+    throw new Error("Host interno bloqueado");
+  }
+}
+
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const DEFAULT_MODEL = "google/gemini-2.5-flash";
@@ -59,14 +107,17 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     idioma?: string;
     nivel?: string;
   }) => input)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertAdminOrDocente(context.userId);
+    assertSafePdfUrl(data.pdfUrl);
+
     const cantidad = Math.min(Math.max(data.cantidad ?? 5, 1), 20);
     const tipo = data.tipo ?? "mixto";
     const idioma = data.idioma ?? "español";
     const nivel = data.nivel ?? "intermedio";
 
     // Descargar PDF
-    const pdfRes = await fetch(data.pdfUrl);
+    const pdfRes = await fetch(data.pdfUrl, { redirect: "error" });
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
 
@@ -134,7 +185,8 @@ export const generateLessonFromWeb = createServerFn({ method: "POST" })
     idioma?: string;
     nivel?: string;
   }) => input)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertAdminOrDocente(context.userId);
     const fcKey = process.env.FIRECRAWL_API_KEY;
     const idioma = data.idioma ?? "español";
     const nivel = data.nivel ?? "intermedio";
