@@ -146,17 +146,8 @@ function CursoPlayer() {
           fecha_completado: nuevoEstado ? new Date().toISOString() : null,
         });
       }
-
-      const nuevosCompletados = nuevoEstado ? completados + 1 : completados - 1;
-      const nuevoPct = total > 0 ? Math.round((nuevosCompletados / total) * 100) : 0;
-      await supabase
-        .from("enrollments")
-        .update({
-          progreso_porcentaje: nuevoPct,
-          ...(nuevoPct === 100 ? { fecha_completado: new Date().toISOString(), estado: "completado" } : {}),
-        })
-        .eq("id", enrollment.id);
-
+      // El porcentaje, estado y fecha_completado de la inscripción los
+      // recalcula automáticamente un trigger en la base de datos.
       qc.invalidateQueries({ queryKey: ["mc-progress", enrollment.id] });
       qc.invalidateQueries({ queryKey: ["mc-enrollment", programa?.id, user?.id] });
     } catch (e: any) {
