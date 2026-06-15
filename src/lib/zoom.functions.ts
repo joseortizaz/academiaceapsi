@@ -196,7 +196,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("id, programa_id, zoom_meeting_id, zoom_password, titulo")
+      .select("id, programa_id, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
       .eq("id", data.meetingRowId)
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
