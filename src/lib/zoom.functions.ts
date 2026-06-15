@@ -240,5 +240,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       password: meeting.zoom_password ?? "",
       titulo: meeting.titulo,
       role,
+      joinUrl: meeting.zoom_join_url ?? "",
+      startUrl: meeting.zoom_start_url ?? "",
     };
   });
