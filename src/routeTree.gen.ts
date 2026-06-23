@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
   id: '/solicitud-curso',
@@ -336,6 +337,12 @@ const AuthenticatedAdminAnunciosRoute =
     path: '/anuncios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -387,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -434,6 +442,7 @@ export interface FileRoutesByTo {
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos': typeof AuthenticatedMisCursosIndexRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -487,6 +496,7 @@ export interface FileRoutesById {
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/_authenticated/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -540,6 +550,7 @@ export interface FileRouteTypes {
     | '/docente/'
     | '/estudiante/'
     | '/mis-cursos/'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -587,6 +598,7 @@ export interface FileRouteTypes {
     | '/docente'
     | '/estudiante'
     | '/mis-cursos'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -639,6 +651,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
     | '/_authenticated/mis-cursos/'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -656,6 +669,7 @@ export interface RootRouteChildren {
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1010,6 +1024,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1152,6 +1173,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
