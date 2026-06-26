@@ -140,9 +140,15 @@ function Acceder() {
                 <Input id="correo" type="email" required placeholder="correo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                   <Label htmlFor="password">Contraseña</Label>
-                  <Link to="/recuperar-password" className="text-xs text-primary hover:text-accent">¿Olvidaste tu contraseña?</Link>
+                  <Link
+                    to="/recuperar-password"
+                    preload={false}
+                    className="relative z-10 inline-flex min-h-8 items-center self-start rounded-md px-1 text-sm font-medium text-primary underline-offset-4 hover:text-accent hover:underline sm:self-auto"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
                 </div>
                 <Input id="password" type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
