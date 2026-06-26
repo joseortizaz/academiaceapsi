@@ -12,12 +12,12 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'Confirma tu correo — Academia Ceapsi RD',
+  invite: 'Has sido invitado a Academia Ceapsi RD',
+  magiclink: 'Tu enlace de acceso a Academia Ceapsi RD',
+  recovery: 'Restablece tu contraseña — Academia Ceapsi RD',
+  email_change: 'Confirma tu nuevo correo — Academia Ceapsi RD',
+  reauthentication: 'Tu código de verificación',
 }
 
 // Template mapping
