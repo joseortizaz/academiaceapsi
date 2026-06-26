@@ -142,7 +142,7 @@ function Acceder() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Contraseña</Label>
-                  <a href="#" className="text-xs text-primary hover:text-accent">¿Olvidaste tu contraseña?</a>
+                  <Link to="/recuperar-password" className="text-xs text-primary hover:text-accent">¿Olvidaste tu contraseña?</Link>
                 </div>
                 <Input id="password" type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>

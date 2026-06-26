@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as ProgramasRouteImport } from './routes/programas'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as DocentesRouteImport } from './routes/docentes'
@@ -71,9 +73,19 @@ const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
   path: '/sobre-nosotros',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegistroRoute = RegistroRouteImport.update({
   id: '/registro',
   path: '/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramasRoute = ProgramasRouteImport.update({
@@ -352,7 +364,9 @@ export interface FileRoutesByFullPath {
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
   '/programas': typeof ProgramasRouteWithChildren
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -403,7 +417,9 @@ export interface FileRoutesByTo {
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
@@ -454,7 +470,9 @@ export interface FileRoutesById {
   '/docentes': typeof DocentesRoute
   '/galeria': typeof GaleriaRoute
   '/programas': typeof ProgramasRouteWithChildren
+  '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -508,7 +526,9 @@ export interface FileRouteTypes {
     | '/docentes'
     | '/galeria'
     | '/programas'
+    | '/recuperar-password'
     | '/registro'
+    | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/admin'
@@ -559,7 +579,9 @@ export interface FileRouteTypes {
     | '/contactos'
     | '/docentes'
     | '/galeria'
+    | '/recuperar-password'
     | '/registro'
+    | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/certificados'
@@ -609,7 +631,9 @@ export interface FileRouteTypes {
     | '/docentes'
     | '/galeria'
     | '/programas'
+    | '/recuperar-password'
     | '/registro'
+    | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/_authenticated/admin'
@@ -663,7 +687,9 @@ export interface RootRouteChildren {
   DocentesRoute: typeof DocentesRoute
   GaleriaRoute: typeof GaleriaRoute
   ProgramasRoute: typeof ProgramasRouteWithChildren
+  RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RegistroRoute: typeof RegistroRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
@@ -688,11 +714,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreNosotrosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registro': {
       id: '/registro'
       path: '/registro'
       fullPath: '/registro'
       preLoaderRoute: typeof RegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recuperar-password': {
+      id: '/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof RecuperarPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/programas': {
@@ -1167,7 +1207,9 @@ const rootRouteChildren: RootRouteChildren = {
   DocentesRoute: DocentesRoute,
   GaleriaRoute: GaleriaRoute,
   ProgramasRoute: ProgramasRouteWithChildren,
+  RecuperarPasswordRoute: RecuperarPasswordRoute,
   RegistroRoute: RegistroRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
