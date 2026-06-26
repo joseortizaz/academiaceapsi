@@ -1748,6 +1748,18 @@ export type Database = {
         Returns: number
       }
       gen_verification_code: { Args: never; Returns: string }
+      get_assessment_questions_for_student: {
+        Args: { _assessment_id: string }
+        Returns: {
+          assessment_id: string
+          enunciado: string
+          id: string
+          opciones: Json
+          orden: number
+          puntaje: number
+          tipo: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
