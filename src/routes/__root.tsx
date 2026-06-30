@@ -82,8 +82,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Academia Ceapsi RD — Diplomados y cursos de psicología" },
       { name: "twitter:description", content: "Plataforma educativa dominicana de diplomados y cursos en psicología, educación y ciencias del comportamiento. En vivo por Zoom o a tu ritmo." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97d1879b-0e27-49b6-9e74-1efdf0661ef7" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/97d1879b-0e27-49b6-9e74-1efdf0661ef7" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/HdfYYSHElHOCcbrFG3SQJEuhBtr1/social-images/social-1782790146327-Captura_de_pantalla_2026-06-29_232803.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/HdfYYSHElHOCcbrFG3SQJEuhBtr1/social-images/social-1782790146327-Captura_de_pantalla_2026-06-29_232803.webp" },
     ],
     links: [
       {
