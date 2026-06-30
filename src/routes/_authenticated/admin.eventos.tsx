@@ -16,7 +16,8 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { Image as ImageIcon, Video as VideoIcon, Trash2, Plus } from "lucide-react";
+import { Image as ImageIcon, Video as VideoIcon, Trash2, Plus, Upload, Loader2 } from "lucide-react";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/eventos")({
   component: EventosAdmin,
@@ -202,6 +203,50 @@ function MediaManager({ event, onClose }: { event: Evento; onClose: () => void }
   const [tipo, setTipo] = useState<"image" | "video">("image");
   const [url, setUrl] = useState("");
   const [titulo, setTitulo] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const uploadImages = async (files: File[]) => {
+    if (!files.length) return;
+    setUploading(true);
+    setProgress({ done: 0, total: files.length });
+    let ok = 0, fail = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        if (!file.type.startsWith("image/")) { fail++; continue; }
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`"${file.name}" supera 5 MB`);
+          fail++; continue;
+        }
+        const ext = file.name.split(".").pop() || "jpg";
+        const path = `events/${event.slug}/${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("course-images")
+          .upload(path, file, { cacheControl: "3600", upsert: false });
+        if (upErr) throw upErr;
+        const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
+        const { error: insErr } = await supabase.from("event_media").insert({
+          event_id: event.id!,
+          tipo: "image",
+          url: pub.publicUrl,
+          titulo: null,
+        });
+        if (insErr) throw insErr;
+        ok++;
+      } catch (e: any) {
+        toast.error(e.message ?? `Error subiendo ${file.name}`);
+        fail++;
+      } finally {
+        setProgress({ done: i + 1, total: files.length });
+      }
+    }
+    setUploading(false);
+    setProgress(null);
+    if (ok) toast.success(`${ok} imagen(es) subida(s)${fail ? `, ${fail} con error` : ""}`);
+    qc.invalidateQueries({ queryKey: ["admin", "event_media", event.id] });
+  };
 
   const { data: media = [] } = useQuery({
     queryKey: ["admin", "event_media", event.id],
@@ -260,11 +305,39 @@ function MediaManager({ event, onClose }: { event: Evento; onClose: () => void }
 
           {tipo === "image" ? (
             <div className="space-y-2">
-              <Label>Subir imagen</Label>
-              <ImageUploader
-                folder={`events/${event.slug}`}
-                value=""
-                onChange={(u) => u && addItem(u)}
+              <Label>Subir imágenes (puedes seleccionar varias)</Label>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-muted/30 text-muted-foreground transition-colors hover:bg-muted/60 disabled:opacity-60"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="text-sm">
+                      Subiendo {progress?.done ?? 0} / {progress?.total ?? 0}…
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-6 w-6" />
+                    <span className="text-sm">Haz clic para seleccionar imágenes</span>
+                    <span className="text-xs">JPG, PNG, WEBP (máx. 5 MB c/u)</span>
+                  </>
+                )}
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  if (files.length) uploadImages(files);
+                  e.target.value = "";
+                }}
               />
             </div>
           ) : (
