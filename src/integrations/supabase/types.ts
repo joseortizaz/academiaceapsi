@@ -674,6 +674,83 @@ export type Database = {
           },
         ]
       }
+      event_media: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          orden: number
+          tipo: string
+          titulo: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          orden?: number
+          tipo: string
+          titulo?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          orden?: number
+          tipo?: string
+          titulo?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_media_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          descripcion: string | null
+          fecha: string | null
+          id: string
+          orden: number
+          publicado: boolean
+          slug: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          descripcion?: string | null
+          fecha?: string | null
+          id?: string
+          orden?: number
+          publicado?: boolean
+          slug: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          descripcion?: string | null
+          fecha?: string | null
+          id?: string
+          orden?: number
+          publicado?: boolean
+          slug?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           activo: boolean
