@@ -16,6 +16,7 @@ import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as ProgramasRouteImport } from './routes/programas'
 import { Route as GaleriaRouteImport } from './routes/galeria'
+import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as DocentesRouteImport } from './routes/docentes'
 import { Route as ContactosRouteImport } from './routes/contactos'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -55,6 +56,7 @@ import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
 import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
+import { Route as AuthenticatedAdminEventosRouteImport } from './routes/_authenticated/admin.eventos'
 import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
 import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
 import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
@@ -98,6 +100,11 @@ const ProgramasRoute = ProgramasRouteImport.update({
 const GaleriaRoute = GaleriaRouteImport.update({
   id: '/galeria',
   path: '/galeria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocentesRoute = DocentesRouteImport.update({
@@ -316,6 +323,12 @@ const AuthenticatedAdminFinanzasRoute =
     path: '/finanzas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEventosRoute =
+  AuthenticatedAdminEventosRouteImport.update({
+    id: '/eventos',
+    path: '/eventos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminEvaluacionesRoute =
   AuthenticatedAdminEvaluacionesRouteImport.update({
     id: '/evaluaciones',
@@ -374,6 +387,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
+  '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
   '/programas': typeof ProgramasRouteWithChildren
   '/recuperar-password': typeof RecuperarPasswordRoute
@@ -395,6 +409,7 @@ export interface FileRoutesByFullPath {
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -430,6 +445,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
+  '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
@@ -447,6 +463,7 @@ export interface FileRoutesByTo {
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -484,6 +501,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
+  '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
   '/programas': typeof ProgramasRouteWithChildren
   '/recuperar-password': typeof RecuperarPasswordRoute
@@ -505,6 +523,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/_authenticated/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/_authenticated/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/_authenticated/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -542,6 +561,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contactos'
     | '/docentes'
+    | '/eventos'
     | '/galeria'
     | '/programas'
     | '/recuperar-password'
@@ -563,6 +583,7 @@ export interface FileRouteTypes {
     | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
+    | '/admin/eventos'
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
@@ -598,6 +619,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contactos'
     | '/docentes'
+    | '/eventos'
     | '/galeria'
     | '/recuperar-password'
     | '/registro'
@@ -615,6 +637,7 @@ export interface FileRouteTypes {
     | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
+    | '/admin/eventos'
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
@@ -651,6 +674,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contactos'
     | '/docentes'
+    | '/eventos'
     | '/galeria'
     | '/programas'
     | '/recuperar-password'
@@ -672,6 +696,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/certificados'
     | '/_authenticated/admin/docentes'
     | '/_authenticated/admin/evaluaciones'
+    | '/_authenticated/admin/eventos'
     | '/_authenticated/admin/finanzas'
     | '/_authenticated/admin/hero'
     | '/_authenticated/admin/inscripciones'
@@ -709,6 +734,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactosRoute: typeof ContactosRoute
   DocentesRoute: typeof DocentesRoute
+  EventosRoute: typeof EventosRoute
   GaleriaRoute: typeof GaleriaRoute
   ProgramasRoute: typeof ProgramasRouteWithChildren
   RecuperarPasswordRoute: typeof RecuperarPasswordRoute
@@ -773,6 +799,13 @@ declare module '@tanstack/react-router' {
       path: '/galeria'
       fullPath: '/galeria'
       preLoaderRoute: typeof GaleriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docentes': {
@@ -1048,6 +1081,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFinanzasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/eventos': {
+      id: '/_authenticated/admin/eventos'
+      path: '/eventos'
+      fullPath: '/admin/eventos'
+      preLoaderRoute: typeof AuthenticatedAdminEventosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/evaluaciones': {
       id: '/_authenticated/admin/evaluaciones'
       path: '/evaluaciones'
@@ -1121,6 +1161,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCertificadosRoute: typeof AuthenticatedAdminCertificadosRoute
   AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
   AuthenticatedAdminEvaluacionesRoute: typeof AuthenticatedAdminEvaluacionesRoute
+  AuthenticatedAdminEventosRoute: typeof AuthenticatedAdminEventosRoute
   AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
   AuthenticatedAdminInscripcionesRoute: typeof AuthenticatedAdminInscripcionesRoute
@@ -1141,6 +1182,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCertificadosRoute: AuthenticatedAdminCertificadosRoute,
   AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
   AuthenticatedAdminEvaluacionesRoute: AuthenticatedAdminEvaluacionesRoute,
+  AuthenticatedAdminEventosRoute: AuthenticatedAdminEventosRoute,
   AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
   AuthenticatedAdminInscripcionesRoute: AuthenticatedAdminInscripcionesRoute,
@@ -1245,6 +1287,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactosRoute: ContactosRoute,
   DocentesRoute: DocentesRoute,
+  EventosRoute: EventosRoute,
   GaleriaRoute: GaleriaRoute,
   ProgramasRoute: ProgramasRouteWithChildren,
   RecuperarPasswordRoute: RecuperarPasswordRoute,
@@ -1262,13 +1305,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

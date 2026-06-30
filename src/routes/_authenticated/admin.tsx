@@ -38,6 +38,7 @@ const nav = [
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/certificados", label: "Certificados", icon: Award },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
+  { to: "/admin/eventos", label: "Eventos", icon: Images },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
   { to: "/admin/inscripciones", label: "Inscripciones", icon: ClipboardList },

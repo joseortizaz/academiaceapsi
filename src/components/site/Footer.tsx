@@ -24,6 +24,7 @@ export function Footer() {
             <li><Link to="/" className="hover:text-accent">Inicio</Link></li>
             <li><Link to="/sobre-nosotros" className="hover:text-accent">Sobre nosotros</Link></li>
             <li><Link to="/docentes" className="hover:text-accent">Docentes</Link></li>
+            <li><Link to="/eventos" className="hover:text-accent">Eventos</Link></li>
             <li><Link to="/blog" className="hover:text-accent">Blog</Link></li>
           </ul>
         </div>
