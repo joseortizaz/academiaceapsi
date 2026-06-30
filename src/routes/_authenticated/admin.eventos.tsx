@@ -221,7 +221,7 @@ function MediaManager({ event, onClose }: { event: Evento; onClose: () => void }
     const finalUrl = overrideUrl ?? url;
     if (!finalUrl) return;
     const { error } = await supabase.from("event_media").insert({
-      event_id: event.id,
+      event_id: event.id!,
       tipo,
       url: finalUrl,
       titulo: titulo || null,
