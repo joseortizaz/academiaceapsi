@@ -16,7 +16,8 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { Image as ImageIcon, Video as VideoIcon, Trash2, Plus } from "lucide-react";
+import { Image as ImageIcon, Video as VideoIcon, Trash2, Plus, Upload, Loader2 } from "lucide-react";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/eventos")({
   component: EventosAdmin,
