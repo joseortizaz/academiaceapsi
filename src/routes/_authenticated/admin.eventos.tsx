@@ -203,6 +203,50 @@ function MediaManager({ event, onClose }: { event: Evento; onClose: () => void }
   const [tipo, setTipo] = useState<"image" | "video">("image");
   const [url, setUrl] = useState("");
   const [titulo, setTitulo] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const uploadImages = async (files: File[]) => {
+    if (!files.length) return;
+    setUploading(true);
+    setProgress({ done: 0, total: files.length });
+    let ok = 0, fail = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        if (!file.type.startsWith("image/")) { fail++; continue; }
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`"${file.name}" supera 5 MB`);
+          fail++; continue;
+        }
+        const ext = file.name.split(".").pop() || "jpg";
+        const path = `events/${event.slug}/${Date.now()}-${i}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("course-images")
+          .upload(path, file, { cacheControl: "3600", upsert: false });
+        if (upErr) throw upErr;
+        const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
+        const { error: insErr } = await supabase.from("event_media").insert({
+          event_id: event.id!,
+          tipo: "image",
+          url: pub.publicUrl,
+          titulo: null,
+        });
+        if (insErr) throw insErr;
+        ok++;
+      } catch (e: any) {
+        toast.error(e.message ?? `Error subiendo ${file.name}`);
+        fail++;
+      } finally {
+        setProgress({ done: i + 1, total: files.length });
+      }
+    }
+    setUploading(false);
+    setProgress(null);
+    if (ok) toast.success(`${ok} imagen(es) subida(s)${fail ? `, ${fail} con error` : ""}`);
+    qc.invalidateQueries({ queryKey: ["admin", "event_media", event.id] });
+  };
 
   const { data: media = [] } = useQuery({
     queryKey: ["admin", "event_media", event.id],
