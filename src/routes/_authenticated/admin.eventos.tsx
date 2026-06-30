@@ -305,11 +305,39 @@ function MediaManager({ event, onClose }: { event: Evento; onClose: () => void }
 
           {tipo === "image" ? (
             <div className="space-y-2">
-              <Label>Subir imagen</Label>
-              <ImageUploader
-                folder={`events/${event.slug}`}
-                value=""
-                onChange={(u) => u && addItem(u)}
+              <Label>Subir imágenes (puedes seleccionar varias)</Label>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-muted/30 text-muted-foreground transition-colors hover:bg-muted/60 disabled:opacity-60"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span className="text-sm">
+                      Subiendo {progress?.done ?? 0} / {progress?.total ?? 0}…
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-6 w-6" />
+                    <span className="text-sm">Haz clic para seleccionar imágenes</span>
+                    <span className="text-xs">JPG, PNG, WEBP (máx. 5 MB c/u)</span>
+                  </>
+                )}
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  if (files.length) uploadImages(files);
+                  e.target.value = "";
+                }}
               />
             </div>
           ) : (
