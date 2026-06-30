@@ -11,7 +11,7 @@ const links = [
   { to: "/programas", label: "Programas" },
   { to: "/sobre-nosotros", label: "Sobre nosotros" },
   { to: "/docentes", label: "Docentes" },
-  { to: "/blog", label: "Blog" },
+  { to: "/eventos", label: "Eventos" },
   { to: "/contactos", label: "Contactos" },
 ];
 
