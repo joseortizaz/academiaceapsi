@@ -55,6 +55,7 @@ import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
 import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
+import { Route as AuthenticatedAdminEventosRouteImport } from './routes/_authenticated/admin.eventos'
 import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
 import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
 import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
@@ -316,6 +317,12 @@ const AuthenticatedAdminFinanzasRoute =
     path: '/finanzas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEventosRoute =
+  AuthenticatedAdminEventosRouteImport.update({
+    id: '/eventos',
+    path: '/eventos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminEvaluacionesRoute =
   AuthenticatedAdminEvaluacionesRouteImport.update({
     id: '/evaluaciones',
@@ -395,6 +402,7 @@ export interface FileRoutesByFullPath {
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -447,6 +455,7 @@ export interface FileRoutesByTo {
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -505,6 +514,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
   '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/_authenticated/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
+  '/_authenticated/admin/eventos': typeof AuthenticatedAdminEventosRoute
   '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
   '/_authenticated/admin/inscripciones': typeof AuthenticatedAdminInscripcionesRoute
@@ -563,6 +573,7 @@ export interface FileRouteTypes {
     | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
+    | '/admin/eventos'
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/admin/certificados'
     | '/admin/docentes'
     | '/admin/evaluaciones'
+    | '/admin/eventos'
     | '/admin/finanzas'
     | '/admin/hero'
     | '/admin/inscripciones'
@@ -672,6 +684,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/certificados'
     | '/_authenticated/admin/docentes'
     | '/_authenticated/admin/evaluaciones'
+    | '/_authenticated/admin/eventos'
     | '/_authenticated/admin/finanzas'
     | '/_authenticated/admin/hero'
     | '/_authenticated/admin/inscripciones'
@@ -1048,6 +1061,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFinanzasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/eventos': {
+      id: '/_authenticated/admin/eventos'
+      path: '/eventos'
+      fullPath: '/admin/eventos'
+      preLoaderRoute: typeof AuthenticatedAdminEventosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/evaluaciones': {
       id: '/_authenticated/admin/evaluaciones'
       path: '/evaluaciones'
@@ -1121,6 +1141,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCertificadosRoute: typeof AuthenticatedAdminCertificadosRoute
   AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
   AuthenticatedAdminEvaluacionesRoute: typeof AuthenticatedAdminEvaluacionesRoute
+  AuthenticatedAdminEventosRoute: typeof AuthenticatedAdminEventosRoute
   AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
   AuthenticatedAdminInscripcionesRoute: typeof AuthenticatedAdminInscripcionesRoute
@@ -1141,6 +1162,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCertificadosRoute: AuthenticatedAdminCertificadosRoute,
   AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
   AuthenticatedAdminEvaluacionesRoute: AuthenticatedAdminEvaluacionesRoute,
+  AuthenticatedAdminEventosRoute: AuthenticatedAdminEventosRoute,
   AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
   AuthenticatedAdminInscripcionesRoute: AuthenticatedAdminInscripcionesRoute,
