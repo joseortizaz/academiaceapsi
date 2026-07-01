@@ -299,12 +299,12 @@ function ProgramasPage() {
                     <SelectItem value="mixto">Mixto (híbrido)</SelectItem>
                     <SelectItem value="presencial">Presencial</SelectItem>
                   </SelectContent>
-                  {s.modalidad === "presencial" && (
-                    <p className="text-xs text-muted-foreground">
-                      Los programas presenciales no habilitan el campus virtual para los alumnos; se gestionan por grupos, asistencia y certificados.
-                    </p>
-                  )}
                 </Select>
+                {s.modalidad === "presencial" && (
+                  <p className="text-xs text-muted-foreground">
+                    Los programas presenciales no habilitan el campus virtual para los alumnos; se gestionan por grupos, asistencia y certificados.
+                  </p>
+                )}
               </div>
             </div>
 
