@@ -356,7 +356,7 @@ function SolicitudCurso() {
                         <SelectValue placeholder={`Selecciona un ${form.tipo_formacion}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        {PROGRAMAS[form.tipo_formacion].map((p) => (
+                        {programas[form.tipo_formacion].map((p: string) => (
                           <SelectItem key={p} value={p}>{p}</SelectItem>
                         ))}
                       </SelectContent>
