@@ -126,6 +126,28 @@ function SolicitudCurso() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [programas, setProgramas] = useState<Record<"curso" | "diplomado", string[]>>(DEFAULT_PROGRAMAS);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("course_request_options")
+        .select("tipo,nombre,activo,orden")
+        .eq("activo", true)
+        .order("orden", { ascending: true });
+      if (cancelled || error || !data || data.length === 0) return;
+      const grouped: Record<"curso" | "diplomado", string[]> = { curso: [], diplomado: [] };
+      for (const row of data) {
+        const t = row.tipo as "curso" | "diplomado";
+        if (t === "curso" || t === "diplomado") grouped[t].push(row.nombre);
+      }
+      if (grouped.curso.length === 0) grouped.curso = DEFAULT_PROGRAMAS.curso;
+      if (grouped.diplomado.length === 0) grouped.diplomado = DEFAULT_PROGRAMAS.diplomado;
+      setProgramas(grouped);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => {
