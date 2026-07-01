@@ -314,6 +314,54 @@ export type Database = {
           },
         ]
       }
+      cohort_enrollments: {
+        Row: {
+          cohort_id: string
+          created_at: string
+          enrollment_id: string
+          estado: string
+          fecha_asignacion: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cohort_id: string
+          created_at?: string
+          enrollment_id: string
+          estado?: string
+          fecha_asignacion?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cohort_id?: string
+          created_at?: string
+          enrollment_id?: string
+          estado?: string
+          fecha_asignacion?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cohort_enrollments_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "program_cohorts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cohort_enrollments_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
           autor_id: string
@@ -1184,6 +1232,85 @@ export type Database = {
           },
         ]
       }
+      program_cohorts: {
+        Row: {
+          created_at: string
+          cupo_maximo: number | null
+          dias_clase: Json
+          docente_id: string | null
+          estado: string
+          fecha_fin: string | null
+          fecha_inicio: string | null
+          horario: string | null
+          id: string
+          modalidad: string
+          nivel_actual: string | null
+          nombre: string
+          notas: string | null
+          programa_id: string
+          ubicacion: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cupo_maximo?: number | null
+          dias_clase?: Json
+          docente_id?: string | null
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio?: string | null
+          horario?: string | null
+          id?: string
+          modalidad: string
+          nivel_actual?: string | null
+          nombre: string
+          notas?: string | null
+          programa_id: string
+          ubicacion?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cupo_maximo?: number | null
+          dias_clase?: Json
+          docente_id?: string | null
+          estado?: string
+          fecha_fin?: string | null
+          fecha_inicio?: string | null
+          horario?: string | null
+          id?: string
+          modalidad?: string
+          nivel_actual?: string | null
+          nombre?: string
+          notas?: string | null
+          programa_id?: string
+          ubicacion?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_cohorts_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_cohorts_docente_id_fkey"
+            columns: ["docente_id"]
+            isOneToOne: false
+            referencedRelation: "teachers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_cohorts_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_modules: {
         Row: {
           audio_url: string | null
@@ -1875,6 +2002,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_teacher_of_cohort: { Args: { _cohort_id: string }; Returns: boolean }
       is_teacher_of_program: {
         Args: { _programa_id: string }
         Returns: boolean
