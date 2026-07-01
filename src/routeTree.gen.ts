@@ -48,6 +48,7 @@ import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes
 import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_authenticated/clase-vivo.$meetingId'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
+import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
 import { Route as AuthenticatedAdminPagosRouteImport } from './routes/_authenticated/admin.pagos'
 import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
@@ -277,6 +278,12 @@ const AuthenticatedAdminTestimoniosRoute =
     path: '/testimonios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSolicitudesRoute =
+  AuthenticatedAdminSolicitudesRouteImport.update({
+    id: '/solicitudes',
+    path: '/solicitudes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProgramasRoute =
   AuthenticatedAdminProgramasRouteImport.update({
     id: '/programas',
@@ -418,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
@@ -472,6 +480,7 @@ export interface FileRoutesByTo {
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
@@ -532,6 +541,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/_authenticated/admin/pagos': typeof AuthenticatedAdminPagosRoute
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/_authenticated/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/clase-vivo/$meetingId': typeof AuthenticatedClaseVivoMeetingIdRoute
@@ -592,6 +602,7 @@ export interface FileRouteTypes {
     | '/admin/modulos'
     | '/admin/pagos'
     | '/admin/programas'
+    | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
     | '/clase-vivo/$meetingId'
@@ -646,6 +657,7 @@ export interface FileRouteTypes {
     | '/admin/modulos'
     | '/admin/pagos'
     | '/admin/programas'
+    | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
     | '/clase-vivo/$meetingId'
@@ -705,6 +717,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/modulos'
     | '/_authenticated/admin/pagos'
     | '/_authenticated/admin/programas'
+    | '/_authenticated/admin/solicitudes'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/clase-vivo/$meetingId'
@@ -1025,6 +1038,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTestimoniosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/solicitudes': {
+      id: '/_authenticated/admin/solicitudes'
+      path: '/solicitudes'
+      fullPath: '/admin/solicitudes'
+      preLoaderRoute: typeof AuthenticatedAdminSolicitudesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/programas': {
       id: '/_authenticated/admin/programas'
       path: '/programas'
@@ -1170,6 +1190,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminModulosRoute: typeof AuthenticatedAdminModulosRoute
   AuthenticatedAdminPagosRoute: typeof AuthenticatedAdminPagosRoute
   AuthenticatedAdminProgramasRoute: typeof AuthenticatedAdminProgramasRoute
+  AuthenticatedAdminSolicitudesRoute: typeof AuthenticatedAdminSolicitudesRoute
   AuthenticatedAdminTestimoniosRoute: typeof AuthenticatedAdminTestimoniosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1191,6 +1212,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminModulosRoute: AuthenticatedAdminModulosRoute,
   AuthenticatedAdminPagosRoute: AuthenticatedAdminPagosRoute,
   AuthenticatedAdminProgramasRoute: AuthenticatedAdminProgramasRoute,
+  AuthenticatedAdminSolicitudesRoute: AuthenticatedAdminSolicitudesRoute,
   AuthenticatedAdminTestimoniosRoute: AuthenticatedAdminTestimoniosRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -1305,13 +1327,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

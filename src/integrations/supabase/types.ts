@@ -471,6 +471,36 @@ export type Database = {
           },
         ]
       }
+      course_request_options: {
+        Row: {
+          activo: boolean
+          created_at: string
+          id: string
+          nombre: string
+          orden: number
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nombre: string
+          orden?: number
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nombre?: string
+          orden?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       course_requests: {
         Row: {
           codigo_pais: string

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -68,7 +68,7 @@ const CODIGOS_PAIS = [
   { code: "+54", label: "+54 (ARG)" },
 ];
 
-const PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
+const DEFAULT_PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
   curso: [
     "Curso de Marketing Digital",
     "Curso de Excel Avanzado para Negocios",
@@ -126,6 +126,28 @@ function SolicitudCurso() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [programas, setProgramas] = useState<Record<"curso" | "diplomado", string[]>>(DEFAULT_PROGRAMAS);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("course_request_options")
+        .select("tipo,nombre,activo,orden")
+        .eq("activo", true)
+        .order("orden", { ascending: true });
+      if (cancelled || error || !data || data.length === 0) return;
+      const grouped: Record<"curso" | "diplomado", string[]> = { curso: [], diplomado: [] };
+      for (const row of data) {
+        const t = row.tipo as "curso" | "diplomado";
+        if (t === "curso" || t === "diplomado") grouped[t].push(row.nombre);
+      }
+      if (grouped.curso.length === 0) grouped.curso = DEFAULT_PROGRAMAS.curso;
+      if (grouped.diplomado.length === 0) grouped.diplomado = DEFAULT_PROGRAMAS.diplomado;
+      setProgramas(grouped);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => {
@@ -334,7 +356,7 @@ function SolicitudCurso() {
                         <SelectValue placeholder={`Selecciona un ${form.tipo_formacion}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        {PROGRAMAS[form.tipo_formacion].map((p) => (
+                        {programas[form.tipo_formacion].map((p: string) => (
                           <SelectItem key={p} value={p}>{p}</SelectItem>
                         ))}
                       </SelectContent>
