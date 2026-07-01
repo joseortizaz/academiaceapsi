@@ -12,6 +12,7 @@ import {
   Video,
   UserCog,
   FileCheck,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
