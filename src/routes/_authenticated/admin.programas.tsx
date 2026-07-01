@@ -297,8 +297,14 @@ function ProgramasPage() {
                     <SelectItem value="sincrono">Sincrónico (en vivo)</SelectItem>
                     <SelectItem value="asincrono">Asincrónico</SelectItem>
                     <SelectItem value="mixto">Mixto (híbrido)</SelectItem>
+                    <SelectItem value="presencial">Presencial</SelectItem>
                   </SelectContent>
                 </Select>
+                {s.modalidad === "presencial" && (
+                  <p className="text-xs text-muted-foreground">
+                    Los programas presenciales no habilitan el campus virtual para los alumnos; se gestionan por grupos, asistencia y certificados.
+                  </p>
+                )}
               </div>
             </div>
 

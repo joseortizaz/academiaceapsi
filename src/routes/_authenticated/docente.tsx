@@ -12,6 +12,7 @@ import {
   Video,
   UserCog,
   FileCheck,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/docente")({
 const nav = [
   { to: "/docente", label: "Resumen", icon: LayoutDashboard, exact: true },
   { to: "/docente/cursos", label: "Mis Cursos", icon: BookOpen },
+  { to: "/docente/grupos", label: "Mis Grupos", icon: Users },
   { to: "/docente/clases-vivo", label: "Clases en Vivo", icon: Video },
   { to: "/docente/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/docente/calificaciones", label: "Calificaciones", icon: ClipboardCheck },
