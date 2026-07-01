@@ -113,7 +113,7 @@ function SolicitudesTab() {
 
   const updateEstado = useMutation({
     mutationFn: async ({ id, estado, notas }: { id: string; estado?: string; notas?: string }) => {
-      const patch: Record<string, unknown> = {};
+      const patch: { estado?: string; notas?: string } = {};
       if (estado !== undefined) patch.estado = estado;
       if (notas !== undefined) patch.notas = notas;
       const { error } = await supabase.from("course_requests").update(patch).eq("id", id);
