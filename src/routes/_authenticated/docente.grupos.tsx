@@ -215,7 +215,7 @@ function EditCohortDialog({
               try {
                 await onSave({
                   ...state,
-                  dias_clase: state.dias_clase.split("\n").map((l) => l.trim()).filter(Boolean),
+                  dias_clase: state.dias_clase.split("\n").map((l: string) => l.trim()).filter(Boolean),
                 });
               } finally { setLoading(false); }
             }}
