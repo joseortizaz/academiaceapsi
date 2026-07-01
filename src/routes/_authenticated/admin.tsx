@@ -42,6 +42,7 @@ const nav = [
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
   { to: "/admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
+  { to: "/admin/solicitudes", label: "Solicitudes", icon: ClipboardList },
   { to: "/admin/pagos", label: "Pagos", icon: CreditCard },
   { to: "/admin/finanzas", label: "Finanzas", icon: TrendingUp },
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
