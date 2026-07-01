@@ -31,8 +31,21 @@ function MisCursos() {
         .from("programs")
         .select("id,titulo,slug,imagen_url,tipo,modalidad")
         .in("id", programaIds);
-      const map = new Map((programas ?? []).map((p) => [p.id, p]));
-      return (enrolls ?? []).map((e) => ({ ...e, programa: map.get(e.programa_id) }));
+      const pmap = new Map((programas ?? []).map((p) => [p.id, p]));
+
+      const enrollmentIds = (enrolls ?? []).map((e) => e.id);
+      const { data: cohortLinks } = await supabase
+        .from("cohort_enrollments" as any)
+        .select("enrollment_id, cohort_id, program_cohorts(nombre,horario,nivel_actual,modalidad,ubicacion)")
+        .in("enrollment_id", enrollmentIds)
+        .eq("estado", "activo");
+      const cmap = new Map<string, any>(((cohortLinks as any[]) ?? []).map((c) => [c.enrollment_id, c.program_cohorts]));
+
+      return (enrolls ?? []).map((e) => ({
+        ...e,
+        programa: pmap.get(e.programa_id),
+        cohort: cmap.get(e.id) ?? null,
+      }));
     },
   });
 
