@@ -200,6 +200,20 @@ function CursoPlayer() {
       </div>
     );
   }
+  if (programa.modalidad === "presencial") {
+    return (
+      <div className="mx-auto max-w-xl p-8 text-center">
+        <h2 className="text-xl font-bold">Programa presencial</h2>
+        <p className="mt-2 text-muted-foreground">
+          Este programa se dicta de forma presencial y no cuenta con campus virtual.
+          Consulta con tu docente o coordinador el aula, horario y materiales del curso.
+        </p>
+        <Button asChild variant="outline" className="mt-4">
+          <Link to="/mis-cursos">Volver a mis cursos</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
