@@ -68,7 +68,7 @@ const CODIGOS_PAIS = [
   { code: "+54", label: "+54 (ARG)" },
 ];
 
-const PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
+const DEFAULT_PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
   curso: [
     "Curso de Marketing Digital",
     "Curso de Excel Avanzado para Negocios",
