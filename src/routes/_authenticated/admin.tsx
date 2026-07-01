@@ -35,6 +35,7 @@ const nav = [
   { to: "/admin/programas", label: "Programas", icon: GraduationCap },
   { to: "/admin/categorias", label: "Categorías", icon: FolderTree },
   { to: "/admin/docentes", label: "Docentes", icon: Users },
+  { to: "/admin/grupos", label: "Grupos / Cohortes", icon: Users2 },
   { to: "/admin/modulos", label: "Lecciones", icon: BookOpen },
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/certificados", label: "Certificados", icon: Award },
