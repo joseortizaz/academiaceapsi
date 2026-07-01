@@ -91,19 +91,36 @@ function MisCursos() {
                     <Badge variant={e.estado === "activo" ? "default" : "secondary"}>
                       {e.estado}
                     </Badge>
+                    {e.programa?.modalidad === "presencial" && (
+                      <Badge variant="outline">Presencial</Badge>
+                    )}
                   </div>
                   <h2 className="line-clamp-2 font-bold">{e.programa?.titulo ?? "Curso no disponible"}</h2>
-                  <div>
-                    <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                      <span>Progreso</span>
-                      <span>{e.progreso_porcentaje}%</span>
+                  {e.cohort && (
+                    <div className="rounded-md bg-muted/50 p-2 text-xs">
+                      <p className="font-semibold">{e.cohort.nombre}</p>
+                      {e.cohort.nivel_actual && <p className="text-muted-foreground">Nivel: {e.cohort.nivel_actual}</p>}
+                      {e.cohort.horario && <p className="text-muted-foreground">Horario: {e.cohort.horario}</p>}
+                      {e.cohort.ubicacion && <p className="text-muted-foreground">{e.cohort.ubicacion}</p>}
                     </div>
-                    <Progress value={e.progreso_porcentaje} />
-                  </div>
+                  )}
+                  {e.programa?.modalidad !== "presencial" && (
+                    <div>
+                      <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                        <span>Progreso</span>
+                        <span>{e.progreso_porcentaje}%</span>
+                      </div>
+                      <Progress value={e.progreso_porcentaje} />
+                    </div>
+                  )}
                   {e.estado === "pendiente" ? (
                     <Button disabled className="w-full" variant="secondary">
                       Pago pendiente de verificación
                     </Button>
+                  ) : e.programa?.modalidad === "presencial" ? (
+                    <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
+                      Programa presencial — sin campus virtual. Consulta a tu docente.
+                    </div>
                   ) : e.programa?.slug ? (
                     <Button asChild className="w-full">
                       <Link to="/mis-cursos/$slug" params={{ slug: e.programa.slug }}>
