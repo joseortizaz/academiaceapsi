@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { Card, CardContent } from "@/components/ui/card";
