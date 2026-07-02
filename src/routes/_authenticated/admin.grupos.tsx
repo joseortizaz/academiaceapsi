@@ -373,7 +373,28 @@ function StudentsDialog({
         .select("id,user_id,estado,nombre_completo,email_contacto")
         .eq("programa_id", cohort.programa_id)
         .in("estado", ["activo", "pendiente"]);
-      return enrolls ?? [];
+      const list = enrolls ?? [];
+      const userIds = Array.from(new Set(list.map((e: any) => e.user_id).filter(Boolean)));
+      let profileMap = new Map<string, any>();
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id,nombre,apellido,telefono")
+          .in("id", userIds);
+        profileMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      }
+      return list.map((e: any) => {
+        const p = profileMap.get(e.user_id);
+        const nombreProfile = p ? `${p.nombre ?? ""} ${p.apellido ?? ""}`.trim() : "";
+        return {
+          ...e,
+          display_name:
+            e.nombre_completo?.trim() ||
+            nombreProfile ||
+            e.email_contacto ||
+            null,
+        };
+      });
     },
   });
 
@@ -427,7 +448,7 @@ function StudentsDialog({
                     return (
                       <TableRow key={m.id}>
                         <TableCell className="text-sm">
-                          {enr?.nombre_completo ?? enr?.email_contacto ?? m.user_id.slice(0, 8)}
+                          {enr?.display_name ?? m.user_id.slice(0, 8)}
                         </TableCell>
                         <TableCell><Badge variant="secondary">{m.estado}</Badge></TableCell>
                         <TableCell className="text-xs text-muted-foreground">
@@ -460,7 +481,7 @@ function StudentsDialog({
                     .map((e: any) => (
                       <TableRow key={e.id}>
                         <TableCell className="text-sm">
-                          {e.nombre_completo ?? e.email_contacto ?? e.user_id.slice(0, 8)}
+                          {e.display_name ?? e.user_id.slice(0, 8)}
                           <span className="ml-2 text-xs text-muted-foreground">({e.estado})</span>
                         </TableCell>
                         <TableCell className="text-right">
