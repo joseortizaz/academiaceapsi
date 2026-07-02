@@ -22,6 +22,7 @@ import {
   FileCheck,
   Award,
   Users2,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
