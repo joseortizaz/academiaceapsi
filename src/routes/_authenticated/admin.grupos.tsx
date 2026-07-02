@@ -448,7 +448,7 @@ function StudentsDialog({
                     return (
                       <TableRow key={m.id}>
                         <TableCell className="text-sm">
-                          {enr?.nombre_completo ?? enr?.email_contacto ?? m.user_id.slice(0, 8)}
+                          {enr?.display_name ?? m.user_id.slice(0, 8)}
                         </TableCell>
                         <TableCell><Badge variant="secondary">{m.estado}</Badge></TableCell>
                         <TableCell className="text-xs text-muted-foreground">
