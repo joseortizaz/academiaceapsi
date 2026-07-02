@@ -241,6 +241,8 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       titulo: meeting.titulo,
       role,
       joinUrl: meeting.zoom_join_url ?? "",
-      startUrl: meeting.zoom_start_url ?? "",
+      // startUrl es la URL de host: solo la devolvemos a admin/docente (role === 1),
+      // nunca a estudiantes, para evitar que puedan iniciar la reunión como anfitrión.
+      startUrl: role === 1 ? (meeting.zoom_start_url ?? "") : "",
     };
   });
