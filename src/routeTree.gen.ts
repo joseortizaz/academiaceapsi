@@ -36,6 +36,7 @@ import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
+import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
 import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
@@ -59,6 +60,7 @@ import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
 import { Route as AuthenticatedAdminGruposRouteImport } from './routes/_authenticated/admin.grupos'
 import { Route as AuthenticatedAdminFinanzasRouteImport } from './routes/_authenticated/admin.finanzas'
+import { Route as AuthenticatedAdminFacturacionRouteImport } from './routes/_authenticated/admin.facturacion'
 import { Route as AuthenticatedAdminEventosRouteImport } from './routes/_authenticated/admin.eventos'
 import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
 import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
@@ -208,6 +210,12 @@ const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
   path: '/api/public/zoom-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBalanceActivoWebhookRoute =
+  ApiPublicBalanceActivoWebhookRouteImport.update({
+    id: '/api/public/balance-activo-webhook',
+    path: '/api/public/balance-activo-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedMisCursosSlugRoute =
   AuthenticatedMisCursosSlugRouteImport.update({
     id: '/mis-cursos/$slug',
@@ -344,6 +352,12 @@ const AuthenticatedAdminFinanzasRoute =
     path: '/finanzas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminFacturacionRoute =
+  AuthenticatedAdminFacturacionRouteImport.update({
+    id: '/facturacion',
+    path: '/facturacion',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminEventosRoute =
   AuthenticatedAdminEventosRouteImport.update({
     id: '/eventos',
@@ -431,6 +445,7 @@ export interface FileRoutesByFullPath {
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/admin/eventos': typeof AuthenticatedAdminEventosRoute
+  '/admin/facturacion': typeof AuthenticatedAdminFacturacionRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/grupos': typeof AuthenticatedAdminGruposRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -454,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
@@ -488,6 +504,7 @@ export interface FileRoutesByTo {
   '/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/admin/eventos': typeof AuthenticatedAdminEventosRoute
+  '/admin/facturacion': typeof AuthenticatedAdminFacturacionRoute
   '/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/admin/grupos': typeof AuthenticatedAdminGruposRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -511,6 +528,7 @@ export interface FileRoutesByTo {
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
@@ -551,6 +569,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/docentes': typeof AuthenticatedAdminDocentesRoute
   '/_authenticated/admin/evaluaciones': typeof AuthenticatedAdminEvaluacionesRoute
   '/_authenticated/admin/eventos': typeof AuthenticatedAdminEventosRoute
+  '/_authenticated/admin/facturacion': typeof AuthenticatedAdminFacturacionRoute
   '/_authenticated/admin/finanzas': typeof AuthenticatedAdminFinanzasRoute
   '/_authenticated/admin/grupos': typeof AuthenticatedAdminGruposRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -574,6 +593,7 @@ export interface FileRoutesById {
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/_authenticated/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
+  '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
@@ -614,6 +634,7 @@ export interface FileRouteTypes {
     | '/admin/docentes'
     | '/admin/evaluaciones'
     | '/admin/eventos'
+    | '/admin/facturacion'
     | '/admin/finanzas'
     | '/admin/grupos'
     | '/admin/hero'
@@ -637,6 +658,7 @@ export interface FileRouteTypes {
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
+    | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
     | '/admin/'
     | '/docente/'
@@ -671,6 +693,7 @@ export interface FileRouteTypes {
     | '/admin/docentes'
     | '/admin/evaluaciones'
     | '/admin/eventos'
+    | '/admin/facturacion'
     | '/admin/finanzas'
     | '/admin/grupos'
     | '/admin/hero'
@@ -694,6 +717,7 @@ export interface FileRouteTypes {
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
     | '/mis-cursos/$slug'
+    | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
     | '/admin'
     | '/docente'
@@ -733,6 +757,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/docentes'
     | '/_authenticated/admin/evaluaciones'
     | '/_authenticated/admin/eventos'
+    | '/_authenticated/admin/facturacion'
     | '/_authenticated/admin/finanzas'
     | '/_authenticated/admin/grupos'
     | '/_authenticated/admin/hero'
@@ -756,6 +781,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante/cuenta'
     | '/_authenticated/estudiante/evaluaciones'
     | '/_authenticated/mis-cursos/$slug'
+    | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/docente/'
@@ -783,6 +809,7 @@ export interface RootRouteChildren {
   SolicitudCursoRoute: typeof SolicitudCursoRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
+  ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -980,6 +1007,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/balance-activo-webhook': {
+      id: '/api/public/balance-activo-webhook'
+      path: '/api/public/balance-activo-webhook'
+      fullPath: '/api/public/balance-activo-webhook'
+      preLoaderRoute: typeof ApiPublicBalanceActivoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/mis-cursos/$slug': {
       id: '/_authenticated/mis-cursos/$slug'
       path: '/mis-cursos/$slug'
@@ -1141,6 +1175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFinanzasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/facturacion': {
+      id: '/_authenticated/admin/facturacion'
+      path: '/facturacion'
+      fullPath: '/admin/facturacion'
+      preLoaderRoute: typeof AuthenticatedAdminFacturacionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/eventos': {
       id: '/_authenticated/admin/eventos'
       path: '/eventos'
@@ -1222,6 +1263,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDocentesRoute: typeof AuthenticatedAdminDocentesRoute
   AuthenticatedAdminEvaluacionesRoute: typeof AuthenticatedAdminEvaluacionesRoute
   AuthenticatedAdminEventosRoute: typeof AuthenticatedAdminEventosRoute
+  AuthenticatedAdminFacturacionRoute: typeof AuthenticatedAdminFacturacionRoute
   AuthenticatedAdminFinanzasRoute: typeof AuthenticatedAdminFinanzasRoute
   AuthenticatedAdminGruposRoute: typeof AuthenticatedAdminGruposRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
@@ -1245,6 +1287,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDocentesRoute: AuthenticatedAdminDocentesRoute,
   AuthenticatedAdminEvaluacionesRoute: AuthenticatedAdminEvaluacionesRoute,
   AuthenticatedAdminEventosRoute: AuthenticatedAdminEventosRoute,
+  AuthenticatedAdminFacturacionRoute: AuthenticatedAdminFacturacionRoute,
   AuthenticatedAdminFinanzasRoute: AuthenticatedAdminFinanzasRoute,
   AuthenticatedAdminGruposRoute: AuthenticatedAdminGruposRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
@@ -1363,6 +1406,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolicitudCursoRoute: SolicitudCursoRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
+  ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
