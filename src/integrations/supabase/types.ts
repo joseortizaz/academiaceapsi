@@ -589,6 +589,7 @@ export type Database = {
           email: string
           estado: string
           id: string
+          modalidad: string | null
           nivel_estudios: string
           nombre_completo: string
           notas: string | null
@@ -606,6 +607,7 @@ export type Database = {
           email: string
           estado?: string
           id?: string
+          modalidad?: string | null
           nivel_estudios: string
           nombre_completo: string
           notas?: string | null
@@ -623,6 +625,7 @@ export type Database = {
           email?: string
           estado?: string
           id?: string
+          modalidad?: string | null
           nivel_estudios?: string
           nombre_completo?: string
           notas?: string | null

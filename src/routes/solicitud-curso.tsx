@@ -104,6 +104,9 @@ const schema = z.object({
   provincia: z.string().min(1, "Selecciona una provincia"),
   tipo_formacion: z.enum(["curso", "diplomado"]),
   programa: z.string().min(1, "Selecciona un programa"),
+  modalidad: z.enum(["presencial", "online_vivo", "online_asincronico"], {
+    errorMap: () => ({ message: "Selecciona una modalidad" }),
+  }),
 });
 
 type FormState = z.infer<typeof schema>;
@@ -119,6 +122,7 @@ const INITIAL: FormState = {
   provincia: "",
   tipo_formacion: "curso",
   programa: "",
+  modalidad: "" as unknown as FormState["modalidad"],
 };
 
 function SolicitudCurso() {
@@ -362,6 +366,36 @@ function SolicitudCurso() {
                       </SelectContent>
                     </Select>
                   </Field>
+
+                  <Field label="Modalidad de tu Interés" required error={errors.modalidad} className="sm:col-span-2">
+                    <RadioGroup
+                      value={form.modalidad}
+                      onValueChange={(v) => update("modalidad", v as FormState["modalidad"])}
+                      className="grid gap-3 sm:grid-cols-3"
+                    >
+                      {([
+                        { value: "presencial", label: "Presencial", desc: "Clases en el aula" },
+                        { value: "online_vivo", label: "Online en vivo", desc: "Clases virtuales sincrónicas" },
+                        { value: "online_asincronico", label: "Online asincrónico", desc: "A tu propio ritmo" },
+                      ] as const).map((opt) => (
+                        <label
+                          key={opt.value}
+                          className={`flex cursor-pointer items-start gap-3 rounded-md border px-4 py-3 transition-colors ${
+                            form.modalidad === opt.value
+                              ? "border-primary bg-primary/5"
+                              : "border-input hover:bg-accent/40"
+                          }`}
+                        >
+                          <RadioGroupItem value={opt.value} className="mt-0.5" />
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium text-foreground">{opt.label}</span>
+                            <span className="text-xs text-muted-foreground">{opt.desc}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  </Field>
+
 
                   <div className="sm:col-span-2">
                     <Button type="submit" size="lg" className="w-full" disabled={submitting}>
