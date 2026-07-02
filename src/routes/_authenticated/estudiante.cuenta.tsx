@@ -13,8 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Download, Save, KeyRound, Receipt } from "lucide-react";
+import { Download, Save, KeyRound, Receipt, FileText, RefreshCw, ExternalLink } from "lucide-react";
 import { AvatarUploader } from "@/components/AvatarUploader";
+import { useServerFn } from "@tanstack/react-start";
+import { listMyInvoices, syncMyInvoices } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/estudiante/cuenta")({
   component: MiCuenta,
@@ -179,6 +181,8 @@ function MiCuenta() {
           </CardContent>
         </Card>
       </div>
+
+      <BalanceActivoInvoices />
 
       <Card>
         <CardHeader>
