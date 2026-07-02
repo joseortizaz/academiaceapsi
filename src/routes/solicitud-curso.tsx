@@ -104,6 +104,9 @@ const schema = z.object({
   provincia: z.string().min(1, "Selecciona una provincia"),
   tipo_formacion: z.enum(["curso", "diplomado"]),
   programa: z.string().min(1, "Selecciona un programa"),
+  modalidad: z.enum(["presencial", "online_vivo", "online_asincronico"], {
+    errorMap: () => ({ message: "Selecciona una modalidad" }),
+  }),
 });
 
 type FormState = z.infer<typeof schema>;
@@ -119,6 +122,7 @@ const INITIAL: FormState = {
   provincia: "",
   tipo_formacion: "curso",
   programa: "",
+  modalidad: "" as unknown as FormState["modalidad"],
 };
 
 function SolicitudCurso() {
