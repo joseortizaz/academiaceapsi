@@ -256,3 +256,145 @@ function Field({ label, value, onChange }: { label: string; value: string; onCha
     </div>
   );
 }
+
+function BalanceActivoInvoices() {
+  const listFn = useServerFn(listMyInvoices);
+  const syncFn = useServerFn(syncMyInvoices);
+  const qc = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["ba-invoices"],
+    queryFn: () => listFn(),
+  });
+
+  const invoices = data?.invoices ?? [];
+  const payments = data?.payments ?? [];
+  const saldoPendiente = invoices
+    .filter((i: any) => i.estado !== "pagada")
+    .reduce((sum: number, i: any) => sum + Number(i.saldo ?? i.total ?? 0), 0);
+
+  const onSync = async () => {
+    try {
+      const r = await syncFn();
+      if (!r.linked) {
+        toast.info("Aún no tienes cliente vinculado en Balance Activo. Contacta a administración.");
+      } else {
+        toast.success(`Sincronizado: ${r.synced} facturas`);
+        qc.invalidateQueries({ queryKey: ["ba-invoices"] });
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-start justify-between gap-3">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary" /> Facturas y cobros
+          </CardTitle>
+          {saldoPendiente > 0 && (
+            <p className="mt-1 text-sm text-amber-700">
+              Saldo pendiente: <span className="font-semibold">RD$ {saldoPendiente.toLocaleString("es-DO")}</span>
+            </p>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={onSync} disabled={isLoading}>
+          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} /> Sincronizar
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <p className="mb-2 text-sm font-medium">Facturas</p>
+          {invoices.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              Aún no hay facturas emitidas.
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>NCF / #</TableHead>
+                  <TableHead>Concepto</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="text-right">PDF</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((i: any) => (
+                  <TableRow key={i.id}>
+                    <TableCell className="text-muted-foreground">
+                      {i.fecha ? new Date(i.fecha).toLocaleDateString("es-DO") : "—"}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{i.ncf ?? i.numero ?? "—"}</TableCell>
+                    <TableCell>{i.concepto ?? "—"}</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {i.moneda ?? "RD$"} {Number(i.total ?? 0).toLocaleString("es-DO")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          i.estado === "pagada"
+                            ? "bg-emerald-500/15 text-emerald-700"
+                            : i.estado === "vencida"
+                              ? "bg-red-500/15 text-red-700"
+                              : "bg-amber-500/15 text-amber-700"
+                        }
+                      >
+                        {i.estado}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {i.pdf_url ? (
+                        <Button size="sm" variant="ghost" asChild>
+                          <a href={i.pdf_url} target="_blank" rel="noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
+
+        {payments.length > 0 && (
+          <div>
+            <p className="mb-2 text-sm font-medium">Cobros aplicados</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Método</TableHead>
+                  <TableHead>Nota</TableHead>
+                  <TableHead className="text-right">Monto</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((p: any) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="text-muted-foreground">
+                      {p.fecha ? new Date(p.fecha).toLocaleDateString("es-DO") : "—"}
+                    </TableCell>
+                    <TableCell className="capitalize">{p.metodo ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{p.nota ?? ""}</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {p.moneda ?? "RD$"} {Number(p.monto ?? 0).toLocaleString("es-DO")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
