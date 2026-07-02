@@ -481,7 +481,7 @@ function StudentsDialog({
                     .map((e: any) => (
                       <TableRow key={e.id}>
                         <TableCell className="text-sm">
-                          {e.nombre_completo ?? e.email_contacto ?? e.user_id.slice(0, 8)}
+                          {e.display_name ?? e.user_id.slice(0, 8)}
                           <span className="ml-2 text-xs text-muted-foreground">({e.estado})</span>
                         </TableCell>
                         <TableCell className="text-right">
