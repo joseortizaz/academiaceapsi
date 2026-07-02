@@ -373,7 +373,28 @@ function StudentsDialog({
         .select("id,user_id,estado,nombre_completo,email_contacto")
         .eq("programa_id", cohort.programa_id)
         .in("estado", ["activo", "pendiente"]);
-      return enrolls ?? [];
+      const list = enrolls ?? [];
+      const userIds = Array.from(new Set(list.map((e: any) => e.user_id).filter(Boolean)));
+      let profileMap = new Map<string, any>();
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id,nombre,apellido,telefono")
+          .in("id", userIds);
+        profileMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      }
+      return list.map((e: any) => {
+        const p = profileMap.get(e.user_id);
+        const nombreProfile = p ? `${p.nombre ?? ""} ${p.apellido ?? ""}`.trim() : "";
+        return {
+          ...e,
+          display_name:
+            e.nombre_completo?.trim() ||
+            nombreProfile ||
+            e.email_contacto ||
+            null,
+        };
+      });
     },
   });
 
