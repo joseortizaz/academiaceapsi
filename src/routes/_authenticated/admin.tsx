@@ -22,6 +22,7 @@ import {
   FileCheck,
   Award,
   Users2,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +48,7 @@ const nav = [
   { to: "/admin/solicitudes", label: "Solicitudes", icon: ClipboardList },
   { to: "/admin/pagos", label: "Pagos", icon: CreditCard },
   { to: "/admin/finanzas", label: "Finanzas", icon: TrendingUp },
+  { to: "/admin/facturacion", label: "Facturación (BA)", icon: FileText },
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
   { to: "/admin/integraciones", label: "Integraciones", icon: Plug },

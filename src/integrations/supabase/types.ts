@@ -162,6 +162,39 @@ export type Database = {
         }
         Relationships: []
       }
+      balance_activo_webhook_logs: {
+        Row: {
+          created_at: string
+          delivery_id: string | null
+          error: string | null
+          event: string
+          id: string
+          payload: Json
+          processed: boolean
+          signature_valid: boolean
+        }
+        Insert: {
+          created_at?: string
+          delivery_id?: string | null
+          error?: string | null
+          event: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          signature_valid?: boolean
+        }
+        Update: {
+          created_at?: string
+          delivery_id?: string | null
+          error?: string | null
+          event?: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          signature_valid?: boolean
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           autor_id: string
@@ -829,6 +862,123 @@ export type Database = {
         }
         Relationships: []
       }
+      external_invoices: {
+        Row: {
+          ba_customer_id: string
+          concepto: string | null
+          created_at: string
+          estado: string
+          external_id: string
+          fecha: string | null
+          id: string
+          itbis: number | null
+          moneda: string | null
+          ncf: string | null
+          numero: string | null
+          pdf_url: string | null
+          raw: Json
+          saldo: number | null
+          subtotal: number | null
+          synced_at: string
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ba_customer_id: string
+          concepto?: string | null
+          created_at?: string
+          estado?: string
+          external_id: string
+          fecha?: string | null
+          id?: string
+          itbis?: number | null
+          moneda?: string | null
+          ncf?: string | null
+          numero?: string | null
+          pdf_url?: string | null
+          raw?: Json
+          saldo?: number | null
+          subtotal?: number | null
+          synced_at?: string
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ba_customer_id?: string
+          concepto?: string | null
+          created_at?: string
+          estado?: string
+          external_id?: string
+          fecha?: string | null
+          id?: string
+          itbis?: number | null
+          moneda?: string | null
+          ncf?: string | null
+          numero?: string | null
+          pdf_url?: string | null
+          raw?: Json
+          saldo?: number | null
+          subtotal?: number | null
+          synced_at?: string
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      external_payments: {
+        Row: {
+          ba_customer_id: string
+          created_at: string
+          external_id: string
+          fecha: string | null
+          id: string
+          invoice_external_id: string
+          metodo: string | null
+          moneda: string | null
+          monto: number
+          nota: string | null
+          raw: Json
+          synced_at: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ba_customer_id: string
+          created_at?: string
+          external_id: string
+          fecha?: string | null
+          id?: string
+          invoice_external_id: string
+          metodo?: string | null
+          moneda?: string | null
+          monto?: number
+          nota?: string | null
+          raw?: Json
+          synced_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ba_customer_id?: string
+          created_at?: string
+          external_id?: string
+          fecha?: string | null
+          id?: string
+          invoice_external_id?: string
+          metodo?: string | null
+          moneda?: string | null
+          monto?: number
+          nota?: string | null
+          raw?: Json
+          synced_at?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           activo: boolean
@@ -1130,6 +1280,7 @@ export type Database = {
         Row: {
           apellido: string
           avatar_url: string | null
+          balance_activo_customer_id: string | null
           bio: string | null
           ciudad: string | null
           created_at: string
@@ -1145,6 +1296,7 @@ export type Database = {
         Insert: {
           apellido: string
           avatar_url?: string | null
+          balance_activo_customer_id?: string | null
           bio?: string | null
           ciudad?: string | null
           created_at?: string
@@ -1160,6 +1312,7 @@ export type Database = {
         Update: {
           apellido?: string
           avatar_url?: string | null
+          balance_activo_customer_id?: string | null
           bio?: string | null
           ciudad?: string | null
           created_at?: string
