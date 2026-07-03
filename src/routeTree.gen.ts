@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
 import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
+import { Route as AuthenticatedEstudianteFacturacionRouteImport } from './routes/_authenticated/estudiante.facturacion'
 import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
 import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
 import { Route as AuthenticatedDocenteGruposRouteImport } from './routes/_authenticated/docente.grupos'
@@ -221,6 +222,12 @@ const AuthenticatedMisCursosSlugRoute =
     id: '/mis-cursos/$slug',
     path: '/mis-cursos/$slug',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedEstudianteFacturacionRoute =
+  AuthenticatedEstudianteFacturacionRouteImport.update({
+    id: '/facturacion',
+    path: '/facturacion',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
   } as any)
 const AuthenticatedEstudianteEvaluacionesRoute =
   AuthenticatedEstudianteEvaluacionesRouteImport.update({
@@ -468,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/docente/grupos': typeof AuthenticatedDocenteGruposRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
+  '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
@@ -527,6 +535,7 @@ export interface FileRoutesByTo {
   '/docente/grupos': typeof AuthenticatedDocenteGruposRoute
   '/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
+  '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
@@ -592,6 +601,7 @@ export interface FileRoutesById {
   '/_authenticated/docente/grupos': typeof AuthenticatedDocenteGruposRoute
   '/_authenticated/estudiante/cuenta': typeof AuthenticatedEstudianteCuentaRoute
   '/_authenticated/estudiante/evaluaciones': typeof AuthenticatedEstudianteEvaluacionesRoute
+  '/_authenticated/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
@@ -657,6 +667,7 @@ export interface FileRouteTypes {
     | '/docente/grupos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
+    | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
@@ -716,6 +727,7 @@ export interface FileRouteTypes {
     | '/docente/grupos'
     | '/estudiante/cuenta'
     | '/estudiante/evaluaciones'
+    | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
@@ -780,6 +792,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docente/grupos'
     | '/_authenticated/estudiante/cuenta'
     | '/_authenticated/estudiante/evaluaciones'
+    | '/_authenticated/estudiante/facturacion'
     | '/_authenticated/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/zoom-webhook'
@@ -1020,6 +1033,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/mis-cursos/$slug'
       preLoaderRoute: typeof AuthenticatedMisCursosSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/estudiante/facturacion': {
+      id: '/_authenticated/estudiante/facturacion'
+      path: '/facturacion'
+      fullPath: '/estudiante/facturacion'
+      preLoaderRoute: typeof AuthenticatedEstudianteFacturacionRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
     }
     '/_authenticated/estudiante/evaluaciones': {
       id: '/_authenticated/estudiante/evaluaciones'
@@ -1335,6 +1355,7 @@ const AuthenticatedDocenteRouteWithChildren =
 interface AuthenticatedEstudianteRouteChildren {
   AuthenticatedEstudianteCuentaRoute: typeof AuthenticatedEstudianteCuentaRoute
   AuthenticatedEstudianteEvaluacionesRoute: typeof AuthenticatedEstudianteEvaluacionesRoute
+  AuthenticatedEstudianteFacturacionRoute: typeof AuthenticatedEstudianteFacturacionRoute
   AuthenticatedEstudianteIndexRoute: typeof AuthenticatedEstudianteIndexRoute
 }
 
@@ -1343,6 +1364,8 @@ const AuthenticatedEstudianteRouteChildren: AuthenticatedEstudianteRouteChildren
     AuthenticatedEstudianteCuentaRoute: AuthenticatedEstudianteCuentaRoute,
     AuthenticatedEstudianteEvaluacionesRoute:
       AuthenticatedEstudianteEvaluacionesRoute,
+    AuthenticatedEstudianteFacturacionRoute:
+      AuthenticatedEstudianteFacturacionRoute,
     AuthenticatedEstudianteIndexRoute: AuthenticatedEstudianteIndexRoute,
   }
 
@@ -1415,13 +1438,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

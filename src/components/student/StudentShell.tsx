@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, BookOpen, ClipboardCheck, Award, UserCog, LogOut,
-  GraduationCap,
+  GraduationCap, Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -22,6 +22,7 @@ const nav: NavItem[] = [
   { to: "/mis-cursos", label: "Mis Cursos", icon: BookOpen },
   { to: "/estudiante/evaluaciones", label: "Evaluaciones", icon: ClipboardCheck },
   { to: "/certificados", label: "Certificados", icon: Award },
+  { to: "/estudiante/facturacion", label: "Mi Estado de Cuenta", icon: Receipt },
   { to: "/estudiante/cuenta", label: "Mi Cuenta", icon: UserCog },
 ];
 
