@@ -38,6 +38,7 @@ import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
+import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
 import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
 import { Route as AuthenticatedEstudianteFacturacionRouteImport } from './routes/_authenticated/estudiante.facturacion'
@@ -223,6 +224,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
 const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
   id: '/api/public/zoom-webhook',
   path: '/api/public/zoom-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCourseRequestRoute = ApiPublicCourseRequestRouteImport.update({
+  id: '/api/public/course-request',
+  path: '/api/public/course-request',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicBalanceActivoWebhookRoute =
@@ -505,6 +511,7 @@ export interface FileRoutesByFullPath {
   '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -569,6 +576,7 @@ export interface FileRoutesByTo {
   '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -639,6 +647,7 @@ export interface FileRoutesById {
   '/_authenticated/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -709,6 +718,7 @@ export interface FileRouteTypes {
     | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
     | '/admin/'
@@ -773,6 +783,7 @@ export interface FileRouteTypes {
     | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
     | '/admin'
@@ -842,6 +853,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante/facturacion'
     | '/_authenticated/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
     | '/_authenticated/admin/'
@@ -874,6 +886,7 @@ export interface RootRouteChildren {
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
+  ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1086,6 +1099,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/zoom-webhook'
       fullPath: '/api/public/zoom-webhook'
       preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/course-request': {
+      id: '/api/public/course-request'
+      path: '/api/public/course-request'
+      fullPath: '/api/public/course-request'
+      preLoaderRoute: typeof ApiPublicCourseRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/balance-activo-webhook': {
@@ -1513,6 +1533,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
+  ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
