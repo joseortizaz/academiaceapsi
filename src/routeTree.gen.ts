@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -27,6 +28,7 @@ import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
@@ -35,7 +37,9 @@ import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
+import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
 import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
 import { Route as AuthenticatedEstudianteFacturacionRouteImport } from './routes/_authenticated/estudiante.facturacion'
@@ -69,10 +73,17 @@ import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
   id: '/solicitud-curso',
   path: '/solicitud-curso',
@@ -162,6 +173,11 @@ const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProgramasRoute,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   id: '/estudiante',
   path: '/estudiante',
@@ -206,9 +222,19 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
   id: '/api/public/zoom-webhook',
   path: '/api/public/zoom-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCourseRequestRoute = ApiPublicCourseRequestRouteImport.update({
+  id: '/api/public/course-request',
+  path: '/api/public/course-request',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicBalanceActivoWebhookRoute =
@@ -406,6 +432,18 @@ const AuthenticatedAdminAnunciosRoute =
     path: '/anuncios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -437,10 +475,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -478,7 +518,9 @@ export interface FileRoutesByFullPath {
   '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
@@ -486,6 +528,8 @@ export interface FileRoutesByFullPath {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -500,7 +544,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -538,7 +584,9 @@ export interface FileRoutesByTo {
   '/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
@@ -546,6 +594,8 @@ export interface FileRoutesByTo {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -563,10 +613,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
@@ -604,7 +656,9 @@ export interface FileRoutesById {
   '/_authenticated/estudiante/facturacion': typeof AuthenticatedEstudianteFacturacionRoute
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
+  '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
@@ -612,6 +666,8 @@ export interface FileRoutesById {
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -629,10 +685,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/admin'
     | '/certificados'
     | '/docente'
     | '/estudiante'
+    | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
@@ -670,7 +728,9 @@ export interface FileRouteTypes {
     | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
+    | '/lovable/email/suppression'
     | '/admin/'
     | '/docente/'
     | '/estudiante/'
@@ -678,6 +738,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -692,7 +754,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/certificados'
+    | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
@@ -730,7 +794,9 @@ export interface FileRouteTypes {
     | '/estudiante/facturacion'
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
+    | '/lovable/email/suppression'
     | '/admin'
     | '/docente'
     | '/estudiante'
@@ -738,6 +804,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -754,10 +822,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
+    | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
@@ -795,7 +865,9 @@ export interface FileRouteTypes {
     | '/_authenticated/estudiante/facturacion'
     | '/_authenticated/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
+    | '/api/public/course-request'
     | '/api/public/zoom-webhook'
+    | '/lovable/email/suppression'
     | '/_authenticated/admin/'
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
@@ -803,6 +875,8 @@ export interface FileRouteTypes {
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -820,17 +894,30 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
   ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
+  ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solicitud-curso': {
       id: '/solicitud-curso'
       path: '/solicitud-curso'
@@ -957,6 +1044,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramasSlugRouteImport
       parentRoute: typeof ProgramasRoute
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/estudiante': {
       id: '/_authenticated/estudiante'
       path: '/estudiante'
@@ -1013,11 +1107,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/zoom-webhook': {
       id: '/api/public/zoom-webhook'
       path: '/api/public/zoom-webhook'
       fullPath: '/api/public/zoom-webhook'
       preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/course-request': {
+      id: '/api/public/course-request'
+      path: '/api/public/course-request'
+      fullPath: '/api/public/course-request'
+      preLoaderRoute: typeof ApiPublicCourseRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/balance-activo-webhook': {
@@ -1251,6 +1359,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -1427,24 +1549,20 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
   ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
+  ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

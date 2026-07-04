@@ -178,17 +178,34 @@ function SolicitudCurso() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from("course_requests").insert(parsed.data);
-    setSubmitting(false);
-
-    if (error) {
-      toast.error("No pudimos enviar tu solicitud", { description: error.message });
-      return;
+    try {
+      const res = await fetch("/api/public/course-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error("No pudimos enviar tu solicitud", {
+          description: json?.error ?? "Intenta nuevamente en unos momentos.",
+        });
+        setSubmitting(false);
+        return;
+      }
+      toast.success("¡Solicitud enviada con éxito!", {
+        description: json?.emailSent
+          ? "Te enviamos un correo de confirmación."
+          : undefined,
+      });
+      setSuccess(true);
+      setForm(INITIAL);
+    } catch (err) {
+      toast.error("Error de conexión", {
+        description: err instanceof Error ? err.message : "Intenta nuevamente.",
+      });
+    } finally {
+      setSubmitting(false);
     }
-
-    toast.success("¡Solicitud enviada con éxito!");
-    setSuccess(true);
-    setForm(INITIAL);
   };
 
   return (
