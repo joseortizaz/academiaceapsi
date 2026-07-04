@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -78,6 +79,11 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
   id: '/solicitud-curso',
   path: '/solicitud-curso',
@@ -469,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
@@ -537,6 +544,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
@@ -605,6 +613,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
@@ -676,6 +685,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/admin'
     | '/certificados'
     | '/docente'
@@ -744,6 +754,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/certificados'
     | '/email/unsubscribe'
     | '/programas/$slug'
@@ -811,6 +822,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
@@ -882,6 +894,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
@@ -898,6 +911,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solicitud-curso': {
       id: '/solicitud-curso'
       path: '/solicitud-curso'
@@ -1529,6 +1549,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
