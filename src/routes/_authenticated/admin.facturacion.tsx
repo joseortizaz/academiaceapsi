@@ -16,6 +16,7 @@ import {
   adminSearchCustomers,
   adminLinkCustomer,
   adminSyncUser,
+  adminRunFullSync,
 } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/facturacion")({
@@ -44,6 +45,8 @@ function AdminFacturacion() {
   const searchFn = useServerFn(adminSearchCustomers);
   const linkFn = useServerFn(adminLinkCustomer);
   const syncFn = useServerFn(adminSyncUser);
+  const runFullSyncFn = useServerFn(adminRunFullSync);
+  const [runningFullSync, setRunningFullSync] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -169,6 +172,40 @@ function AdminFacturacion() {
     }
   };
 
+  const { data: syncRuns = [] } = useQuery({
+    queryKey: ["ba-sync-runs"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("balance_activo_webhook_logs")
+        .select("id,event,processed,error,payload,created_at")
+        .eq("event", "cron_sync")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return data ?? [];
+    },
+    refetchInterval: 30_000,
+  });
+
+  const lastRun = syncRuns[0] as any | undefined;
+
+  const handleRunFullSync = async () => {
+    setRunningFullSync(true);
+    try {
+      const r = await runFullSyncFn();
+      toast.success(
+        `Sincronización completada: ${r.processed}/${r.targets} alumnos · ${r.invoices} facturas · ${r.payments} cobros`,
+      );
+      qc.invalidateQueries({ queryKey: ["admin", "external_invoices"] });
+      qc.invalidateQueries({ queryKey: ["admin", "external_payments"] });
+      qc.invalidateQueries({ queryKey: ["ba-sync-runs"] });
+      if (r.errors?.length) toast.warning(`${r.errors.length} alumnos con errores; revisa el historial.`);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setRunningFullSync(false);
+    }
+  };
+
   const totalFacturado = invoices.reduce((s: number, i: any) => s + Number(i.total ?? 0), 0);
   const totalPendiente = invoices.reduce((s: number, i: any) => s + Number(i.saldo ?? 0), 0);
   const totalCobrado = payments.reduce((s: number, p: any) => s + Number(p.monto ?? 0), 0);
@@ -185,6 +222,7 @@ function AdminFacturacion() {
       <Tabs defaultValue="conexion" className="space-y-4">
         <TabsList>
           <TabsTrigger value="conexion">Conexión & vínculos</TabsTrigger>
+          <TabsTrigger value="sincronizacion">Sincronización</TabsTrigger>
           <TabsTrigger value="facturas">Facturas ({invoices.length})</TabsTrigger>
           <TabsTrigger value="pagos">Pagos ({payments.length})</TabsTrigger>
           <TabsTrigger value="logs">Webhooks</TabsTrigger>
@@ -300,6 +338,107 @@ function AdminFacturacion() {
                   <RefreshCw className="mr-2 h-4 w-4" /> Sincronizar facturas de este alumno
                 </Button>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sincronizacion" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <CardTitle>Sincronización automática</CardTitle>
+                  <CardDescription>
+                    Los estados de cuenta se mantienen al día por dos vías: webhooks de Balance Activo en
+                    tiempo real y una corrida nocturna de reconciliación a las 03:15 AM (solo alumnos con
+                    inscripción activa o pendiente).
+                  </CardDescription>
+                </div>
+                <Button onClick={handleRunFullSync} disabled={runningFullSync}>
+                  <RefreshCw className={`mr-2 h-4 w-4 ${runningFullSync ? "animate-spin" : ""}`} />
+                  Ejecutar ahora
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {lastRun ? (
+                <div className="rounded-md border bg-muted/30 p-3 text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">Última corrida:</span>{" "}
+                    {new Date(lastRun.created_at).toLocaleString("es-DO")}{" "}
+                    <span className="text-muted-foreground">
+                      ({lastRun.payload?.source === "cron" ? "cron nocturno" : "manual"})
+                    </span>
+                  </p>
+                  <p className="text-muted-foreground">
+                    {lastRun.payload?.processed ?? 0}/{lastRun.payload?.targets ?? 0} alumnos ·{" "}
+                    {lastRun.payload?.invoices ?? 0} facturas · {lastRun.payload?.payments ?? 0} cobros ·{" "}
+                    {Math.round((lastRun.payload?.duration_ms ?? 0) / 100) / 10}s
+                  </p>
+                  {lastRun.error && <p className="text-red-700">{lastRun.error}</p>}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Aún no se ha ejecutado ninguna corrida.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Historial de corridas</CardTitle>
+              <CardDescription>Últimas 20 sincronizaciones masivas (cron + manuales).</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Origen</TableHead>
+                    <TableHead className="text-right">Alumnos</TableHead>
+                    <TableHead className="text-right">Facturas</TableHead>
+                    <TableHead className="text-right">Cobros</TableHead>
+                    <TableHead className="text-right">Duración</TableHead>
+                    <TableHead>Resultado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {syncRuns.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                        Sin corridas registradas.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    syncRuns.map((r: any) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {new Date(r.created_at).toLocaleString("es-DO")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {r.payload?.source === "cron" ? "cron" : "manual"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {r.payload?.processed ?? 0}/{r.payload?.targets ?? 0}
+                        </TableCell>
+                        <TableCell className="text-right">{r.payload?.invoices ?? 0}</TableCell>
+                        <TableCell className="text-right">{r.payload?.payments ?? 0}</TableCell>
+                        <TableCell className="text-right text-xs text-muted-foreground">
+                          {Math.round((r.payload?.duration_ms ?? 0) / 100) / 10}s
+                        </TableCell>
+                        <TableCell>
+                          {r.error ? (
+                            <Badge className="bg-red-500/15 text-red-700">{r.error}</Badge>
+                          ) : (
+                            <Badge className="bg-emerald-500/15 text-emerald-700">OK</Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </TabsContent>
