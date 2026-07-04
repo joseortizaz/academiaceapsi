@@ -82,3 +82,103 @@ export function verifyBaSignature(rawBody: string, header: string | null): boole
     return false;
   }
 }
+
+/**
+ * Sincroniza facturas y cobros de un cliente BA hacia external_invoices / external_payments.
+ * Usa el cliente admin (bypass RLS).
+ */
+export async function syncCustomerData(
+  userId: string,
+  customerId: string,
+): Promise<{ invoices: number; payments: number }> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const invoices = await baFetch<BaInvoice[]>(
+    `/facturas?cliente_id=${encodeURIComponent(customerId)}&limit=200`,
+  );
+  const payments = await baFetch<BaPayment[]>(
+    `/cobros?cliente_id=${encodeURIComponent(customerId)}&limit=200`,
+  ).catch(() => [] as BaPayment[]);
+
+  const now = new Date().toISOString();
+  for (const inv of invoices) {
+    await supabaseAdmin.from("external_invoices").upsert(
+      {
+        external_id: inv.id,
+        user_id: userId,
+        ba_customer_id: inv.cliente_id,
+        numero: inv.numero ?? null,
+        ncf: inv.ncf ?? null,
+        fecha: inv.fecha ?? null,
+        concepto: inv.concepto ?? null,
+        moneda: inv.moneda ?? "DOP",
+        subtotal: inv.subtotal ?? null,
+        itbis: inv.itbis ?? null,
+        total: inv.total ?? 0,
+        saldo: inv.saldo ?? null,
+        estado: inv.estado ?? "pendiente",
+        pdf_url: inv.pdf_url ?? null,
+        raw: inv as any,
+        synced_at: now,
+      },
+      { onConflict: "external_id" },
+    );
+  }
+  for (const pay of payments) {
+    await supabaseAdmin.from("external_payments").upsert(
+      {
+        external_id: pay.id,
+        invoice_external_id: pay.factura_id,
+        user_id: userId,
+        ba_customer_id: customerId,
+        fecha: pay.fecha ?? null,
+        monto: pay.monto ?? 0,
+        moneda: pay.moneda ?? "DOP",
+        metodo: pay.metodo ?? null,
+        nota: pay.nota ?? null,
+        raw: pay as any,
+        synced_at: now,
+      },
+      { onConflict: "external_id" },
+    );
+  }
+  return { invoices: invoices.length, payments: payments.length };
+}
+
+/**
+ * Sincroniza un lote de alumnos con concurrencia limitada. Los fallos por alumno
+ * se capturan y no abortan el resto del lote.
+ */
+export async function syncManyCustomers(
+  targets: Array<{ userId: string; customerId: string }>,
+  concurrency = 5,
+): Promise<{
+  processed: number;
+  invoices: number;
+  payments: number;
+  errors: Array<{ userId: string; message: string }>;
+}> {
+  let processed = 0;
+  let invoices = 0;
+  let payments = 0;
+  const errors: Array<{ userId: string; message: string }> = [];
+
+  for (let i = 0; i < targets.length; i += concurrency) {
+    const chunk = targets.slice(i, i + concurrency);
+    await Promise.all(
+      chunk.map(async (t) => {
+        try {
+          const r = await syncCustomerData(t.userId, t.customerId);
+          processed += 1;
+          invoices += r.invoices;
+          payments += r.payments;
+        } catch (e) {
+          errors.push({
+            userId: t.userId,
+            message: e instanceof Error ? e.message : String(e),
+          });
+        }
+      }),
+    );
+  }
+  return { processed, invoices, payments, errors };
+}
