@@ -222,6 +222,7 @@ function AdminFacturacion() {
       <Tabs defaultValue="conexion" className="space-y-4">
         <TabsList>
           <TabsTrigger value="conexion">Conexión & vínculos</TabsTrigger>
+          <TabsTrigger value="sincronizacion">Sincronización</TabsTrigger>
           <TabsTrigger value="facturas">Facturas ({invoices.length})</TabsTrigger>
           <TabsTrigger value="pagos">Pagos ({payments.length})</TabsTrigger>
           <TabsTrigger value="logs">Webhooks</TabsTrigger>
