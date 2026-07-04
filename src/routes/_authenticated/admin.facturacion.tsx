@@ -45,6 +45,8 @@ function AdminFacturacion() {
   const searchFn = useServerFn(adminSearchCustomers);
   const linkFn = useServerFn(adminLinkCustomer);
   const syncFn = useServerFn(adminSyncUser);
+  const runFullSyncFn = useServerFn(adminRunFullSync);
+  const [runningFullSync, setRunningFullSync] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
