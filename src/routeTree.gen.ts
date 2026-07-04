@@ -78,6 +78,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicHooksSyncActiveStudentsRouteImport } from './routes/api/public/hooks/sync-active-students'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -460,6 +461,12 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksSyncActiveStudentsRoute =
+  ApiPublicHooksSyncActiveStudentsRouteImport.update({
+    id: '/api/public/hooks/sync-active-students',
+    path: '/api/public/hooks/sync-active-students',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -525,6 +532,7 @@ export interface FileRoutesByFullPath {
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -591,6 +599,7 @@ export interface FileRoutesByTo {
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -663,6 +672,7 @@ export interface FileRoutesById {
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/_authenticated/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/docente/'
     | '/estudiante/'
     | '/mis-cursos/'
+    | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -801,6 +812,7 @@ export interface FileRouteTypes {
     | '/docente'
     | '/estudiante'
     | '/mis-cursos'
+    | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -872,6 +884,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
     | '/_authenticated/mis-cursos/'
+    | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -902,6 +915,7 @@ export interface RootRouteChildren {
   ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksSyncActiveStudentsRoute: typeof ApiPublicHooksSyncActiveStudentsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1394,6 +1408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-active-students': {
+      id: '/api/public/hooks/sync-active-students'
+      path: '/api/public/hooks/sync-active-students'
+      fullPath: '/api/public/hooks/sync-active-students'
+      preLoaderRoute: typeof ApiPublicHooksSyncActiveStudentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1557,6 +1578,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksSyncActiveStudentsRoute: ApiPublicHooksSyncActiveStudentsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

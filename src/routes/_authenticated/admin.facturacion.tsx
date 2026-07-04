@@ -16,6 +16,7 @@ import {
   adminSearchCustomers,
   adminLinkCustomer,
   adminSyncUser,
+  adminRunFullSync,
 } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/facturacion")({
