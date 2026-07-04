@@ -103,44 +103,55 @@ export const adminSyncUser = createServerFn({ method: "POST" })
       .maybeSingle();
     const customerId = (profile as any)?.balance_activo_customer_id;
     if (!customerId) throw new Error("Alumno sin cliente vinculado en Balance Activo.");
+    return await syncCustomerData(data.userId, customerId);
+  });
 
-    const invoices = await baFetch<BaInvoice[]>(`/facturas?cliente_id=${encodeURIComponent(customerId)}&limit=200`);
-    const payments = await baFetch<BaPayment[]>(`/cobros?cliente_id=${encodeURIComponent(customerId)}&limit=200`).catch(() => [] as BaPayment[]);
+/**
+ * Admin: ejecuta manualmente la sincronización masiva de todos los alumnos
+ * con inscripción activa/pendiente y cliente BA vinculado.
+ * Es el mismo trabajo que el cron nocturno.
+ */
+export const adminRunFullSync = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const started = Date.now();
 
-    for (const inv of invoices) {
-      await supabaseAdmin.from("external_invoices").upsert({
-        external_id: inv.id,
-        user_id: data.userId,
-        ba_customer_id: inv.cliente_id,
-        numero: inv.numero ?? null,
-        ncf: inv.ncf ?? null,
-        fecha: inv.fecha ?? null,
-        concepto: inv.concepto ?? null,
-        moneda: inv.moneda ?? "DOP",
-        subtotal: inv.subtotal ?? null,
-        itbis: inv.itbis ?? null,
-        total: inv.total ?? 0,
-        saldo: inv.saldo ?? null,
-        estado: inv.estado ?? "pendiente",
-        pdf_url: inv.pdf_url ?? null,
-        raw: inv as any,
-        synced_at: new Date().toISOString(),
-      }, { onConflict: "external_id" });
+    const { data: enrollments, error } = await supabaseAdmin
+      .from("enrollments")
+      .select("user_id, profiles!inner(balance_activo_customer_id)")
+      .in("estado", ["activo", "pendiente"])
+      .not("profiles.balance_activo_customer_id", "is", null);
+    if (error) throw new Error(error.message);
+
+    const seen = new Set<string>();
+    const targets: Array<{ userId: string; customerId: string }> = [];
+    for (const row of (enrollments ?? []) as any[]) {
+      const cid = row?.profiles?.balance_activo_customer_id;
+      if (!row.user_id || !cid || seen.has(row.user_id)) continue;
+      seen.add(row.user_id);
+      targets.push({ userId: row.user_id, customerId: cid });
     }
-    for (const pay of payments) {
-      await supabaseAdmin.from("external_payments").upsert({
-        external_id: pay.id,
-        invoice_external_id: pay.factura_id,
-        user_id: data.userId,
-        ba_customer_id: customerId,
-        fecha: pay.fecha ?? null,
-        monto: pay.monto ?? 0,
-        moneda: pay.moneda ?? "DOP",
-        metodo: pay.metodo ?? null,
-        nota: pay.nota ?? null,
-        raw: pay as any,
-        synced_at: new Date().toISOString(),
-      }, { onConflict: "external_id" });
-    }
-    return { invoices: invoices.length, payments: payments.length };
+
+    const result = await syncManyCustomers(targets, 5);
+    const duration_ms = Date.now() - started;
+
+    await supabaseAdmin.from("balance_activo_webhook_logs").insert({
+      event: "cron_sync",
+      signature_valid: true,
+      processed: result.errors.length === 0,
+      error: result.errors.length ? `${result.errors.length} fallos` : null,
+      payload: {
+        source: "admin_manual",
+        targets: targets.length,
+        processed: result.processed,
+        invoices: result.invoices,
+        payments: result.payments,
+        duration_ms,
+        errors: result.errors,
+      } as any,
+    });
+
+    return { ...result, targets: targets.length, duration_ms };
   });
