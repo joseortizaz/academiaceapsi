@@ -1,72 +1,92 @@
-# Integración con Balance Activo
+## Objetivo
+Automatizar la sincronización de los estados de cuenta de los alumnos con Balance Activo mediante **webhooks en tiempo real + un cron nocturno de respaldo** que reconcilia solo a los alumnos con inscripción activa.
 
-## Qué implica esta integración
+## Arquitectura
 
-Balance Activo es una app externa (SaaS multi-tenant, aunque esté construida en Lovable, sigue siendo otro proyecto con su propia base de datos). Para que la academia pueda mostrar facturas y pagos que viven allá, hacen falta tres cosas:
+```
+Balance Activo ──(evento factura/pago)──► /api/public/balance-activo-webhook  (ya existe)
+                                                    │
+                                                    └──► upsert external_invoices / external_payments
 
-1. **Una API en Balance Activo** que exponga, con autenticación, los endpoints necesarios (listar facturas por cliente, listar pagos, opcionalmente crear factura). Sin API no hay integración posible; habría que construirla primero en ese proyecto.
-2. **Una credencial de tu tenant** (API key o token OAuth) que la academia guardará como secreto para llamar a Balance Activo en nombre de tu cuenta.
-3. **Un mecanismo de identidad**: cómo sabe Balance Activo que "alumno X de la academia" = "cliente Y en su base". Lo resolvemos guardando un `balance_activo_customer_id` en el perfil del alumno.
+pg_cron (03:15 AM diario) ──► /api/public/hooks/sync-active-students
+                                                    │
+                                                    ├─ selecciona alumnos con enrollment activo + BA vinculado
+                                                    ├─ por cada uno: GET /facturas y /cobros de BA
+                                                    └─ upsert en external_invoices / external_payments
+```
 
-### Implicaciones importantes
-- **Privacidad y RLS**: cada alumno solo puede ver sus propias facturas. Toda llamada saliente se hace desde el servidor (server function) validando `auth.uid()`, nunca desde el navegador con la API key.
-- **Secretos**: la API key de Balance Activo se guarda con `add_secret`, nunca en el código ni en `.env` público.
-- **Latencia y caché**: consultar Balance Activo en cada carga es lento y castiga su API. Guardamos una copia sincronizada en tablas locales (`external_invoices`, `external_payments`) y refrescamos por webhook o cron.
-- **Fuente de verdad**: Balance Activo manda en lo contable. La academia solo lee/replica; nunca edita montos localmente.
-- **Fallo del proveedor**: si Balance Activo está caído, el alumno debe seguir viendo la última copia cacheada, no una pantalla rota.
-- **Cumplimiento fiscal**: los PDF de factura los genera y numera Balance Activo (con validez legal). La academia solo enlaza al PDF, no lo reimprime.
+## Cambios
 
-## Decisiones por defecto (asumidas)
-- **Sentido**: bidireccional ligero — la academia lee facturas/pagos, y cuando un admin aprueba una inscripción, opcionalmente crea la factura en Balance Activo con un botón manual (evitamos automatismo total hasta validar).
-- **Vínculo**: por `email` como fallback + `balance_activo_customer_id` guardado en `profiles` cuando se confirma el match.
-- **Qué ve el alumno**: listado de facturas (número, fecha, concepto, monto, estado), enlace al PDF, historial de pagos y saldo pendiente.
-- **Sincronización**: webhook desde Balance Activo (`invoice.created`, `invoice.updated`, `payment.recorded`) + botón "Sincronizar ahora" en admin.
+### 1. Nuevo endpoint de sincronización masiva
+Archivo nuevo: `src/routes/api/public/hooks/sync-active-students.ts`
+- Verifica header `apikey` contra la anon key.
+- Consulta con `supabaseAdmin`:
+  ```sql
+  select distinct p.id, p.balance_activo_customer_id
+  from profiles p
+  join enrollments e on e.user_id = p.id
+  where p.balance_activo_customer_id is not null
+    and e.estado in ('activo','pendiente')
+  ```
+- Por cada alumno, reutiliza la lógica de `adminSyncUser` (extraída a un helper compartido en `balance-activo.server.ts` para no duplicar).
+- Procesa en lotes con concurrencia limitada (ej. 5 en paralelo) para no saturar BA.
+- Registra resumen en `balance_activo_webhook_logs` con tipo `cron_sync` (o crea tabla `balance_activo_sync_runs` si prefieres separar; por simplicidad, reutilizar logs).
+- Devuelve `{ processed, invoices, payments, errors }`.
 
-## Plan paso a paso
+### 2. Extracción del helper de sync
+En `src/lib/balance-activo.server.ts` añadir:
+```ts
+export async function syncCustomerData(userId: string, customerId: string)
+```
+Y refactorizar `syncMyInvoices` y `adminSyncUser` para llamar a este helper (elimina duplicación actual).
 
-### Fase 1 — Prerrequisitos en Balance Activo (tú + equipo de esa app)
-1. Confirmar que Balance Activo expone (o construir) estos endpoints REST autenticados por API key:
-   - `GET /api/customers?email=…` → buscar/crear cliente
-   - `GET /api/invoices?customer_id=…` → listar facturas
-   - `GET /api/invoices/:id/pdf` → PDF (URL firmada temporal)
-   - `GET /api/payments?customer_id=…` → pagos
-   - `POST /api/invoices` → crear factura (opcional fase 2)
-   - Webhook saliente firmado con HMAC → `invoice.*`, `payment.*`
-2. Emitir una API key para el tenant "Academia CEAPSI" y un `WEBHOOK_SECRET`.
+### 3. Programar el cron
+Vía `supabase--insert` (no migración, contiene URL y key específicos del proyecto):
+```sql
+select cron.schedule(
+  'sync-balance-activo-active-students',
+  '15 3 * * *',   -- 03:15 AM diario
+  $$
+  select net.http_post(
+    url := 'https://project--574a587a-0476-4791-be9b-3d7e669d64c8.lovable.app/api/public/hooks/sync-active-students',
+    headers := '{"Content-Type":"application/json","apikey":"<ANON_KEY>"}'::jsonb,
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+Requiere extensiones `pg_cron` y `pg_net` habilitadas (verificar; si faltan, activarlas por migración previa).
 
-### Fase 2 — Backend en la academia
-3. **Secretos**: `add_secret` para `BALANCE_ACTIVO_API_URL`, `BALANCE_ACTIVO_API_KEY`, `BALANCE_ACTIVO_WEBHOOK_SECRET`.
-4. **Migración DB**:
-   - `profiles.balance_activo_customer_id` (text, nullable).
-   - Tabla `external_invoices` (id externo, user_id, número, fecha, concepto, monto, moneda, estado, pdf_url, raw jsonb, synced_at).
-   - Tabla `external_payments` (id externo, invoice_id externo, user_id, fecha, monto, método, raw jsonb).
-   - RLS: alumno ve solo sus filas (`auth.uid() = user_id`); admin ve todo; service_role total. GRANT correspondiente.
-5. **Cliente HTTP** en `src/lib/balance-activo.server.ts` con `fetch` + API key + reintentos + manejo de errores.
-6. **Server functions** en `src/lib/balance-activo.functions.ts`:
-   - `listMyInvoices` (usa `requireSupabaseAuth`, devuelve de `external_invoices`).
-   - `syncMyInvoices` (refresca desde la API para el usuario actual).
-   - `adminLinkCustomer` (admin: setea `balance_activo_customer_id`).
-   - `adminCreateInvoice` (admin: `POST /api/invoices` + upsert local).
-7. **Webhook público** en `src/routes/api/public/balance-activo-webhook.ts`: verifica HMAC del `WEBHOOK_SECRET`, hace upsert en `external_invoices`/`external_payments`. Nunca confía en el payload sin firma.
+### 4. Panel de administrador — visibilidad
+En `src/routes/_authenticated/admin.facturacion.tsx`, pestaña **Conexión** o nueva pestaña **Sincronización**:
+- Mostrar última corrida del cron (fecha, alumnos procesados, errores) leyendo `balance_activo_webhook_logs` filtrados por `event_type = 'cron_sync'`.
+- Botón "Ejecutar sincronización ahora" que invoca una nueva server function `adminRunFullSync` (protegida con `requireSupabaseAuth` + `has_role admin`) que llama al mismo helper.
 
-### Fase 3 — UI
-8. **Alumno** — nueva pestaña "Facturación" en `estudiante.cuenta.tsx` (o sección aparte) con:
-   - Resumen: saldo pendiente, próxima fecha.
-   - Tabla de facturas con estado (pagada/pendiente/vencida) y botón "Descargar PDF".
-   - Historial de pagos.
-   - Estado vacío si aún no hay `balance_activo_customer_id` vinculado.
-9. **Admin** — nueva ruta `/admin/facturacion`:
-   - Buscar alumno → vincular con cliente de Balance Activo (autocomplete por email).
-   - Botón "Crear factura" desde una inscripción aprobada.
-   - Botón "Resincronizar" por alumno.
-   - Log de webhooks recibidos (similar a `zoom_webhook_logs`).
+### 5. Webhooks (ya existentes)
+- Verificar que `/api/public/balance-activo-webhook` esté configurado en el panel de Balance Activo apuntando a la URL estable del proyecto. Se incluirá una nota en el panel admin con la URL y el header/secret esperado para que el usuario lo configure en BA si aún no lo hizo.
 
-### Fase 4 — Validación
-10. Prueba end-to-end con 1 alumno real: vincular → crear factura desde admin → recibir webhook → alumno ve la factura y el PDF → registrar pago en Balance Activo → alumno ve pago aplicado y saldo en 0.
+## Detalles técnicos
 
-## Lo que necesito de ti para empezar
-- **URL base y documentación** de la API de Balance Activo (o confirmación de que hay que construirla primero en ese proyecto — en cuyo caso empezamos por allá).
-- **API key** de tu tenant (la pediré con `add_secret` cuando llegue el momento, no la pegues en el chat).
-- Confirmación de las decisiones por defecto arriba (vínculo por email, ver facturas+pagos+PDF, sincronización por webhook).
+- **Concurrencia**: usar un pool simple (`Promise.all` en chunks de 5) para evitar 429 del API de BA.
+- **Timeouts**: cada llamada a BA con timeout de 15s; los fallos por alumno se capturan individualmente y no abortan el lote.
+- **Idempotencia**: los upserts usan `onConflict: "external_id"`, así que reejecutar es seguro.
+- **Observabilidad**: cada corrida inserta una fila en `balance_activo_webhook_logs` con:
+  - `event_type: 'cron_sync'`
+  - `payload: { processed, invoices, payments, duration_ms }`
+  - `errors: [ { userId, message } ]` en caso de fallos.
+- **Seguridad**: el endpoint `/api/public/hooks/sync-active-students` valida la anon key en header `apikey` (patrón canónico); no expone datos, solo escribe.
 
-Cuando confirmes esos tres puntos arranco por la Fase 2 (migración + secretos + cliente HTTP).
+## Archivos afectados
+
+Nuevos:
+- `src/routes/api/public/hooks/sync-active-students.ts`
+
+Editados:
+- `src/lib/balance-activo.server.ts` (helper `syncCustomerData`)
+- `src/lib/balance-activo.functions.ts` (refactor + nueva `adminRunFullSync`)
+- `src/routes/_authenticated/admin.facturacion.tsx` (UI de estado del cron + botón manual)
+
+SQL (vía `supabase--insert`, no migración):
+- Programación del `cron.schedule`.
+
+Migración solo si `pg_cron`/`pg_net` no están habilitadas aún.
