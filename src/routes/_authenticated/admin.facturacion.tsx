@@ -342,6 +342,107 @@ function AdminFacturacion() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="sincronizacion" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <CardTitle>Sincronización automática</CardTitle>
+                  <CardDescription>
+                    Los estados de cuenta se mantienen al día por dos vías: webhooks de Balance Activo en
+                    tiempo real y una corrida nocturna de reconciliación a las 03:15 AM (solo alumnos con
+                    inscripción activa o pendiente).
+                  </CardDescription>
+                </div>
+                <Button onClick={handleRunFullSync} disabled={runningFullSync}>
+                  <RefreshCw className={`mr-2 h-4 w-4 ${runningFullSync ? "animate-spin" : ""}`} />
+                  Ejecutar ahora
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {lastRun ? (
+                <div className="rounded-md border bg-muted/30 p-3 text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">Última corrida:</span>{" "}
+                    {new Date(lastRun.created_at).toLocaleString("es-DO")}{" "}
+                    <span className="text-muted-foreground">
+                      ({lastRun.payload?.source === "cron" ? "cron nocturno" : "manual"})
+                    </span>
+                  </p>
+                  <p className="text-muted-foreground">
+                    {lastRun.payload?.processed ?? 0}/{lastRun.payload?.targets ?? 0} alumnos ·{" "}
+                    {lastRun.payload?.invoices ?? 0} facturas · {lastRun.payload?.payments ?? 0} cobros ·{" "}
+                    {Math.round((lastRun.payload?.duration_ms ?? 0) / 100) / 10}s
+                  </p>
+                  {lastRun.error && <p className="text-red-700">{lastRun.error}</p>}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Aún no se ha ejecutado ninguna corrida.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Historial de corridas</CardTitle>
+              <CardDescription>Últimas 20 sincronizaciones masivas (cron + manuales).</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Origen</TableHead>
+                    <TableHead className="text-right">Alumnos</TableHead>
+                    <TableHead className="text-right">Facturas</TableHead>
+                    <TableHead className="text-right">Cobros</TableHead>
+                    <TableHead className="text-right">Duración</TableHead>
+                    <TableHead>Resultado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {syncRuns.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                        Sin corridas registradas.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    syncRuns.map((r: any) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {new Date(r.created_at).toLocaleString("es-DO")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {r.payload?.source === "cron" ? "cron" : "manual"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {r.payload?.processed ?? 0}/{r.payload?.targets ?? 0}
+                        </TableCell>
+                        <TableCell className="text-right">{r.payload?.invoices ?? 0}</TableCell>
+                        <TableCell className="text-right">{r.payload?.payments ?? 0}</TableCell>
+                        <TableCell className="text-right text-xs text-muted-foreground">
+                          {Math.round((r.payload?.duration_ms ?? 0) / 100) / 10}s
+                        </TableCell>
+                        <TableCell>
+                          {r.error ? (
+                            <Badge className="bg-red-500/15 text-red-700">{r.error}</Badge>
+                          ) : (
+                            <Badge className="bg-emerald-500/15 text-emerald-700">OK</Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="facturas" className="space-y-4">
           <div className="grid gap-3 md:grid-cols-3">
             <StatCard label="Total facturado" value={fmtMoney(totalFacturado, "DOP")} />
