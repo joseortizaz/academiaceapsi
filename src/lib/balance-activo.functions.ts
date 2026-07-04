@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { baFetch, type BaCustomer, type BaInvoice, type BaPayment } from "./balance-activo.server";
+import {
+  baFetch,
+  syncCustomerData,
+  syncManyCustomers,
+  type BaCustomer,
+} from "./balance-activo.server";
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", {
