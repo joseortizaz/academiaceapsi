@@ -172,6 +172,40 @@ function AdminFacturacion() {
     }
   };
 
+  const { data: syncRuns = [] } = useQuery({
+    queryKey: ["ba-sync-runs"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("balance_activo_webhook_logs")
+        .select("id,event,processed,error,payload,created_at")
+        .eq("event", "cron_sync")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return data ?? [];
+    },
+    refetchInterval: 30_000,
+  });
+
+  const lastRun = syncRuns[0] as any | undefined;
+
+  const handleRunFullSync = async () => {
+    setRunningFullSync(true);
+    try {
+      const r = await runFullSyncFn();
+      toast.success(
+        `Sincronización completada: ${r.processed}/${r.targets} alumnos · ${r.invoices} facturas · ${r.payments} cobros`,
+      );
+      qc.invalidateQueries({ queryKey: ["admin", "external_invoices"] });
+      qc.invalidateQueries({ queryKey: ["admin", "external_payments"] });
+      qc.invalidateQueries({ queryKey: ["ba-sync-runs"] });
+      if (r.errors?.length) toast.warning(`${r.errors.length} alumnos con errores; revisa el historial.`);
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setRunningFullSync(false);
+    }
+  };
+
   const totalFacturado = invoices.reduce((s: number, i: any) => s + Number(i.total ?? 0), 0);
   const totalPendiente = invoices.reduce((s: number, i: any) => s + Number(i.saldo ?? 0), 0);
   const totalCobrado = payments.reduce((s: number, p: any) => s + Number(p.monto ?? 0), 0);
