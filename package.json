@@ -55,7 +55,7 @@
     "@tiptap/react": "^3.23.6",
     "@tiptap/starter-kit": "^3.23.6",
     "@types/qrcode.react": "^3.0.0",
-    "@zoom/meetingsdk": "^6.0.2",
+    "@zoom/meetingsdk": "^6.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
