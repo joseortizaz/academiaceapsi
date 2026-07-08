@@ -6,13 +6,14 @@ import { ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 type SigResult = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getMeetingSdkSignature>>>>;
+type State = "loading" | "joining" | "in-meeting" | "fallback";
 
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const clientRef = useRef<unknown>(null);
   const [info, setInfo] = useState<SigResult | null>(null);
-  const [state, setState] = useState<"loading" | "joining" | "in-meeting" | "error" | "fallback">("loading");
+  const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,12 +31,15 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         const ZoomMtgEmbedded = mod.default;
         if (cancelled) return;
 
+        // Wait for the container to be mounted (it renders alongside the loader).
+        const root = await waitForRef(containerRef);
+        if (cancelled || !root) return;
+
         const client = ZoomMtgEmbedded.createClient();
         clientRef.current = client;
 
-        if (!containerRef.current) return;
         await client.init({
-          zoomAppRoot: containerRef.current,
+          zoomAppRoot: root,
           language: "es-ES",
           patchJsMedia: true,
           leaveOnPageUnload: true,
@@ -46,9 +50,6 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
                 default: { width: 1000, height: 600 },
                 ribbon: { width: 300, height: 700 },
               },
-            },
-            toolbar: {
-              buttons: [],
             },
           },
         });
@@ -87,17 +88,6 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
       })();
     };
   }, [meetingRowId, sigFn]);
-
-  if (state === "loading" || state === "joining") {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center rounded-lg border bg-card">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {state === "loading" ? "Preparando reunión…" : "Conectando a Zoom…"}
-        </div>
-      </div>
-    );
-  }
 
   if (state === "fallback") {
     const primary = info && info.role === 1 && info.startUrl ? info.startUrl : info?.joinUrl;
@@ -145,11 +135,24 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div
-        ref={containerRef}
-        id="zoom-meeting-root"
-        className="min-h-[600px] w-full overflow-hidden rounded-lg border bg-black"
-      />
+      <div className="relative min-h-[600px] w-full overflow-hidden rounded-lg border bg-black">
+        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
+        {state !== "in-meeting" && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {state === "loading" ? "Preparando reunión…" : "Conectando a Zoom…"}
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+async function waitForRef<T>(ref: React.MutableRefObject<T | null>, timeoutMs = 5000): Promise<T | null> {
+  const start = Date.now();
+  while (!ref.current) {
+    if (Date.now() - start > timeoutMs) return null;
+    await new Promise((r) => setTimeout(r, 30));
+  }
+  return ref.current;
 }
