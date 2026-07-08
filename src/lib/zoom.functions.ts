@@ -229,6 +229,18 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       role = 0;
     }
 
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("nombre, apellido")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(context.userId);
+    const email = authUser?.user?.email ?? "";
+    const userName =
+      [profile?.nombre, profile?.apellido].filter(Boolean).join(" ").trim() ||
+      email ||
+      "Participante";
+
     const { signature, sdkKey } = signMeetingSdkJwt({
       meetingNumber: meeting.zoom_meeting_id,
       role,
@@ -240,9 +252,13 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       password: meeting.zoom_password ?? "",
       titulo: meeting.titulo,
       role,
+      userName,
+      userEmail: email,
       joinUrl: meeting.zoom_join_url ?? "",
       // startUrl es la URL de host: solo la devolvemos a admin/docente (role === 1),
       // nunca a estudiantes, para evitar que puedan iniciar la reunión como anfitrión.
       startUrl: role === 1 ? (meeting.zoom_start_url ?? "") : "",
     };
   });
+
+
