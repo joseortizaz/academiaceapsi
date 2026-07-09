@@ -265,15 +265,18 @@ function CursoPlayer() {
                         {lecs.map((m, i) => {
                           const done = progressMap.get(m.id)?.completado;
                           const isActive = activeModule?.id === m.id;
+                          const locked = isLocked(m);
                           return (
                             <li key={m.id}>
                               <button
                                 onClick={() => setActiveModuleId(m.id)}
                                 className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
                                   isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                }`}
+                                } ${locked ? "opacity-70" : ""}`}
                               >
-                                {done ? (
+                                {locked ? (
+                                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                                ) : done ? (
                                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                                 ) : (
                                   <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
@@ -282,6 +285,11 @@ function CursoPlayer() {
                                   <span className="font-medium">{i + 1}. {m.titulo}</span>
                                   {m.es_en_vivo && (
                                     <Video className="ml-1 inline h-3 w-3 text-primary" />
+                                  )}
+                                  {locked && (
+                                    <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                      Disponible el {formatFecha((m as any).disponible_desde)}
+                                    </span>
                                   )}
                                 </span>
                               </button>
