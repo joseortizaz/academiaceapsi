@@ -411,7 +411,20 @@ function CursoPlayer() {
         </aside>
 
         <main className="rounded-lg border bg-card p-6">
-          {activeModule ? (
+          {activeModule && isLocked(activeModule) ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="rounded-full bg-muted p-4">
+                <Lock className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h1 className="mt-4 text-2xl font-bold">{activeModule.titulo}</h1>
+              <p className="mt-2 max-w-md text-muted-foreground">
+                Esta lección aún no está disponible. Podrás acceder a su contenido a partir del{" "}
+                <strong className="text-foreground">
+                  {formatFecha((activeModule as any).disponible_desde)}
+                </strong>.
+              </p>
+            </div>
+          ) : activeModule ? (
             <article>
               <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                 <div>
