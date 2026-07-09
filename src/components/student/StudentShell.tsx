@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, BookOpen, ClipboardCheck, Award, UserCog, LogOut,
-  GraduationCap, Receipt,
+  GraduationCap, Receipt, HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -100,6 +100,12 @@ export function StudentShell({ children }: { children: ReactNode }) {
 
       <div className="flex-1 overflow-x-auto">
         <div className="flex items-center justify-between gap-2 border-b bg-card p-3">
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Link to="/estudiante/instructivo">
+              <HelpCircle className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Instructivo</span>
+            </Link>
+          </Button>
           <div className="flex-1 md:hidden">
             <select
               className="w-full rounded-md border bg-background p-2 text-sm"

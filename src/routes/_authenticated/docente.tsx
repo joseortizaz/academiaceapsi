@@ -13,6 +13,7 @@ import {
   UserCog,
   FileCheck,
   Users,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -95,6 +96,12 @@ function DocenteLayout() {
       </aside>
       <div className="flex-1 overflow-x-auto">
         <div className="flex items-center gap-2 border-b bg-card p-3">
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Link to="/docente/instructivo">
+              <HelpCircle className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Instructivo</span>
+            </Link>
+          </Button>
           <select
             className="flex-1 rounded-md border bg-background p-2 text-sm md:hidden"
             value={location.pathname}
