@@ -141,8 +141,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         try {
           const client = clientRef.current as { leave?: () => Promise<void> } | null;
           if (client && typeof client.leave === "function") await client.leave();
-          const mod = await import("@zoom/meetingsdk/embedded");
-          mod.default.destroyClient();
+          const w = window as unknown as { ZoomMtgEmbedded?: { destroyClient: () => void } };
+          w.ZoomMtgEmbedded?.destroyClient();
         } catch {
           // ignore teardown errors
         }
