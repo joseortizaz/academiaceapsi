@@ -409,19 +409,26 @@ function CursoPlayer() {
               </div>
 
               {activeModule.video_url && (
-                <div className="mb-6 aspect-video w-full overflow-hidden rounded-lg bg-black">
-                  {activeModule.video_url.includes("youtube") ||
-                  activeModule.video_url.includes("youtu.be") ||
-                  activeModule.video_url.includes("vimeo") ? (
-                    <iframe
-                      src={activeModule.video_url}
-                      title={activeModule.titulo}
-                      allowFullScreen
-                      className="h-full w-full"
-                    />
-                  ) : (
-                    <video controls src={activeModule.video_url} className="h-full w-full" />
-                  )}
+                <div className="mx-auto mb-6 w-full max-w-3xl">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                    {activeModule.video_url.includes("youtube") ||
+                    activeModule.video_url.includes("youtu.be") ||
+                    activeModule.video_url.includes("vimeo") ? (
+                      <iframe
+                        src={activeModule.video_url}
+                        title={activeModule.titulo}
+                        allowFullScreen
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        className="absolute inset-0 h-full w-full border-0"
+                      />
+                    ) : (
+                      <video
+                        controls
+                        src={activeModule.video_url}
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                    )}
+                  </div>
                 </div>
               )}
 
