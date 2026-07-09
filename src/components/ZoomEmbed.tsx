@@ -88,9 +88,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         setInfo(sig);
         setState("joining");
 
-        // Dynamic import: keep the 2MB+ SDK out of the initial bundle and off SSR.
-        const mod = await import("@zoom/meetingsdk/embedded");
-        const ZoomMtgEmbedded = mod.default;
+        // Cargar el SDK vía CDN con su propio React 18 aislado en window.*
+        const ZoomMtgEmbedded = await loadZoomEmbedded();
         if (cancelled) return;
 
         // Wait for the container to be mounted (it renders alongside the loader).
