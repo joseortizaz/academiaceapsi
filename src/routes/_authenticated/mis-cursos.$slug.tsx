@@ -118,6 +118,14 @@ function CursoPlayer() {
     [progresos],
   );
 
+  const isLocked = (m: any) =>
+    !!m?.disponible_desde && new Date(m.disponible_desde).getTime() > Date.now();
+  const formatFecha = (iso: string) =>
+    new Date(iso).toLocaleString("es-DO", {
+      dateStyle: "long",
+      timeStyle: "short",
+    });
+
   const completados = progresos.filter((p) => p.completado).length;
   const total = modulos.length;
   const pct = total > 0 ? Math.round((completados / total) * 100) : 0;
