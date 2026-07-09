@@ -8,6 +8,68 @@ import { toast } from "sonner";
 type SigResult = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getMeetingSdkSignature>>>>;
 type State = "loading" | "joining" | "in-meeting" | "fallback";
 
+// El Meeting SDK de Zoom depende de React 18 vía globals (window.React, ReactDOM,
+// Redux, ReduxThunk). Este proyecto usa React 19, que removió el interno
+// `ReactCurrentOwner` que el SDK necesita, por eso hay que cargar React 18
+// desde CDN y exponerlo como global ANTES de importar el SDK.
+const ZOOM_SDK_VERSION = "3.13.2";
+const CDN_SCRIPTS = [
+  { global: "React", url: "https://source.zoom.us/3.13.2/lib/vendor/react.min.js" },
+  { global: "ReactDOM", url: "https://source.zoom.us/3.13.2/lib/vendor/react-dom.min.js" },
+  { global: "Redux", url: "https://source.zoom.us/3.13.2/lib/vendor/redux.min.js" },
+  { global: "ReduxThunk", url: "https://source.zoom.us/3.13.2/lib/vendor/redux-thunk.min.js" },
+  { global: "lodash", url: "https://source.zoom.us/3.13.2/lib/vendor/lodash.min.js" },
+];
+
+function loadScript(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[data-zoom-dep="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === "true") return resolve();
+      existing.addEventListener("load", () => resolve());
+      existing.addEventListener("error", () => reject(new Error(`No se pudo cargar ${src}`)));
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.dataset.zoomDep = src;
+    s.onload = () => { s.dataset.loaded = "true"; resolve(); };
+    s.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureZoomGlobals(): Promise<void> {
+  // Cargar dependencias secuencialmente para respetar el orden (React antes de ReactDOM, etc.).
+  for (const dep of CDN_SCRIPTS) {
+    if (!(window as unknown as Record<string, unknown>)[dep.global]) {
+      await loadScript(dep.url);
+    }
+  }
+}
+
+async function loadZoomEmbedded(): Promise<{
+  createClient: () => {
+    init: (opts: unknown) => Promise<void>;
+    join: (opts: unknown) => Promise<void>;
+    leave: () => Promise<void>;
+  };
+  destroyClient: () => void;
+}> {
+  await ensureZoomGlobals();
+  const w = window as unknown as { ZoomMtgEmbedded?: unknown };
+  if (!w.ZoomMtgEmbedded) {
+    await loadScript(`https://source.zoom.us/${ZOOM_SDK_VERSION}/zoom-meeting-embedded-${ZOOM_SDK_VERSION}.min.js`);
+  }
+  const ZoomMtgEmbedded = w.ZoomMtgEmbedded as {
+    createClient: () => never;
+    destroyClient: () => void;
+  } | undefined;
+  if (!ZoomMtgEmbedded) throw new Error("No se pudo inicializar el SDK de Zoom.");
+  return ZoomMtgEmbedded as never;
+}
+
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
