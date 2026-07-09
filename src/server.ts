@@ -55,7 +55,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "camera=(self \"https://*.zoom.us\"), microphone=(self \"https://*.zoom.us\"), display-capture=(self \"https://*.zoom.us\"), fullscreen=(self)",
+  "Permissions-Policy": "camera=(self \"https://*.zoom.us\"), microphone=(self \"https://*.zoom.us\"), display-capture=(self \"https://*.zoom.us\"), fullscreen=*",
   "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
 };
 
