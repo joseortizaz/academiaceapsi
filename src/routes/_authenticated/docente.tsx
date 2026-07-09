@@ -96,7 +96,7 @@ function DocenteLayout() {
       </aside>
       <div className="flex-1 overflow-x-auto">
         <div className="flex items-center gap-2 border-b bg-card p-3">
-          <Button asChild variant="outline" size="sm" className="shrink-0">
+          <Button asChild variant="default" size="sm" className="shrink-0 bg-navy text-navy-foreground hover:bg-navy/90">
             <Link to="/docente/instructivo">
               <HelpCircle className="h-4 w-4 md:mr-2" />
               <span className="hidden md:inline">Instructivo</span>
