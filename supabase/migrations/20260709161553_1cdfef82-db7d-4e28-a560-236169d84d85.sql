@@ -1,0 +1,1 @@
+ALTER TABLE public.program_modules ADD COLUMN IF NOT EXISTS disponible_desde timestamptz;

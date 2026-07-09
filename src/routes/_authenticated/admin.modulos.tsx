@@ -40,6 +40,7 @@ type Leccion = {
   material_url: string;
   es_en_vivo: boolean;
   fecha_sesion: string | null;
+  disponible_desde: string | null;
 };
 
 type CourseModule = {
@@ -53,7 +54,7 @@ type CourseModule = {
 const emptyLeccion = (programa_id: string, modulo_id: string | null = null): Leccion => ({
   programa_id, modulo_id, docente_id: null, titulo: "", descripcion: "", orden: 0,
   duracion_minutos: null, video_url: "", audio_url: "", material_url: "",
-  es_en_vivo: false, fecha_sesion: null,
+  es_en_vivo: false, fecha_sesion: null, disponible_desde: null,
 });
 
 const emptyModulo = (programa_id: string): CourseModule => ({
@@ -146,6 +147,7 @@ function LeccionesPage() {
       orden: Number(v.orden) || 0,
       duracion_minutos: v.duracion_minutos ? Number(v.duracion_minutos) : null,
       fecha_sesion: v.fecha_sesion || null,
+      disponible_desde: v.disponible_desde || null,
       docente_id: v.docente_id || null,
     };
     const { error } = v.id
@@ -520,6 +522,17 @@ function LeccionesPage() {
                 />
               </div>
             )}
+            <div className="grid gap-2">
+              <Label>Disponible para alumnos desde (opcional)</Label>
+              <Input
+                type="datetime-local"
+                value={s.disponible_desde ? s.disponible_desde.substring(0, 16) : ""}
+                onChange={(e) => set({ disponible_desde: e.target.value ? new Date(e.target.value).toISOString() : null })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Si estableces una fecha futura, la lección aparecerá bloqueada hasta ese momento. Deja vacío para publicarla de inmediato.
+              </p>
+            </div>
             <p className="text-xs text-muted-foreground">
               Lección encadenada al módulo: <strong>{moduloTitulo(s.modulo_id)}</strong>
             </p>

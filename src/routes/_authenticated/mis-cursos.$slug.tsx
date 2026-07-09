@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, Download, Award,
+  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
@@ -117,6 +117,14 @@ function CursoPlayer() {
     () => new Map(progresos.map((p) => [p.modulo_id, p])),
     [progresos],
   );
+
+  const isLocked = (m: any) =>
+    !!m?.disponible_desde && new Date(m.disponible_desde).getTime() > Date.now();
+  const formatFecha = (iso: string) =>
+    new Date(iso).toLocaleString("es-DO", {
+      dateStyle: "long",
+      timeStyle: "short",
+    });
 
   const completados = progresos.filter((p) => p.completado).length;
   const total = modulos.length;
@@ -257,15 +265,18 @@ function CursoPlayer() {
                         {lecs.map((m, i) => {
                           const done = progressMap.get(m.id)?.completado;
                           const isActive = activeModule?.id === m.id;
+                          const locked = isLocked(m);
                           return (
                             <li key={m.id}>
                               <button
                                 onClick={() => setActiveModuleId(m.id)}
                                 className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
                                   isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                                }`}
+                                } ${locked ? "opacity-70" : ""}`}
                               >
-                                {done ? (
+                                {locked ? (
+                                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                                ) : done ? (
                                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                                 ) : (
                                   <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
@@ -274,6 +285,11 @@ function CursoPlayer() {
                                   <span className="font-medium">{i + 1}. {m.titulo}</span>
                                   {m.es_en_vivo && (
                                     <Video className="ml-1 inline h-3 w-3 text-primary" />
+                                  )}
+                                  {locked && (
+                                    <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                                      Disponible el {formatFecha((m as any).disponible_desde)}
+                                    </span>
                                   )}
                                 </span>
                               </button>
@@ -290,15 +306,18 @@ function CursoPlayer() {
                 {modulos.map((m, i) => {
                   const done = progressMap.get(m.id)?.completado;
                   const isActive = activeModule?.id === m.id;
+                  const locked = isLocked(m);
                   return (
                     <li key={m.id}>
                       <button
                         onClick={() => setActiveModuleId(m.id)}
                         className={`flex w-full items-start gap-2 rounded-md p-2 text-left text-sm transition ${
                           isActive ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                        }`}
+                        } ${locked ? "opacity-70" : ""}`}
                       >
-                        {done ? (
+                        {locked ? (
+                          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                        ) : done ? (
                           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                         ) : (
                           <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
@@ -307,6 +326,11 @@ function CursoPlayer() {
                           <span className="font-medium">{i + 1}. {m.titulo}</span>
                           {m.es_en_vivo && (
                             <Video className="ml-1 inline h-3 w-3 text-primary" />
+                          )}
+                          {locked && (
+                            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                              Disponible el {formatFecha((m as any).disponible_desde)}
+                            </span>
                           )}
                         </span>
                       </button>
@@ -387,7 +411,20 @@ function CursoPlayer() {
         </aside>
 
         <main className="rounded-lg border bg-card p-6">
-          {activeModule ? (
+          {activeModule && isLocked(activeModule) ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="rounded-full bg-muted p-4">
+                <Lock className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h1 className="mt-4 text-2xl font-bold">{activeModule.titulo}</h1>
+              <p className="mt-2 max-w-md text-muted-foreground">
+                Esta lección aún no está disponible. Podrás acceder a su contenido a partir del{" "}
+                <strong className="text-foreground">
+                  {formatFecha((activeModule as any).disponible_desde)}
+                </strong>.
+              </p>
+            </div>
+          ) : activeModule ? (
             <article>
               <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                 <div>
