@@ -1472,6 +1472,7 @@ export type Database = {
           audio_url: string | null
           created_at: string
           descripcion: string | null
+          disponible_desde: string | null
           docente_id: string | null
           duracion_minutos: number | null
           es_en_vivo: boolean | null
@@ -1489,6 +1490,7 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           descripcion?: string | null
+          disponible_desde?: string | null
           docente_id?: string | null
           duracion_minutos?: number | null
           es_en_vivo?: boolean | null
@@ -1506,6 +1508,7 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           descripcion?: string | null
+          disponible_desde?: string | null
           docente_id?: string | null
           duracion_minutos?: number | null
           es_en_vivo?: boolean | null
