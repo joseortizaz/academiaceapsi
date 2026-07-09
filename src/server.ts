@@ -42,7 +42,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "img-src 'self' data: blob: https:",
     "media-src 'self' data: blob: https: https://*.zoom.us https://*.vimeocdn.com https://*.akamaized.net",
     "connect-src 'self' data: blob: https: wss: https://*.zoom.us wss://*.zoom.us https://source.zoom.us https://zoom.us https://player.vimeo.com https://vimeo.com https://*.vimeocdn.com https://*.akamaized.net",
-    "frame-src 'self' https://zoom.us https://*.zoom.us https://player.vimeo.com https://vimeo.com https://www.youtube.com https://www.youtube-nocookie.com",
+    "frame-src 'self' blob: https://zoom.us https://*.zoom.us https://player.vimeo.com https://vimeo.com https://www.youtube.com https://www.youtube-nocookie.com https://*.supabase.co https://*.supabase.in",
     "worker-src 'self' blob:",
     "child-src 'self' blob: https://*.zoom.us https://player.vimeo.com",
     "object-src 'none'",
