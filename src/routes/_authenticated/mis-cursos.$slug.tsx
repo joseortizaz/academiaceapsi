@@ -408,35 +408,61 @@ function CursoPlayer() {
                 </Button>
               </div>
 
-              {activeModule.video_url && (
-                <div className="mx-auto mb-6 w-full max-w-3xl">
-                  <div
-                    className="relative w-full overflow-hidden rounded-lg bg-black"
-                    style={{ paddingBottom: "56.25%" }}
-                  >
-                    {activeModule.video_url.includes("youtube") ||
-                    activeModule.video_url.includes("youtu.be") ||
-                    activeModule.video_url.includes("vimeo") ? (
-                      <iframe
-                        src={activeModule.video_url}
-                        title={activeModule.titulo}
-                        allowFullScreen
-                        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        loading="lazy"
-                        className="absolute inset-0 h-full w-full border-0"
-                      />
-                    ) : (
-                      <video
-                        controls
-                        preload="metadata"
-                        src={activeModule.video_url}
-                        className="absolute inset-0 h-full w-full object-contain"
-                      />
-                    )}
+              {activeModule.video_url && (() => {
+                const raw = activeModule.video_url.trim();
+                const isYouTube = /youtube\.com|youtu\.be/.test(raw);
+                const isVimeo = /vimeo\.com/.test(raw);
+                let embedSrc = raw;
+                if (isYouTube) {
+                  const idMatch =
+                    raw.match(/[?&]v=([^&]+)/) ||
+                    raw.match(/youtu\.be\/([^?&]+)/) ||
+                    raw.match(/embed\/([^?&]+)/);
+                  if (idMatch) embedSrc = `https://www.youtube.com/embed/${idMatch[1]}`;
+                } else if (isVimeo && !/player\.vimeo\.com/.test(raw)) {
+                  const m = raw.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([a-zA-Z0-9]+))?/);
+                  if (m) embedSrc = `https://player.vimeo.com/video/${m[1]}${m[2] ? `?h=${m[2]}` : ""}`;
+                }
+                return (
+                  <div className="mx-auto mb-6 w-full max-w-3xl">
+                    <div
+                      className="relative w-full overflow-hidden rounded-lg bg-black"
+                      style={{ paddingBottom: "56.25%" }}
+                    >
+                      {isYouTube || isVimeo ? (
+                        <iframe
+                          key={`${activeModule.id}-${embedSrc}`}
+                          src={embedSrc}
+                          title={activeModule.titulo}
+                          allowFullScreen
+                          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          className="absolute inset-0 h-full w-full border-0"
+                        />
+                      ) : (
+                        <video
+                          key={activeModule.id}
+                          controls
+                          preload="metadata"
+                          src={embedSrc}
+                          className="absolute inset-0 h-full w-full object-contain"
+                        />
+                      )}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      ¿No se ve el video?{" "}
+                      <a
+                        href={raw}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline"
+                      >
+                        Abrir en una pestaña nueva
+                      </a>
+                    </p>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {activeModule.audio_url && (
                 <div className="mb-6 rounded-lg border bg-muted/30 p-4">
