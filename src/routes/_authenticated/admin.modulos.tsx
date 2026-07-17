@@ -17,7 +17,7 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
-import { AudioUploader } from "@/components/AudioUploader";
+import { LessonAudiosManager } from "@/components/LessonAudiosManager";
 import { Badge } from "@/components/ui/badge";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
 
@@ -488,11 +488,14 @@ function LeccionesPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label>Audio de la lección</Label>
-              <AudioUploader
-                value={s.audio_url}
-                onChange={(url) => set({ audio_url: url ?? "" })}
-              />
+              <Label>Audios de la lección</Label>
+              {s.id ? (
+                <LessonAudiosManager moduloId={s.id} programaId={s.programa_id} />
+              ) : (
+                <p className="rounded-md border border-dashed bg-muted/40 p-3 text-xs text-muted-foreground">
+                  Guarda primero la lección para poder adjuntar uno o varios audios.
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Materiales complementarios</Label>
