@@ -113,14 +113,51 @@ function CursoPlayer() {
     },
   });
 
+  const { data: cohortInfo } = useQuery({
+    queryKey: ["mc-cohort", enrollment?.id],
+    enabled: !!enrollment?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cohort_enrollments" as any)
+        .select("cohort_id, program_cohorts:cohort_id ( fecha_inicio, nombre )")
+        .eq("enrollment_id", enrollment!.id)
+        .eq("estado", "activo")
+        .maybeSingle();
+      return (data as any) ?? null;
+    },
+  });
+
+  const cohortStart: Date | null = useMemo(() => {
+    const f = cohortInfo?.program_cohorts?.fecha_inicio;
+    return f ? new Date(f + "T00:00:00") : null;
+  }, [cohortInfo]);
+
   const progressMap = useMemo(
     () => new Map(progresos.map((p) => [p.modulo_id, p])),
     [progresos],
   );
 
-  const isLocked = (m: any) =>
-    !!m?.disponible_desde && new Date(m.disponible_desde).getTime() > Date.now();
-  const formatFecha = (iso: string) =>
+  const isCompleted = enrollment?.estado === "completado";
+
+  const getUnlockDate = (m: any): Date | null => {
+    if (isCompleted) return null;
+    if (
+      m?.disponible_offset_dias !== null &&
+      m?.disponible_offset_dias !== undefined &&
+      cohortStart
+    ) {
+      const d = new Date(cohortStart);
+      d.setDate(d.getDate() + Number(m.disponible_offset_dias));
+      return d;
+    }
+    if (m?.disponible_desde) return new Date(m.disponible_desde);
+    return null;
+  };
+  const isLocked = (m: any) => {
+    const d = getUnlockDate(m);
+    return !!d && d.getTime() > Date.now();
+  };
+  const formatFecha = (iso: string | Date) =>
     new Date(iso).toLocaleString("es-DO", {
       dateStyle: "long",
       timeStyle: "short",
