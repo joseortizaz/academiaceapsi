@@ -55,7 +55,7 @@ type CourseModule = {
 const emptyLeccion = (programa_id: string, modulo_id: string | null = null): Leccion => ({
   programa_id, modulo_id, docente_id: null, titulo: "", descripcion: "", orden: 0,
   duracion_minutos: null, video_url: "", audio_url: "", material_url: "",
-  es_en_vivo: false, fecha_sesion: null, disponible_desde: null,
+  es_en_vivo: false, fecha_sesion: null, disponible_desde: null, disponible_offset_dias: null,
 });
 
 const emptyModulo = (programa_id: string): CourseModule => ({
