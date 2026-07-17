@@ -541,6 +541,19 @@ function LeccionesPage() {
                 Si estableces una fecha futura, la lección aparecerá bloqueada hasta ese momento. Deja vacío para publicarla de inmediato.
               </p>
             </div>
+            <div className="grid gap-2">
+              <Label>Disponible el día N desde el inicio del grupo (opcional)</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="Ej: 0 (día del arranque), 14, 30…"
+                value={s.disponible_offset_dias ?? ""}
+                onChange={(e) => set({ disponible_offset_dias: e.target.value === "" ? null : Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Para diplomados con grupos escalonados: si el alumno pertenece a un grupo (cohorte) con fecha de inicio definida, esta lección se abrirá cuando pase esa cantidad de días desde el inicio del grupo. Si se define, prevalece sobre la fecha fija de arriba. Los alumnos que ya completaron el diplomado siempre pueden acceder para repaso.
+              </p>
+            </div>
             <p className="text-xs text-muted-foreground">
               Lección encadenada al módulo: <strong>{moduloTitulo(s.modulo_id)}</strong>
             </p>
