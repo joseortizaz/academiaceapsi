@@ -7,10 +7,13 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText, ExternalLink } from "lucide-react";
+import { CreateButton, DeleteButton, EmptyState, FormDialog } from "@/components/admin/AdminUI";
+import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText, CreditCard, TrendingUp, Ticket, Users, Wallet } from "lucide-react";
 import {
   getBaConnectionStatus,
   adminSearchCustomers,
