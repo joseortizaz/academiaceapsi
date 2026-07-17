@@ -14,29 +14,28 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 async function fetchStats() {
-  const [programs, enrollments, payments, messages, posts, users, certificates] = await Promise.all([
+  const [programs, enrollments, extPayments, messages, posts, users, certificates] = await Promise.all([
     supabase.from("programs").select("id,titulo", { count: "exact" }),
     supabase.from("enrollments").select("id,programa_id,user_id,estado,fecha_inscripcion,progreso_porcentaje"),
-    supabase.from("payments").select("monto,estado,fecha_pago,created_at,programa_id,user_id"),
+    supabase.from("external_payments").select("monto,fecha,created_at"),
     supabase.from("contact_messages").select("*", { count: "exact", head: true }).eq("leido", false),
     supabase.from("blog_posts").select("*", { count: "exact", head: true }),
     supabase.from("profiles").select("id,nombre,apellido,created_at,is_active"),
     supabase.from("certificates").select("id,created_at,user_id,programa_id"),
   ]);
 
-  const pagos = payments.data ?? [];
-  const completados = pagos.filter((p) => p.estado === "completado" || p.estado === "aprobado");
-  const ingresos = completados.reduce((s, p) => s + Number(p.monto ?? 0), 0);
+  const pagos = extPayments.data ?? [];
+  const ingresos = pagos.reduce((s, p) => s + Number(p.monto ?? 0), 0);
 
-  // Monthly revenue last 6 months
+  // Monthly revenue last 6 months (from Balance Activo)
   const months: { label: string; ingresos: number }[] = [];
   const now = new Date();
   for (let i = 5; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const next = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    const total = completados
+    const total = pagos
       .filter((p) => {
-        const t = new Date(p.fecha_pago ?? p.created_at).getTime();
+        const t = new Date(p.fecha ?? p.created_at).getTime();
         return t >= d.getTime() && t < next.getTime();
       })
       .reduce((s, p) => s + Number(p.monto ?? 0), 0);
@@ -52,16 +51,17 @@ async function fetchStats() {
     ? 0
     : Math.round((enr.reduce((s, e) => s + (e.progreso_porcentaje ?? 0), 0) / enr.length));
 
-  // Top selling programs
-  const ventasMap = new Map<string, number>();
-  for (const p of completados) {
-    ventasMap.set(p.programa_id, (ventasMap.get(p.programa_id) ?? 0) + 1);
+  // Top programs by enrollments (payment linkage lives in Balance Activo)
+  const inscMap = new Map<string, number>();
+  for (const e of enr) {
+    inscMap.set(e.programa_id, (inscMap.get(e.programa_id) ?? 0) + 1);
   }
   const programaTitulos = new Map((programs.data ?? []).map((p) => [p.id, p.titulo]));
-  const topCursos = [...ventasMap.entries()]
+  const topCursos = [...inscMap.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
     .map(([id, count]) => ({ titulo: programaTitulos.get(id) ?? "—", count }));
+
 
   // Recent activity (last 8 events)
   const profileMap = new Map(
