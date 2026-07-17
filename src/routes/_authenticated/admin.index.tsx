@@ -182,10 +182,10 @@ function AdminIndex() {
         <div className="rounded-lg border bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center gap-2">
             <Award className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">Cursos más vendidos</h2>
+            <h2 className="text-lg font-semibold">Programas con más inscripciones</h2>
           </div>
           {(data?.topCursos ?? []).length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aún no hay ventas registradas.</p>
+            <p className="text-sm text-muted-foreground">Aún no hay inscripciones registradas.</p>
           ) : (
             <ol className="space-y-3">
               {data?.topCursos.map((c, i) => (
@@ -196,7 +196,8 @@ function AdminIndex() {
                     </span>
                     <span className="text-sm font-medium">{c.titulo}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">{c.count} ventas</span>
+                  <span className="text-sm text-muted-foreground">{c.count} inscripciones</span>
+
                 </li>
               ))}
             </ol>
