@@ -1473,6 +1473,7 @@ export type Database = {
           created_at: string
           descripcion: string | null
           disponible_desde: string | null
+          disponible_offset_dias: number | null
           docente_id: string | null
           duracion_minutos: number | null
           es_en_vivo: boolean | null
@@ -1491,6 +1492,7 @@ export type Database = {
           created_at?: string
           descripcion?: string | null
           disponible_desde?: string | null
+          disponible_offset_dias?: number | null
           docente_id?: string | null
           duracion_minutos?: number | null
           es_en_vivo?: boolean | null
@@ -1509,6 +1511,7 @@ export type Database = {
           created_at?: string
           descripcion?: string | null
           disponible_desde?: string | null
+          disponible_offset_dias?: number | null
           docente_id?: string | null
           duracion_minutos?: number | null
           es_en_vivo?: boolean | null
@@ -2159,6 +2162,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_module_available_for_user: {
+        Args: { _modulo_id: string; _user_id: string }
         Returns: boolean
       }
       is_teacher_of_cohort: { Args: { _cohort_id: string }; Returns: boolean }

@@ -41,6 +41,7 @@ type Leccion = {
   es_en_vivo: boolean;
   fecha_sesion: string | null;
   disponible_desde: string | null;
+  disponible_offset_dias: number | null;
 };
 
 type CourseModule = {
@@ -54,7 +55,7 @@ type CourseModule = {
 const emptyLeccion = (programa_id: string, modulo_id: string | null = null): Leccion => ({
   programa_id, modulo_id, docente_id: null, titulo: "", descripcion: "", orden: 0,
   duracion_minutos: null, video_url: "", audio_url: "", material_url: "",
-  es_en_vivo: false, fecha_sesion: null, disponible_desde: null,
+  es_en_vivo: false, fecha_sesion: null, disponible_desde: null, disponible_offset_dias: null,
 });
 
 const emptyModulo = (programa_id: string): CourseModule => ({
@@ -148,6 +149,10 @@ function LeccionesPage() {
       duracion_minutos: v.duracion_minutos ? Number(v.duracion_minutos) : null,
       fecha_sesion: v.fecha_sesion || null,
       disponible_desde: v.disponible_desde || null,
+      disponible_offset_dias:
+        v.disponible_offset_dias === null || v.disponible_offset_dias === undefined || (v.disponible_offset_dias as any) === ""
+          ? null
+          : Number(v.disponible_offset_dias),
       docente_id: v.docente_id || null,
     };
     const { error } = v.id
@@ -534,6 +539,19 @@ function LeccionesPage() {
               />
               <p className="text-xs text-muted-foreground">
                 Si estableces una fecha futura, la lección aparecerá bloqueada hasta ese momento. Deja vacío para publicarla de inmediato.
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label>Disponible el día N desde el inicio del grupo (opcional)</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="Ej: 0 (día del arranque), 14, 30…"
+                value={s.disponible_offset_dias ?? ""}
+                onChange={(e) => set({ disponible_offset_dias: e.target.value === "" ? null : Number(e.target.value) })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Para diplomados con grupos escalonados: si el alumno pertenece a un grupo (cohorte) con fecha de inicio definida, esta lección se abrirá cuando pase esa cantidad de días desde el inicio del grupo. Si se define, prevalece sobre la fecha fija de arriba. Los alumnos que ya completaron el diplomado siempre pueden acceder para repaso.
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
