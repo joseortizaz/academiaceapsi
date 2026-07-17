@@ -325,7 +325,7 @@ function CursoPlayer() {
                                   )}
                                   {locked && (
                                     <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                                      Disponible el {formatFecha((m as any).disponible_desde)}
+                                      Disponible el {formatFecha(getUnlockDate(m)!)}
                                     </span>
                                   )}
                                 </span>
