@@ -17,7 +17,7 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
-import { AudioUploader } from "@/components/AudioUploader";
+import { LessonAudiosManager } from "@/components/LessonAudiosManager";
 import { Badge } from "@/components/ui/badge";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
 
