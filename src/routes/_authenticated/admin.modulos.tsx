@@ -149,6 +149,10 @@ function LeccionesPage() {
       duracion_minutos: v.duracion_minutos ? Number(v.duracion_minutos) : null,
       fecha_sesion: v.fecha_sesion || null,
       disponible_desde: v.disponible_desde || null,
+      disponible_offset_dias:
+        v.disponible_offset_dias === null || v.disponible_offset_dias === undefined || (v.disponible_offset_dias as any) === ""
+          ? null
+          : Number(v.disponible_offset_dias),
       docente_id: v.docente_id || null,
     };
     const { error } = v.id
