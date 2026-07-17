@@ -7,10 +7,13 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText, ExternalLink } from "lucide-react";
+import { CreateButton, DeleteButton, EmptyState, FormDialog } from "@/components/admin/AdminUI";
+import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText } from "lucide-react";
 import {
   getBaConnectionStatus,
   adminSearchCustomers,
@@ -53,6 +56,9 @@ function AdminFacturacion() {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [invFilter, setInvFilter] = useState("");
   const [payFilter, setPayFilter] = useState("");
+  const [couponOpen, setCouponOpen] = useState(false);
+  const emptyCoupon = { codigo: "", descripcion: "", porcentaje_descuento: 10, fecha_expiracion: null as string | null, usos_maximos: null as number | null, activo: true };
+  const [editingCoupon, setEditingCoupon] = useState<any>(emptyCoupon);
 
   const { data: status, isFetching, refetch } = useQuery({
     queryKey: ["ba-status"],
@@ -210,23 +216,183 @@ function AdminFacturacion() {
   const totalPendiente = invoices.reduce((s: number, i: any) => s + Number(i.saldo ?? 0), 0);
   const totalCobrado = payments.reduce((s: number, p: any) => s + Number(p.monto ?? 0), 0);
 
+  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+  const inicioAnio = new Date(new Date().getFullYear(), 0, 1).getTime();
+  const cobradoMes = payments
+    .filter((p: any) => new Date(p.fecha ?? p.created_at).getTime() >= inicioMes)
+    .reduce((s: number, p: any) => s + Number(p.monto ?? 0), 0);
+  const cobradoAnio = payments
+    .filter((p: any) => new Date(p.fecha ?? p.created_at).getTime() >= inicioAnio)
+    .reduce((s: number, p: any) => s + Number(p.monto ?? 0), 0);
+  const facturasVencidas = invoices.filter((i: any) => i.estado === "vencida").length;
+  const alumnosConDeuda = new Set(
+    invoices.filter((i: any) => Number(i.saldo ?? 0) > 0 && i.user_id).map((i: any) => i.user_id),
+  ).size;
+
+  const { data: cupones = [] } = useQuery({
+    queryKey: ["admin", "cupones"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from("coupons").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const saveCoupon = async (v: any) => {
+    const payload = {
+      ...v,
+      porcentaje_descuento: Number(v.porcentaje_descuento) || 0,
+      usos_maximos: v.usos_maximos ? Number(v.usos_maximos) : null,
+      fecha_expiracion: v.fecha_expiracion || null,
+      codigo: v.codigo.trim().toUpperCase(),
+    };
+    const { error } = v.id
+      ? await (supabase as any).from("coupons").update(payload).eq("id", v.id)
+      : await (supabase as any).from("coupons").insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Cupón guardado");
+    setCouponOpen(false);
+    qc.invalidateQueries({ queryKey: ["admin", "cupones"] });
+  };
+
+  const removeCoupon = async (id: string) => {
+    const { error } = await (supabase as any).from("coupons").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Cupón eliminado");
+    qc.invalidateQueries({ queryKey: ["admin", "cupones"] });
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Facturación (Balance Activo)</h1>
+        <h1 className="text-2xl font-bold">Facturación & Cobros</h1>
         <p className="text-muted-foreground">
-          Vincula alumnos con clientes contables y consulta facturas y cobros sincronizados.
+          Vista unificada con datos sincronizados desde Balance Activo: KPIs, facturas, cobros, cupones y sincronización.
         </p>
       </div>
 
-      <Tabs defaultValue="conexion" className="space-y-4">
-        <TabsList>
+      <Tabs defaultValue="resumen" className="space-y-4">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="resumen">Resumen</TabsTrigger>
+          <TabsTrigger value="facturas">Facturas ({invoices.length})</TabsTrigger>
+          <TabsTrigger value="pagos">Cobros ({payments.length})</TabsTrigger>
+          <TabsTrigger value="cupones">Cupones</TabsTrigger>
           <TabsTrigger value="conexion">Conexión & vínculos</TabsTrigger>
           <TabsTrigger value="sincronizacion">Sincronización</TabsTrigger>
-          <TabsTrigger value="facturas">Facturas ({invoices.length})</TabsTrigger>
-          <TabsTrigger value="pagos">Pagos ({payments.length})</TabsTrigger>
           <TabsTrigger value="logs">Webhooks</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="resumen" className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Cobrado (año)" value={fmtMoney(cobradoAnio, "DOP")} accent="emerald" />
+            <StatCard label="Cobrado (mes)" value={fmtMoney(cobradoMes, "DOP")} accent="emerald" />
+            <StatCard label="Saldo pendiente" value={fmtMoney(totalPendiente, "DOP")} accent="amber" />
+            <StatCard label="Total facturado" value={fmtMoney(totalFacturado, "DOP")} />
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard label="Facturas" value={String(invoices.length)} />
+            <StatCard label="Cobros registrados" value={String(payments.length)} />
+            <StatCard label="Facturas vencidas" value={String(facturasVencidas)} accent="amber" />
+            <StatCard label="Alumnos con deuda" value={String(alumnosConDeuda)} />
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Fuente de datos</CardTitle>
+              <CardDescription>
+                Todos los importes provienen de Balance Activo (webhooks en tiempo real + reconciliación
+                nocturna 03:15 AM). Usa la pestaña "Sincronización" para forzar una corrida manual.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="cupones" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Cupones de descuento</h2>
+              <p className="text-sm text-muted-foreground">Códigos promocionales aplicables al checkout.</p>
+            </div>
+            <CreateButton label="Nuevo cupón" onClick={() => { setEditingCoupon(emptyCoupon); setCouponOpen(true); }} />
+          </div>
+          {cupones.length === 0 ? (
+            <EmptyState>Aún no hay cupones creados.</EmptyState>
+          ) : (
+            <div className="rounded-lg border bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Código</TableHead>
+                    <TableHead>Descuento</TableHead>
+                    <TableHead>Vence</TableHead>
+                    <TableHead>Usos</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {cupones.map((c: any) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-mono font-semibold">{c.codigo}</TableCell>
+                      <TableCell>{c.porcentaje_descuento}%</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {c.fecha_expiracion ? new Date(c.fecha_expiracion).toLocaleDateString("es-DO") : "Sin vencimiento"}
+                      </TableCell>
+                      <TableCell>{c.usos_actuales}{c.usos_maximos ? ` / ${c.usos_maximos}` : ""}</TableCell>
+                      <TableCell>
+                        <Badge className={c.activo ? "bg-emerald-500/15 text-emerald-700" : "bg-red-500/15 text-red-700"}>
+                          {c.activo ? "Activo" : "Inactivo"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DeleteButton onConfirm={() => removeCoupon(c.id)} label="el cupón" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          <FormDialog<any>
+            title={editingCoupon.id ? "Editar cupón" : "Nuevo cupón"}
+            open={couponOpen}
+            onOpenChange={setCouponOpen}
+            initial={editingCoupon}
+            onSubmit={saveCoupon}
+          >
+            {(s, set) => (
+              <>
+                <div className="grid gap-2">
+                  <Label>Código</Label>
+                  <Input value={s.codigo} onChange={(e) => set({ codigo: e.target.value.toUpperCase() })} placeholder="VERANO2026" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Descripción</Label>
+                  <Input value={s.descripcion ?? ""} onChange={(e) => set({ descripcion: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>% de descuento</Label>
+                    <Input type="number" min={1} max={100} value={s.porcentaje_descuento} onChange={(e) => set({ porcentaje_descuento: Number(e.target.value) })} required />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Usos máximos</Label>
+                    <Input type="number" value={s.usos_maximos ?? ""} placeholder="Ilimitado" onChange={(e) => set({ usos_maximos: e.target.value ? Number(e.target.value) : null })} />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Fecha de expiración</Label>
+                  <Input type="date" value={s.fecha_expiracion ?? ""} onChange={(e) => set({ fecha_expiracion: e.target.value || null })} />
+                </div>
+                <label className="flex items-center gap-2">
+                  <Switch checked={s.activo} onCheckedChange={(c) => set({ activo: c })} />
+                  <span className="text-sm">Cupón activo</span>
+                </label>
+              </>
+            )}
+          </FormDialog>
+        </TabsContent>
+
 
         <TabsContent value="conexion" className="space-y-6">
           <Card>
