@@ -1,66 +1,117 @@
-## Objetivo
+# Gating de contenido por cohorte (Opción A)
 
-Que la clase en vivo se abra **dentro** de la ruta `/clase-vivo/$meetingId` (en un contenedor de la propia app) en lugar de redirigir a Zoom en una pestaña nueva.
+Permite tener varios grupos activos del mismo diplomado con cronogramas distintos, sin duplicar el programa y sin quitarle acceso de repaso a los grupos avanzados.
 
-## Estado actual
+## Idea central
 
-- Backend ya está listo:
-  - `getMeetingSdkSignature` (en `src/lib/zoom.functions.ts`) firma el JWT del Meeting SDK con rol correcto (host para admin/docente titular, attendee para alumnos con inscripción activa/completada) y devuelve `signature`, `sdkKey`, `meetingNumber`, `password`, `titulo`.
-  - Secretos `ZOOM_SDK_KEY` y `ZOOM_SDK_SECRET` ya están configurados en Lovable Cloud.
-- Frontend (`src/components/ZoomEmbed.tsx`) sólo muestra un botón "Unirse a la reunión" que abre `zoom.us` en otra pestaña — no embebe nada.
+Hoy `program_modules.disponible_desde` es una fecha absoluta que aplica a todos por igual. La cambiamos por un **offset relativo al inicio de cada cohorte**: cada módulo/lección se define como "disponible el día N desde el arranque del grupo". La fecha real de apertura para un alumno se calcula así:
 
-## Cambios propuestos
+```
+fecha_apertura(alumno, módulo) = cohorte.fecha_inicio + módulo.offset_dias
+```
 
-### 1. Dependencia
+- Un alumno del grupo que ya va por la mitad ve todo lo publicado hasta hoy.
+- Un alumno del grupo nuevo solo ve el contenido a medida que su cronograma avanza.
+- Los alumnos que ya **completaron** el diplomado conservan acceso permanente para repaso (bypass de fecha).
 
-Añadir `@zoom/meetingsdk` (SDK oficial de Zoom para web) al proyecto.
+## Cambios de datos
 
-### 2. Reescribir `src/components/ZoomEmbed.tsx` usando **Component View**
+- `program_modules`: añadir `disponible_offset_dias INTEGER` (nullable). Se conserva `disponible_desde` para compatibilidad; si el módulo tiene offset, éste manda.
+- (Opcional, fase 2) `cohort_module_overrides`: tabla para excepciones puntuales (postergar una lección para una cohorte específica).
+- Función SQL `is_module_available_for_user(user_id, modulo_id)` que resuelve:
+  1. Admin/docente del programa → siempre `true`.
+  2. Enrollment `completado` → siempre `true` (repaso permanente).
+  3. Cohorte activa del alumno → `now() >= cohorte.fecha_inicio + offset_dias`.
+  4. Sin cohorte asignada → cae al comportamiento actual (`disponible_desde` o abierto).
 
-Component View es el modo recomendado por Zoom para embeber la reunión dentro de un `<div>` de la app sin ocupar toda la pantalla ni requerir cross-origin isolation. Flujo:
+## Cambios de acceso (RLS y lecturas)
 
-1. Al montar: llamar `getMeetingSdkSignature` (ya existe).
-2. Import dinámico de `@zoom/meetingsdk/embedded` (para evitar SSR y aligerar el bundle inicial).
-3. `ZoomMtgEmbedded.createClient()` → `client.init({ zoomAppRoot: divRef, language: "es-ES", customize: { video: { isResizable: true, viewSizes: { default: { width: 1000, height: 600 } } } } })`.
-4. `client.join({ signature, sdkKey, meetingNumber, password, userName, userEmail })` usando nombre/email del `useAuth()` actual.
-5. Al desmontar: `client.leave()` + `ZoomMtgEmbedded.destroyClient()`.
-6. Manejo de errores: si el navegador bloquea (Safari <16, iOS sin WebRTC), mostrar fallback con el botón externo actual (`joinUrl` / `startUrl`).
+- La política SELECT de `program_modules` sigue permitiendo ver la lección; el **gating de contenido** (video, materiales, audios) se aplica en la UI usando `is_module_available_for_user`, tal como funciona hoy con `disponible_desde`.
+- `lesson_materials` y `module_progress`: mismo criterio — se pueden listar, pero el contenido se bloquea si el módulo no está disponible.
 
-### 3. Pasar `userName` y `userEmail` al backend
+## Cambios de UI
 
-Extender `getMeetingSdkSignature` para incluir en la respuesta el nombre y correo del usuario autenticado (leídos de `profiles`), así el componente los envía a `client.join()` sin exponer datos privados de otros.
+**Admin — editor de módulos (`admin.modulos.tsx`)**
+- Nuevo campo "Disponible desde el día N del inicio de cohorte" junto al actual "Disponible desde (fecha)".
+- Aviso claro: "Si el programa usa cohortes, este número prevalece sobre la fecha fija".
 
-### 4. Ruta `/_authenticated/clase-vivo/$meetingId`
+**Admin — grupos (`admin.grupos.tsx`)**
+- Mostrar cronograma calculado del grupo (lista de módulos con su fecha real derivada).
+- Botón "Postergar módulo" (fase 2, si se aprueba el override por cohorte).
 
-Ajustar el layout del contenedor para dar altura suficiente al iframe embebido (mínimo 600px) y ocultar el shell del sidebar cuando la clase está activa (opcional pero recomendado para no comprimir el video).
+**Estudiante (`mis-cursos.$slug.tsx`)**
+- Sidebar y contenido bloquean/desbloquean lecciones según `is_module_available_for_user`.
+- Mensaje: "Disponible el DD/MM/YYYY según tu grupo".
+- Los alumnos con inscripción `completado` ven todo desbloqueado con un badge "Modo repaso".
 
-### 5. Configuración requerida en Zoom Marketplace (usuario)
+**Docente**
+- Vista de cronograma por cohorte (qué módulo toca esta semana en cada grupo).
 
-Para que el Meeting SDK funcione, la app **Meeting SDK** de Zoom (no la Server-to-Server OAuth que ya está) debe tener:
+## Migración de datos existente
 
-- Tipo de app: **Meeting SDK** (o **General App** con Meeting SDK activado).
-- **Domain allow list**: añadir los dominios donde correrá la app:
-  - `academiaceapsi.com`
-  - `www.academiaceapsi.com`
-  - `ceapsird.lovable.app`
-  - `*.lovable.app` (para previews)
-- Activada y publicada internamente (Intra-account).
+- Diplomados que ya usan `disponible_desde`: se dejan como están (siguen funcionando).
+- Para adoptar el nuevo modelo en un diplomado existente:
+  1. Definir `offset_dias` por módulo (script una vez, o edición manual desde admin).
+  2. Asegurarse de que cada alumno esté asignado a una `program_cohorts` con `fecha_inicio`.
+  3. Opcionalmente limpiar `disponible_desde` para que el offset sea la única fuente.
 
-Si `ZOOM_SDK_KEY`/`ZOOM_SDK_SECRET` corresponden a una app distinta a la S2S, ya es correcto; sólo hace falta verificar el allow list.
+## Implicaciones a tener presente
 
-### 6. Consideraciones
+- **Alumnos sin cohorte asignada**: caerán al comportamiento antiguo. Conviene establecer como regla operativa que todo alumno de diplomado on-line quede en una cohorte al momento de matricularse.
+- **Foros/comentarios (`lesson_comments`, `community_posts`)**: seguirán siendo comunes a todo el programa; si en el futuro queremos aislarlos por cohorte, es un cambio adicional.
+- **Evaluaciones y clases Zoom**: hoy se asocian al programa, no a la cohorte. Con este cambio los alumnos nuevos no podrán responder una evaluación de un módulo que aún no tienen disponible (el gating de módulo cubre eso), pero clases Zoom recurrentes seguirán siendo por cohorte via `program_cohorts.docente_id` y horario.
+- **Certificados**: no se afectan; siguen emitiéndose al completar 100% del programa.
+- **Repaso post-graduación**: garantizado gracias al bypass para inscripciones `completado`.
 
-- **Component View** funciona sin COOP/COEP headers y soporta hasta 25 videos simultáneos, suficiente para el caso de uso.
-- Si en el futuro necesitan Gallery View >25 vídeos, hay que añadir cabeceras `Cross-Origin-Opener-Policy` y `Cross-Origin-Embedder-Policy` — no incluido en este cambio.
-- El bundle del SDK (~2.5 MB gz) se carga sólo en la ruta de clase en vivo gracias al import dinámico.
+## Alcance de la implementación
 
-## Archivos afectados
+Fase 1 (recomendada primero):
+1. Migración: columna `disponible_offset_dias` + función `is_module_available_for_user`.
+2. Editor admin de módulos: input de offset.
+3. Vista estudiante: usar la función para gatear contenido y mostrar fecha calculada.
+4. Vista admin de grupo: cronograma derivado.
 
-- `package.json` — nueva dependencia.
-- `src/components/ZoomEmbed.tsx` — reescrito.
-- `src/lib/zoom.functions.ts` — extender `getMeetingSdkSignature` para devolver `userName`/`userEmail`.
-- `src/routes/_authenticated/clase-vivo.$meetingId.tsx` — ajuste de layout.
+Fase 2 (opcional):
+5. Tabla de overrides por cohorte.
+6. Aislamiento de foros por cohorte.
 
-## Pregunta pendiente
+## Detalle técnico
 
-¿Los `ZOOM_SDK_KEY` / `ZOOM_SDK_SECRET` actuales pertenecen a una app tipo **Meeting SDK** en el Zoom Marketplace, o son de la misma app Server-to-Server OAuth? Si es lo segundo, hay que crear una app Meeting SDK aparte antes de que el embed funcione (te guío en los pasos exactos).
+```sql
+ALTER TABLE public.program_modules
+  ADD COLUMN disponible_offset_dias integer;
+
+CREATE OR REPLACE FUNCTION public.is_module_available_for_user(
+  _user_id uuid, _modulo_id uuid
+) RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  WITH m AS (
+    SELECT pm.programa_id, pm.disponible_desde, pm.disponible_offset_dias
+    FROM program_modules pm WHERE pm.id = _modulo_id
+  )
+  SELECT
+    has_role(_user_id,'admin') OR
+    EXISTS (SELECT 1 FROM m WHERE is_teacher_of_program(m.programa_id)) OR
+    EXISTS (
+      SELECT 1 FROM enrollments e, m
+      WHERE e.user_id=_user_id AND e.programa_id=m.programa_id
+        AND e.estado='completado'
+    ) OR
+    EXISTS (
+      SELECT 1
+      FROM enrollments e
+      JOIN cohort_enrollments ce ON ce.enrollment_id=e.id AND ce.estado='activo'
+      JOIN program_cohorts c ON c.id=ce.cohort_id
+      , m
+      WHERE e.user_id=_user_id AND e.programa_id=m.programa_id
+        AND e.estado IN ('activo','completado')
+        AND (
+          (m.disponible_offset_dias IS NOT NULL
+             AND c.fecha_inicio IS NOT NULL
+             AND now()::date >= c.fecha_inicio + m.disponible_offset_dias)
+          OR (m.disponible_offset_dias IS NULL
+             AND (m.disponible_desde IS NULL OR now() >= m.disponible_desde))
+        )
+    );
+$$;
+```
