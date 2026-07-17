@@ -33,6 +33,9 @@ const empty: Inscripcion = { user_id: "", programa_id: "", estado: "activo" };
 function InscripcionesPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [programaFilter, setProgramaFilter] = useState<string>("all");
+  const [estadoFilter, setEstadoFilter] = useState<string>("all");
 
   const { data: rows = [] } = useQuery({
     queryKey: ["admin", "inscripciones"],
