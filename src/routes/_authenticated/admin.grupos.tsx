@@ -316,8 +316,9 @@ function GruposPage() {
               <Label>Fechas de clase (una por línea, formato YYYY-MM-DD)</Label>
               <Textarea
                 rows={4}
-                value={Array.isArray(s.dias_clase) ? s.dias_clase.join("\n") : ""}
-                onChange={(e) => set({
+                value={Array.isArray(s.dias_clase) ? s.dias_clase.join("\n") : (s.dias_clase ?? "")}
+                onChange={(e) => set({ dias_clase: e.target.value as any })}
+                onBlur={(e) => set({
                   dias_clase: e.target.value.split("\n").map((l) => l.trim()).filter(Boolean),
                 })}
                 placeholder="2026-08-15&#10;2026-08-22&#10;2026-08-29"
