@@ -177,7 +177,8 @@ function InscripcionesPage() {
             </TableBody>
           </Table>
         </div>
-      )}
+        );
+      })()}
 
       <FormDialog<Inscripcion>
         title="Matricular estudiante"
