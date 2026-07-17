@@ -108,7 +108,7 @@ async function fetchStats() {
 }
 
 function AdminIndex() {
-  const { data } = useQuery({ queryKey: ["admin-stats-v2"], queryFn: fetchStats });
+  const { data } = useQuery({ queryKey: ["admin-stats-v3"], queryFn: fetchStats });
 
   const cards = [
     { label: "Usuarios registrados", value: data?.usuarios ?? 0, icon: Users },
