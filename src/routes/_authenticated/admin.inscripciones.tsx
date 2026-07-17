@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import {
   AdminPageHeader, CreateButton, EmptyState, FormDialog,
 } from "@/components/admin/AdminUI";
