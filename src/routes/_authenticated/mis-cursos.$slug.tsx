@@ -271,6 +271,9 @@ function CursoPlayer() {
           </Button>
           <div className="hidden text-sm font-medium md:block">{programa.titulo}</div>
           <div className="flex items-center gap-3">
+            {isCompleted && (
+              <Badge variant="secondary" className="text-[11px]">Modo repaso</Badge>
+            )}
             <span className="text-sm text-muted-foreground">{pct}%</span>
             <div className="hidden w-32 sm:block">
               <Progress value={pct} />
