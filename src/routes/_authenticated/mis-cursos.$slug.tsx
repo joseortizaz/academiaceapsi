@@ -457,7 +457,7 @@ function CursoPlayer() {
               <p className="mt-2 max-w-md text-muted-foreground">
                 Esta lección aún no está disponible. Podrás acceder a su contenido a partir del{" "}
                 <strong className="text-foreground">
-                  {formatFecha((activeModule as any).disponible_desde)}
+                  {formatFecha(getUnlockDate(activeModule)!)}
                 </strong>.
               </p>
             </div>
