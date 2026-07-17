@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import {
   AdminPageHeader, CreateButton, EmptyState, FormDialog,
 } from "@/components/admin/AdminUI";
@@ -31,6 +33,9 @@ const empty: Inscripcion = { user_id: "", programa_id: "", estado: "activo" };
 function InscripcionesPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [programaFilter, setProgramaFilter] = useState<string>("all");
+  const [estadoFilter, setEstadoFilter] = useState<string>("all");
 
   const { data: rows = [] } = useQuery({
     queryKey: ["admin", "inscripciones"],
@@ -91,9 +96,48 @@ function InscripcionesPage() {
         description="Estudiantes matriculados por programa."
         action={<CreateButton label="Matricular estudiante" onClick={() => setOpen(true)} />}
       />
-      {rows.length === 0 ? (
-        <EmptyState>Aún no hay inscripciones.</EmptyState>
-      ) : (
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nombre de estudiante"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={programaFilter} onValueChange={setProgramaFilter}>
+          <SelectTrigger><SelectValue placeholder="Filtrar por programa" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los programas</SelectItem>
+            {programas.map((p: any) => (
+              <SelectItem key={p.id} value={p.id}>{p.titulo}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={estadoFilter} onValueChange={setEstadoFilter}>
+          <SelectTrigger><SelectValue placeholder="Filtrar por estado" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los estados</SelectItem>
+            {estados.map((e) => (
+              <SelectItem key={e} value={e}>{e}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {(() => {
+        const filtered = rows.filter((r) => {
+          if (programaFilter !== "all" && r.programa_id !== programaFilter) return false;
+          if (estadoFilter !== "all" && r.estado !== estadoFilter) return false;
+          if (search.trim()) {
+            const name = (uMap.get(r.user_id) ?? "").toLowerCase();
+            if (!name.includes(search.trim().toLowerCase())) return false;
+          }
+          return true;
+        });
+        return filtered.length === 0 ? (
+          <EmptyState>No hay inscripciones que coincidan con los filtros.</EmptyState>
+        ) : (
         <div className="max-h-[640px] overflow-auto rounded-lg border bg-card">
           <Table>
             <TableHeader className="sticky top-0 bg-card">
@@ -106,7 +150,7 @@ function InscripcionesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => (
+              {filtered.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">
                     {uMap.get(r.user_id) ?? r.user_id.slice(0, 8)}
@@ -133,7 +177,8 @@ function InscripcionesPage() {
             </TableBody>
           </Table>
         </div>
-      )}
+        );
+      })()}
 
       <FormDialog<Inscripcion>
         title="Matricular estudiante"
