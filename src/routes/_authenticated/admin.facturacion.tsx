@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CreateButton, DeleteButton, EmptyState, FormDialog } from "@/components/admin/AdminUI";
-import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText, CreditCard, TrendingUp, Ticket, Users, Wallet } from "lucide-react";
+import { RefreshCw, Link2, CheckCircle2, AlertCircle, Search, FileText } from "lucide-react";
 import {
   getBaConnectionStatus,
   adminSearchCustomers,
