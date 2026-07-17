@@ -40,6 +40,12 @@ function Acceder() {
 
   const redirectAuthenticatedUser = async (userId: string) => {
     const destination = await resolveDestination(userId);
+    // Si el destino incluye query string (p.ej. flujo de consent OAuth),
+    // usar navegación nativa para preservar los search params.
+    if (destination.includes("?")) {
+      window.location.replace(destination);
+      return;
+    }
     await navigate({ to: destination as never, replace: true });
   };
 

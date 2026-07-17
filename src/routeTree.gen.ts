@@ -75,6 +75,7 @@ import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -447,6 +448,11 @@ const AuthenticatedAdminAnunciosRoute =
     path: '/anuncios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -506,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -575,6 +582,7 @@ export interface FileRoutesByTo {
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/programas': typeof ProgramasIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -650,6 +658,7 @@ export interface FileRoutesById {
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
   '/programas/': typeof ProgramasIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
@@ -725,6 +734,7 @@ export interface FileRouteTypes {
     | '/verificar/$numero'
     | '/verify/$code'
     | '/programas/'
+    | '/.lovable/oauth/consent'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -794,6 +804,7 @@ export interface FileRouteTypes {
     | '/verificar/$numero'
     | '/verify/$code'
     | '/programas'
+    | '/.lovable/oauth/consent'
     | '/admin/anuncios'
     | '/admin/blog'
     | '/admin/categorias'
@@ -868,6 +879,7 @@ export interface FileRouteTypes {
     | '/verificar/$numero'
     | '/verify/$code'
     | '/programas/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
@@ -937,6 +949,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
   ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
@@ -1413,6 +1426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1619,6 +1639,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
   ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,

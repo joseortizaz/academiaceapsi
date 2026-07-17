@@ -6,6 +6,7 @@
 import path from "node:path";
 import { loadEnv } from "vite";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 // Load ALL env vars (no prefix) into process.env so server routes can read
 // SUPABASE_SERVICE_ROLE_KEY, LOVABLE_API_KEY, etc. Do NOT expose them to the client.
