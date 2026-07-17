@@ -56,6 +56,9 @@ function AdminFacturacion() {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [invFilter, setInvFilter] = useState("");
   const [payFilter, setPayFilter] = useState("");
+  const [couponOpen, setCouponOpen] = useState(false);
+  const emptyCoupon = { codigo: "", descripcion: "", porcentaje_descuento: 10, fecha_expiracion: null as string | null, usos_maximos: null as number | null, activo: true };
+  const [editingCoupon, setEditingCoupon] = useState<any>(emptyCoupon);
 
   const { data: status, isFetching, refetch } = useQuery({
     queryKey: ["ba-status"],
