@@ -41,6 +41,7 @@ type Leccion = {
   es_en_vivo: boolean;
   fecha_sesion: string | null;
   disponible_desde: string | null;
+  disponible_offset_dias: number | null;
 };
 
 type CourseModule = {
