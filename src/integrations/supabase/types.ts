@@ -1826,6 +1826,7 @@ export type Database = {
       zoom_meetings: {
         Row: {
           auto_record: boolean
+          cohort_id: string | null
           created_at: string
           created_by: string
           docente_nombre: string | null
@@ -1848,6 +1849,7 @@ export type Database = {
         }
         Insert: {
           auto_record?: boolean
+          cohort_id?: string | null
           created_at?: string
           created_by: string
           docente_nombre?: string | null
@@ -1870,6 +1872,7 @@ export type Database = {
         }
         Update: {
           auto_record?: boolean
+          cohort_id?: string | null
           created_at?: string
           created_by?: string
           docente_nombre?: string | null
@@ -1890,7 +1893,15 @@ export type Database = {
           zoom_password?: string | null
           zoom_start_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "zoom_meetings_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "program_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       zoom_webhook_logs: {
         Row: {
@@ -2081,6 +2092,8 @@ export type Database = {
       }
       zoom_meetings_student: {
         Row: {
+          cohort_id: string | null
+          cohort_nombre: string | null
           created_at: string | null
           docente_nombre: string | null
           duration_min: number | null
@@ -2097,41 +2110,15 @@ export type Database = {
           zoom_meeting_id: string | null
           zoom_password: string | null
         }
-        Insert: {
-          created_at?: string | null
-          docente_nombre?: string | null
-          duration_min?: number | null
-          id?: string | null
-          modulo_id?: string | null
-          programa_id?: string | null
-          recording_duration_min?: number | null
-          recording_share_url?: string | null
-          start_at?: string | null
-          status?: string | null
-          titulo?: string | null
-          updated_at?: string | null
-          zoom_join_url?: string | null
-          zoom_meeting_id?: string | null
-          zoom_password?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          docente_nombre?: string | null
-          duration_min?: number | null
-          id?: string | null
-          modulo_id?: string | null
-          programa_id?: string | null
-          recording_duration_min?: number | null
-          recording_share_url?: string | null
-          start_at?: string | null
-          status?: string | null
-          titulo?: string | null
-          updated_at?: string | null
-          zoom_join_url?: string | null
-          zoom_meeting_id?: string | null
-          zoom_password?: string | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "zoom_meetings_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "program_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
