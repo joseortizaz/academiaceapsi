@@ -250,7 +250,17 @@ function ClassTable({
       <TableBody>
         {rows.map((c) => (
           <TableRow key={c.id}>
-            <TableCell className="font-medium">{c.titulo}</TableCell>
+            <TableCell className="font-medium">
+              <div className="flex flex-wrap items-center gap-2">
+                <span>{c.titulo}</span>
+                {c.cohort?.nombre ? (
+                  <Badge variant="outline" className="text-xs">Grupo: {c.cohort.nombre}</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">Todos los grupos</Badge>
+                )}
+              </div>
+            </TableCell>
+
             <TableCell className="whitespace-nowrap text-sm">
               {new Date(c.start_at).toLocaleString("es-DO", {
                 day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
