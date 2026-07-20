@@ -300,11 +300,25 @@ function CreateClassDialog({
 }) {
   const [titulo, setTitulo] = useState("");
   const [programaId, setProgramaId] = useState(programas[0]?.id ?? "");
+  const [cohortId, setCohortId] = useState<string>("__all__");
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [duracion, setDuracion] = useState(60);
   const [autoRecord, setAutoRecord] = useState(true);
   const createFn = useServerFn(createZoomMeeting);
+
+  const { data: cohorts = [] } = useQuery({
+    queryKey: ["cohorts-for-program", programaId],
+    enabled: !!programaId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("program_cohorts")
+        .select("id, nombre")
+        .eq("programa_id", programaId)
+        .order("nombre");
+      return data ?? [];
+    },
+  });
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -312,6 +326,7 @@ function CreateClassDialog({
       return createFn({
         data: {
           programaId, titulo,
+          cohortId: cohortId === "__all__" ? null : cohortId,
           startAt, durationMin: duracion,
           autoRecord, docenteNombre,
         },
@@ -336,6 +351,7 @@ function CreateClassDialog({
     }
     mut.mutate();
   };
+
 
   return (
     <DialogContent>
