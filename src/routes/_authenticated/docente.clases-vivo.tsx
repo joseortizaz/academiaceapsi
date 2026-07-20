@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_authenticated/docente/clases-vivo")({
 type ZoomMeetingRow = {
   id: string;
   programa_id: string;
+  cohort_id: string | null;
+  cohort?: { nombre: string } | null;
   titulo: string;
   docente_nombre: string | null;
   zoom_meeting_id: string;
@@ -46,6 +48,7 @@ type ZoomMeetingRow = {
   recording_share_url: string | null;
   recording_duration_min: number | null;
 };
+
 
 function isLiveNow(m: ZoomMeetingRow) {
   const start = new Date(m.start_at).getTime();
