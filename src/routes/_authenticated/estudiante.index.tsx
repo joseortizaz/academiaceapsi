@@ -23,6 +23,8 @@ type ZoomMeetingLite = {
   recording_share_url: string | null;
   recording_duration_min: number | null;
   programa_id: string;
+  cohort_id: string | null;
+  cohort_nombre: string | null;
 };
 
 function isLiveZoom(c: ZoomMeetingLite) {
@@ -43,14 +45,25 @@ function EstudianteDashboard() {
     queryKey: ["estudiante-zoom-meetings", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
+      // Cohorts activos del estudiante
+      const { data: ce } = await supabase
+        .from("cohort_enrollments")
+        .select("cohort_id")
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      const myCohortIds = new Set((ce ?? []).map((r) => r.cohort_id));
+
       const { data } = await supabase
         .from("zoom_meetings_student" as never)
-        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,recording_share_url,recording_duration_min,programa_id")
+        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,recording_share_url,recording_duration_min,programa_id,cohort_id,cohort_nombre")
         .order("start_at", { ascending: false });
-      return (data ?? []) as ZoomMeetingLite[];
+      const rows = (data ?? []) as ZoomMeetingLite[];
+      // Sin cohort_id => visible a todo el programa. Con cohort_id => solo si el alumno pertenece.
+      return rows.filter((r) => r.cohort_id == null || myCohortIds.has(r.cohort_id));
     },
     refetchInterval: 30_000,
   });
+
 
   const liveZoomClass = zoomClasses.find(isLiveZoom);
   const upcomingZoom = zoomClasses
