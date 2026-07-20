@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_authenticated/docente/clases-vivo")({
 type ZoomMeetingRow = {
   id: string;
   programa_id: string;
+  cohort_id: string | null;
+  cohort?: { nombre: string } | null;
   titulo: string;
   docente_nombre: string | null;
   zoom_meeting_id: string;
@@ -46,6 +48,7 @@ type ZoomMeetingRow = {
   recording_share_url: string | null;
   recording_duration_min: number | null;
 };
+
 
 function isLiveNow(m: ZoomMeetingRow) {
   const start = new Date(m.start_at).getTime();
@@ -247,7 +250,17 @@ function ClassTable({
       <TableBody>
         {rows.map((c) => (
           <TableRow key={c.id}>
-            <TableCell className="font-medium">{c.titulo}</TableCell>
+            <TableCell className="font-medium">
+              <div className="flex flex-wrap items-center gap-2">
+                <span>{c.titulo}</span>
+                {c.cohort?.nombre ? (
+                  <Badge variant="outline" className="text-xs">Grupo: {c.cohort.nombre}</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">Todos los grupos</Badge>
+                )}
+              </div>
+            </TableCell>
+
             <TableCell className="whitespace-nowrap text-sm">
               {new Date(c.start_at).toLocaleString("es-DO", {
                 day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
@@ -300,11 +313,25 @@ function CreateClassDialog({
 }) {
   const [titulo, setTitulo] = useState("");
   const [programaId, setProgramaId] = useState(programas[0]?.id ?? "");
+  const [cohortId, setCohortId] = useState<string>("__all__");
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [duracion, setDuracion] = useState(60);
   const [autoRecord, setAutoRecord] = useState(true);
   const createFn = useServerFn(createZoomMeeting);
+
+  const { data: cohorts = [] } = useQuery({
+    queryKey: ["cohorts-for-program", programaId],
+    enabled: !!programaId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("program_cohorts")
+        .select("id, nombre")
+        .eq("programa_id", programaId)
+        .order("nombre");
+      return data ?? [];
+    },
+  });
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -312,6 +339,7 @@ function CreateClassDialog({
       return createFn({
         data: {
           programaId, titulo,
+          cohortId: cohortId === "__all__" ? null : cohortId,
           startAt, durationMin: duracion,
           autoRecord, docenteNombre,
         },
@@ -337,6 +365,7 @@ function CreateClassDialog({
     mut.mutate();
   };
 
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -352,7 +381,7 @@ function CreateClassDialog({
         </div>
         <div>
           <Label>Programa</Label>
-          <Select value={programaId} onValueChange={setProgramaId}>
+          <Select value={programaId} onValueChange={(v) => { setProgramaId(v); setCohortId("__all__"); }}>
             <SelectTrigger><SelectValue placeholder="Selecciona un programa" /></SelectTrigger>
             <SelectContent>
               {programas.map((p) => (
@@ -361,6 +390,24 @@ function CreateClassDialog({
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <Label>Grupo / Cohorte (opcional)</Label>
+          <Select value={cohortId} onValueChange={setCohortId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Todos los grupos del programa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">Todos los grupos del programa</SelectItem>
+              {cohorts.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Si eliges un grupo, solo esos alumnos verán la clase.
+          </p>
+        </div>
+
         <div className="grid grid-cols-3 gap-3">
           <div>
             <Label htmlFor="cls-fecha">Fecha</Label>
