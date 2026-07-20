@@ -67,6 +67,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     z.object({
       programaId: z.string().uuid(),
       moduloId: z.string().uuid().optional().nullable(),
+      cohortId: z.string().uuid().optional().nullable(),
       titulo: z.string().min(3).max(200),
       startAt: z.string().datetime(),
       durationMin: z.number().int().min(15).max(480),
@@ -76,6 +77,18 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertCanManageProgram(context.userId, data.programaId);
+
+    // Validate cohort belongs to the same program
+    if (data.cohortId) {
+      const { data: cohort } = await supabaseAdmin
+        .from("program_cohorts")
+        .select("id, programa_id")
+        .eq("id", data.cohortId)
+        .maybeSingle();
+      if (!cohort || cohort.programa_id !== data.programaId) {
+        throw new Error("El grupo seleccionado no pertenece a este programa.");
+      }
+    }
 
     const meeting = await zoomApi<{
       id: number;
@@ -107,6 +120,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       .insert({
         programa_id: data.programaId,
         modulo_id: data.moduloId ?? null,
+        cohort_id: data.cohortId ?? null,
         titulo: data.titulo,
         docente_nombre: data.docenteNombre ?? null,
         zoom_meeting_id: String(meeting.id),
@@ -124,6 +138,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     if (error) throw new Error(`No se pudo guardar la reunión: ${error.message}`);
     return row;
   });
+
 
 export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
