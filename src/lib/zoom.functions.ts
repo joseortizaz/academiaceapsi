@@ -178,8 +178,9 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
 
     let q = supabaseAdmin
       .from("zoom_meetings")
-      .select("*")
+      .select("*, cohort:program_cohorts(nombre)")
       .order("start_at", { ascending: false });
+
     if (data.programaId) q = q.eq("programa_id", data.programaId);
 
     if (!isAdmin) {
