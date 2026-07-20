@@ -111,7 +111,7 @@ function duracionLabel(p: FeaturedProgram) {
   return null;
 }
 
-function CursosDestacados() {
+function CursosDestacadosSection() {
   const { data: cursos = [], isLoading } = useQuery<FeaturedProgram[]>({
     queryKey: ["programs-destacados-home"],
     queryFn: async () => {
@@ -126,8 +126,59 @@ function CursosDestacados() {
       return data ?? [];
     },
   });
-  return { cursos, isLoading };
+
+  return (
+    <section className="bg-muted/40 py-16 md:py-24">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent">Catálogo</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground md:text-4xl">Cursos destacados</h2>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/programas">Ver catálogo completo</Link>
+          </Button>
+        </div>
+        {isLoading ? (
+          <p className="mt-10 text-center text-muted-foreground">Cargando cursos destacados…</p>
+        ) : cursos.length === 0 ? (
+          <p className="mt-10 text-center text-muted-foreground">Próximamente publicaremos nuestros cursos destacados.</p>
+        ) : (
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {cursos.map((c) => {
+              const dur = duracionLabel(c);
+              const precioFinal = c.precio_descuento ?? c.precio;
+              return (
+                <Card key={c.id} className="overflow-hidden border-border">
+                  <div className="aspect-video bg-gradient-to-br from-primary to-primary/70">
+                    {c.imagen_url && (
+                      <img src={c.imagen_url} alt={c.titulo} className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary">{modalidadLabel(c.modalidad)}</Badge>
+                      <Badge variant="outline" className="capitalize">{c.tipo}</Badge>
+                    </div>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground line-clamp-2">{c.titulo}</h3>
+                    {dur && <p className="mt-1 text-sm text-muted-foreground">Duración: {dur}</p>}
+                    <div className="mt-4 flex items-center justify-between gap-2">
+                      <p className="text-xl font-bold text-primary">{formatDOP(precioFinal)}</p>
+                      <Button asChild size="sm">
+                        <Link to="/programas/$slug" params={{ slug: c.slug }}>Ver detalles</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }
+
 
 const testimonios = [
   { nombre: "María Fernández", ciudad: "Santo Domingo", texto: "El diplomado superó mis expectativas. Los docentes son profesionales reconocidos en el país.", rating: 5 },
