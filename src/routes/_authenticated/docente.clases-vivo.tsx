@@ -368,7 +368,7 @@ function CreateClassDialog({
         </div>
         <div>
           <Label>Programa</Label>
-          <Select value={programaId} onValueChange={setProgramaId}>
+          <Select value={programaId} onValueChange={(v) => { setProgramaId(v); setCohortId("__all__"); }}>
             <SelectTrigger><SelectValue placeholder="Selecciona un programa" /></SelectTrigger>
             <SelectContent>
               {programas.map((p) => (
@@ -377,6 +377,24 @@ function CreateClassDialog({
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <Label>Grupo / Cohorte (opcional)</Label>
+          <Select value={cohortId} onValueChange={setCohortId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Todos los grupos del programa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">Todos los grupos del programa</SelectItem>
+              {cohorts.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Si eliges un grupo, solo esos alumnos verán la clase.
+          </p>
+        </div>
+
         <div className="grid grid-cols-3 gap-3">
           <div>
             <Label htmlFor="cls-fecha">Fecha</Label>
