@@ -81,17 +81,111 @@ function HeroCarousel() {
 }
 
 
-const cursos = [
-  { titulo: "Diplomado en Psicología Clínica", tipo: "En vivo por Zoom", duracion: "6 meses", precio: "RD$ 28,500", nivel: "Avanzado" },
-  { titulo: "Curso de Terapia Cognitivo-Conductual", tipo: "Asincrónico", duracion: "8 semanas", precio: "RD$ 9,800", nivel: "Intermedio" },
-  { titulo: "Diplomado en Neuropsicología Infantil", tipo: "En vivo por Zoom", duracion: "5 meses", precio: "RD$ 24,000", nivel: "Avanzado" },
-];
+type FeaturedProgram = {
+  id: string;
+  slug: string;
+  titulo: string;
+  tipo: string;
+  modalidad: string;
+  imagen_url: string | null;
+  precio: number;
+  precio_descuento: number | null;
+  duracion_semanas: number | null;
+  duracion_horas: number | null;
+};
+
+function formatDOP(n: number) {
+  return new Intl.NumberFormat("es-DO", { style: "currency", currency: "DOP", maximumFractionDigits: 0 }).format(n);
+}
+
+function modalidadLabel(m: string) {
+  if (m === "presencial") return "Presencial";
+  if (m === "en_vivo" || m === "en-vivo" || m === "en vivo") return "En vivo por Zoom";
+  if (m === "asincrónico" || m === "asincronico" || m === "asincrono") return "Asincrónico";
+  return m;
+}
+
+function duracionLabel(p: FeaturedProgram) {
+  if (p.duracion_semanas) return `${p.duracion_semanas} semanas`;
+  if (p.duracion_horas) return `${p.duracion_horas} horas`;
+  return null;
+}
+
+function CursosDestacadosSection() {
+  const { data: cursos = [], isLoading } = useQuery<FeaturedProgram[]>({
+    queryKey: ["programs-destacados-home"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("programs")
+        .select("id, slug, titulo, tipo, modalidad, imagen_url, precio, precio_descuento, duracion_semanas, duracion_horas")
+        .eq("destacado", true)
+        .eq("estado", "publicado")
+        .order("updated_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  return (
+    <section className="bg-muted/40 py-16 md:py-24">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-accent">Catálogo</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground md:text-4xl">Cursos destacados</h2>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/programas">Ver catálogo completo</Link>
+          </Button>
+        </div>
+        {isLoading ? (
+          <p className="mt-10 text-center text-muted-foreground">Cargando cursos destacados…</p>
+        ) : cursos.length === 0 ? (
+          <p className="mt-10 text-center text-muted-foreground">Próximamente publicaremos nuestros cursos destacados.</p>
+        ) : (
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {cursos.map((c) => {
+              const dur = duracionLabel(c);
+              const precioFinal = c.precio_descuento ?? c.precio;
+              return (
+                <Card key={c.id} className="overflow-hidden border-border">
+                  <div className="aspect-video bg-gradient-to-br from-primary to-primary/70">
+                    {c.imagen_url && (
+                      <img src={c.imagen_url} alt={c.titulo} className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary">{modalidadLabel(c.modalidad)}</Badge>
+                      <Badge variant="outline" className="capitalize">{c.tipo}</Badge>
+                    </div>
+                    <h3 className="mt-3 text-lg font-semibold text-foreground line-clamp-2">{c.titulo}</h3>
+                    {dur && <p className="mt-1 text-sm text-muted-foreground">Duración: {dur}</p>}
+                    <div className="mt-4 flex items-center justify-between gap-2">
+                      <p className="text-xl font-bold text-primary">{formatDOP(precioFinal)}</p>
+                      <Button asChild size="sm">
+                        <Link to="/programas/$slug" params={{ slug: c.slug }}>Ver detalles</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 
 const testimonios = [
   { nombre: "María Fernández", ciudad: "Santo Domingo", texto: "El diplomado superó mis expectativas. Los docentes son profesionales reconocidos en el país.", rating: 5 },
   { nombre: "Luis Peña", ciudad: "Santiago", texto: "Pude estudiar a mi ritmo desde el Cibao. La plataforma es excelente y muy clara.", rating: 5 },
   { nombre: "Rosa Jiménez", ciudad: "La Romana", texto: "Recibí mi certificado al instante. Hoy aplico todo lo aprendido en mi consulta.", rating: 5 },
 ];
+
 
 function Home() {
   return (
@@ -164,38 +258,8 @@ function Home() {
       </section>
 
       {/* CURSOS DESTACADOS */}
-      <section className="bg-muted/40 py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent">Catálogo</p>
-              <h2 className="mt-2 text-3xl font-bold text-foreground md:text-4xl">Cursos destacados</h2>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/registro">Ver catálogo completo</Link>
-            </Button>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {cursos.map((c) => (
-              <Card key={c.titulo} className="overflow-hidden border-border">
-                <div className="aspect-video bg-gradient-to-br from-primary to-primary/70" />
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{c.tipo}</Badge>
-                    <Badge variant="outline">{c.nivel}</Badge>
-                  </div>
-                  <h3 className="mt-3 text-lg font-semibold text-foreground">{c.titulo}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Duración: {c.duracion}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <p className="text-xl font-bold text-primary">{c.precio}</p>
-                    <Button asChild size="sm"><Link to="/registro">Inscribirme</Link></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CursosDestacadosSection />
+
 
       {/* TESTIMONIOS */}
       <section className="bg-background py-16 md:py-24">
