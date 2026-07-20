@@ -81,17 +81,60 @@ function HeroCarousel() {
 }
 
 
-const cursos = [
-  { titulo: "Diplomado en Psicología Clínica", tipo: "En vivo por Zoom", duracion: "6 meses", precio: "RD$ 28,500", nivel: "Avanzado" },
-  { titulo: "Curso de Terapia Cognitivo-Conductual", tipo: "Asincrónico", duracion: "8 semanas", precio: "RD$ 9,800", nivel: "Intermedio" },
-  { titulo: "Diplomado en Neuropsicología Infantil", tipo: "En vivo por Zoom", duracion: "5 meses", precio: "RD$ 24,000", nivel: "Avanzado" },
-];
+type FeaturedProgram = {
+  id: string;
+  slug: string;
+  titulo: string;
+  tipo: string;
+  modalidad: string;
+  imagen_url: string | null;
+  precio: number;
+  precio_descuento: number | null;
+  duracion_semanas: number | null;
+  duracion_horas: number | null;
+};
+
+function formatDOP(n: number) {
+  return new Intl.NumberFormat("es-DO", { style: "currency", currency: "DOP", maximumFractionDigits: 0 }).format(n);
+}
+
+function modalidadLabel(m: string) {
+  if (m === "presencial") return "Presencial";
+  if (m === "en_vivo" || m === "en-vivo" || m === "en vivo") return "En vivo por Zoom";
+  if (m === "asincrónico" || m === "asincronico" || m === "asincrono") return "Asincrónico";
+  return m;
+}
+
+function duracionLabel(p: FeaturedProgram) {
+  if (p.duracion_semanas) return `${p.duracion_semanas} semanas`;
+  if (p.duracion_horas) return `${p.duracion_horas} horas`;
+  return null;
+}
+
+function CursosDestacados() {
+  const { data: cursos = [], isLoading } = useQuery<FeaturedProgram[]>({
+    queryKey: ["programs-destacados-home"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("programs")
+        .select("id, slug, titulo, tipo, modalidad, imagen_url, precio, precio_descuento, duracion_semanas, duracion_horas")
+        .eq("destacado", true)
+        .eq("estado", "publicado")
+        .order("updated_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  return { cursos, isLoading };
+}
 
 const testimonios = [
   { nombre: "María Fernández", ciudad: "Santo Domingo", texto: "El diplomado superó mis expectativas. Los docentes son profesionales reconocidos en el país.", rating: 5 },
   { nombre: "Luis Peña", ciudad: "Santiago", texto: "Pude estudiar a mi ritmo desde el Cibao. La plataforma es excelente y muy clara.", rating: 5 },
   { nombre: "Rosa Jiménez", ciudad: "La Romana", texto: "Recibí mi certificado al instante. Hoy aplico todo lo aprendido en mi consulta.", rating: 5 },
 ];
+
 
 function Home() {
   return (
