@@ -207,38 +207,8 @@ function Home() {
       </section>
 
       {/* CURSOS DESTACADOS */}
-      <section className="bg-muted/40 py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent">Catálogo</p>
-              <h2 className="mt-2 text-3xl font-bold text-foreground md:text-4xl">Cursos destacados</h2>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/registro">Ver catálogo completo</Link>
-            </Button>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {cursos.map((c) => (
-              <Card key={c.titulo} className="overflow-hidden border-border">
-                <div className="aspect-video bg-gradient-to-br from-primary to-primary/70" />
-                <CardContent className="p-6">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{c.tipo}</Badge>
-                    <Badge variant="outline">{c.nivel}</Badge>
-                  </div>
-                  <h3 className="mt-3 text-lg font-semibold text-foreground">{c.titulo}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Duración: {c.duracion}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <p className="text-xl font-bold text-primary">{c.precio}</p>
-                    <Button asChild size="sm"><Link to="/registro">Inscribirme</Link></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CursosDestacadosSection />
+
 
       {/* TESTIMONIOS */}
       <section className="bg-background py-16 md:py-24">
