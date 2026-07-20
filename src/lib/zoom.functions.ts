@@ -212,7 +212,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("id, programa_id, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
+      .select("id, programa_id, cohort_id, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
       .eq("id", data.meetingRowId)
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
@@ -242,8 +242,21 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       if (!enr || !["activo", "completado"].includes(enr.estado)) {
         throw new Error("No tienes acceso a esta clase.");
       }
+      // Si la reunión está restringida a un cohort, exigir pertenencia activa.
+      if (meeting.cohort_id) {
+        const { data: ce } = await supabaseAdmin
+          .from("cohort_enrollments")
+          .select("estado")
+          .eq("cohort_id", meeting.cohort_id)
+          .eq("user_id", context.userId)
+          .maybeSingle();
+        if (!ce || ce.estado !== "activo") {
+          throw new Error("Esta clase es exclusiva de otro grupo.");
+        }
+      }
       role = 0;
     }
+
 
     const { data: profile } = await supabaseAdmin
       .from("profiles")
