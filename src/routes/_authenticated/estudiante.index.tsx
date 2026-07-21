@@ -124,9 +124,12 @@ function EstudianteDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">¡Hola, {user?.nombre}! 👋</h1>
-        <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">¡Hola, {user?.nombre}! 👋</h1>
+          <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
+        </div>
+        <NextLiveClassWidget live={liveZoomClass} upcoming={upcomingZoom} />
       </div>
 
       {liveZoomClass && <LiveZoomBanner cls={liveZoomClass} />}
@@ -370,6 +373,58 @@ function StatCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function NextLiveClassWidget({
+  live, upcoming,
+}: { live?: ZoomMeetingLite; upcoming?: ZoomMeetingLite }) {
+  const cls = live ?? upcoming;
+  if (!cls) {
+    return (
+      <div className="hidden min-w-[260px] rounded-lg border bg-card p-3 text-sm shadow-sm sm:block">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Video className="h-4 w-4" />
+          <span className="text-xs font-semibold uppercase tracking-wide">Próxima clase en vivo</span>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">Sin sesiones programadas.</p>
+      </div>
+    );
+  }
+  const isLive = !!live;
+  return (
+    <div className={`min-w-[260px] rounded-lg border p-3 text-sm shadow-sm ${isLive ? "border-red-500/40 bg-red-500/5" : "border-primary/30 bg-primary/5"}`}>
+      <div className="flex items-center gap-2">
+        {isLive ? (
+          <>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wide text-red-600">En vivo ahora</span>
+          </>
+        ) : (
+          <>
+            <Video className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold uppercase tracking-wide text-primary">Próxima clase en vivo</span>
+          </>
+        )}
+      </div>
+      <p className="mt-1 truncate text-sm font-semibold">{cls.titulo}</p>
+      <p className="truncate text-xs text-muted-foreground">
+        {new Date(cls.start_at).toLocaleString("es-DO", {
+          weekday: "short", day: "2-digit", month: "short",
+          hour: "2-digit", minute: "2-digit",
+        })}
+      </p>
+      {isLive && (
+        <Button asChild size="sm" className="mt-2 w-full bg-red-600 hover:bg-red-700">
+          <Link to="/clase-vivo/$meetingId" params={{ meetingId: cls.id }}>
+            <Radio className="mr-1 h-3 w-3" /> Unirse
+          </Link>
+        </Button>
+      )}
+    </div>
   );
 }
 
