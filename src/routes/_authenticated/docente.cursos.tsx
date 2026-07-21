@@ -257,9 +257,11 @@ function DocenteCursos() {
           <Tabs defaultValue="lecciones">
             <TabsList>
               <TabsTrigger value="lecciones">Lecciones</TabsTrigger>
+              <TabsTrigger value="clases">Clases en vivo</TabsTrigger>
               <TabsTrigger value="alumnos">Alumnos inscritos</TabsTrigger>
               <TabsTrigger value="info">Información</TabsTrigger>
             </TabsList>
+
 
             <TabsContent value="lecciones" className="space-y-4">
               <div className="flex justify-between">
