@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/docente/grupos")({
       { name: "description", content: "Consulta y gestión de los grupos asignados al docente en Academia Ceapsi." },
       { property: "og:title", content: "Mis grupos docentes — Academia Ceapsi" },
       { property: "og:description", content: "Consulta y gestión de los grupos asignados al docente en Academia Ceapsi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DocenteGrupos,
