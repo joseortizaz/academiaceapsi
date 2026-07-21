@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { signMeetingSdkJwt, zoomApi } from "./zoom.server";
+import { getZakToken, signMeetingSdkJwt, zoomApi } from "./zoom.server";
 
 async function getUserRoles(userId: string): Promise<string[]> {
   const { data } = await supabaseAdmin
@@ -139,7 +139,6 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     return row;
   });
 
-
 export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid() }).parse)
@@ -257,7 +256,6 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       role = 0;
     }
 
-
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("nombre, apellido")
@@ -274,6 +272,21 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       meetingNumber: meeting.zoom_meeting_id,
       role,
     });
+
+    // Desde el 2 de marzo de 2026, Zoom exige que un usuario "no logueado" (nuestro
+    // caso: el Meeting SDK JWT no pasa por el login de Zoom) que actúa como ANFITRIÓN
+    // de una reunión programada se autentique además con un token ZAK. Sin esto, el
+    // SDK devuelve JOIN_MEETING_FAILED / errorCode 200 aunque la firma sea válida.
+    // Los asistentes (role 0) sí pueden unirse de forma anónima sin ZAK.
+    let zak: string | undefined;
+    if (role === 1) {
+      try {
+        zak = await getZakToken("me");
+      } catch (e) {
+        console.warn("No se pudo obtener ZAK token para el host:", e);
+      }
+    }
+
     return {
       signature,
       sdkKey,
@@ -284,10 +297,9 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       userName,
       userEmail: email,
       joinUrl: meeting.zoom_join_url ?? "",
+      zak: zak ?? "",
       // startUrl es la URL de host: solo la devolvemos a admin/docente (role === 1),
       // nunca a estudiantes, para evitar que puedan iniciar la reunión como anfitrión.
       startUrl: role === 1 ? (meeting.zoom_start_url ?? "") : "",
     };
   });
-
-

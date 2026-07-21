@@ -55,6 +55,21 @@ export async function zoomApi<T = unknown>(path: string, init: RequestInit = {})
   return json as T;
 }
 
+/**
+ * ZAK (Zoom Access Key) del usuario "me" (el usuario detrás de las credenciales
+ * Server-to-Server OAuth, que es quien figura como host de las reuniones creadas
+ * vía /users/me/meetings). Desde marzo de 2026 Zoom exige un token ZAK u OBF para
+ * que un usuario "no logueado" (nuestro caso: el Meeting SDK JWT no involucra login
+ * de Zoom) pueda actuar como ANFITRIÓN de una reunión programada; sin esto, el join
+ * como host falla con errorCode 200 "Fail to join the meeting" aunque la firma sea válida.
+ * Requiere el scope `user:read:token` en la app Server-to-Server OAuth.
+ */
+export async function getZakToken(userId = "me"): Promise<string> {
+  const data = await zoomApi<{ token: string }>(`/users/${encodeURIComponent(userId)}/token?type=zak`);
+  if (!data?.token) throw new Error("Zoom no devolvió un token ZAK para el host.");
+  return data.token;
+}
+
 /** Firma JWT del Meeting SDK (HS256). role: 0=attendee, 1=host. */
 export function signMeetingSdkJwt(params: {
   meetingNumber: string;
