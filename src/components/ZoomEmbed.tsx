@@ -132,7 +132,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         setState("in-meeting");
       } catch (e) {
         if (cancelled) return;
-        const msg = e instanceof Error ? e.message : String(e);
+        const msg = stringifyZoomError(e);
         setError(msg);
         setState("fallback");
         toast.error("No se pudo iniciar la reunión embebida", { description: msg });
@@ -211,6 +211,27 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
       </div>
     </div>
   );
+}
+
+// El SDK de Zoom suele rechazar sus promesas con un objeto plano
+// (p. ej. { type: "JOIN_MEETING_FAILED", reason: "...", errorCode: 200 })
+// en vez de un Error real. `String(e)` en ese caso da "[object Object]",
+// que es lo que se veía en el toast. Esto arma un mensaje legible.
+function stringifyZoomError(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (e && typeof e === "object") {
+    const obj = e as Record<string, unknown>;
+    const parts = [obj.type, obj.reason, obj.errorCode != null ? `código ${obj.errorCode}` : null]
+      .filter(Boolean)
+      .join(" — ");
+    if (parts) return parts;
+    try {
+      return JSON.stringify(obj);
+    } catch {
+      // fall through
+    }
+  }
+  return String(e);
 }
 
 async function waitForRef<T>(ref: React.MutableRefObject<T | null>, timeoutMs = 5000): Promise<T | null> {
