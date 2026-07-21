@@ -15,8 +15,23 @@ import {
 import { Users, Calendar, MapPin, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/docente/grupos")({
+  head: () => ({
+    meta: [
+      { title: "Mis grupos docentes — Academia Ceapsi" },
+      { name: "description", content: "Consulta y gestión de los grupos asignados al docente en Academia Ceapsi." },
+      { property: "og:title", content: "Mis grupos docentes — Academia Ceapsi" },
+      { property: "og:description", content: "Consulta y gestión de los grupos asignados al docente en Academia Ceapsi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: DocenteGrupos,
 });
+
+function formatStudentName(enrollment: any, profile?: any) {
+  const profileName = [profile?.nombre, profile?.apellido].filter(Boolean).join(" ").trim();
+  return profileName || enrollment.nombre_completo || enrollment.email_contacto || "Alumno sin nombre";
+}
 
 function DocenteGrupos() {
   const { user } = useAuth();
@@ -113,6 +128,19 @@ function CohortCard({ cohort, onEdit }: { cohort: any; onEdit: () => void }) {
     },
   });
 
+  const userIds = enrolls.map((e: any) => e.user_id).filter(Boolean);
+  const { data: profilesById = new Map<string, any>() } = useQuery({
+    queryKey: ["docente-cohort-member-profiles", cohort.id, userIds.join(",")],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await (supabase.from as any)("profiles_public")
+        .select("id,nombre,apellido")
+        .in("id", userIds);
+      if (error) throw error;
+      return new Map(((data as any[]) ?? []).map((profile) => [profile.id, profile]));
+    },
+  });
+
   return (
     <Card className="p-5">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
@@ -162,7 +190,7 @@ function CohortCard({ cohort, onEdit }: { cohort: any; onEdit: () => void }) {
           <ul className="space-y-1 text-sm">
             {enrolls.map((e: any) => (
               <li key={e.id} className="rounded border px-3 py-1.5">
-                {e.nombre_completo ?? e.email_contacto ?? e.user_id.slice(0, 8)}
+                {formatStudentName(e, profilesById.get(e.user_id))}
               </li>
             ))}
           </ul>
