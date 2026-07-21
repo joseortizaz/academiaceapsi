@@ -52,7 +52,7 @@ const emptyLeccion = (programa_id: string): Leccion => ({
 function DocenteCursos() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [openSession, setOpenSession] = useState<string | null>(null);
+  const listMeetingsFn = useServerFn(listZoomMeetings);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [openLec, setOpenLec] = useState(false);
   const [editingLec, setEditingLec] = useState<Leccion>(emptyLeccion(""));
