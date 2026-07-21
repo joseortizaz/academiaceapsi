@@ -51,24 +51,34 @@ function DocenteResumen() {
     },
   });
 
-  const { data: modulos = [] } = useQuery({
-    queryKey: ["docente-modulos-live", programaIds],
-    enabled: programaIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("program_modules")
-        .select("*")
-        .in("programa_id", programaIds)
-        .eq("es_en_vivo", true)
-        .not("fecha_sesion", "is", null);
-      return data ?? [];
-    },
+  const listMeetingsFn = useServerFn(listZoomMeetings);
+  type MeetingRow = {
+    id: string;
+    titulo: string;
+    start_at: string;
+    duration_min: number;
+    status: "scheduled" | "live" | "ended" | "recorded";
+    zoom_start_url: string | null;
+    cohort?: { nombre: string } | null;
+  };
+  const { data: meetings = [] } = useQuery<MeetingRow[]>({
+    queryKey: ["docente-zoom-meetings"],
+    queryFn: async () => (await listMeetingsFn({ data: {} })) as MeetingRow[],
+    refetchInterval: 30_000,
   });
 
-  const proximas = modulos
-    .filter((m) => m.fecha_sesion && new Date(m.fecha_sesion) >= new Date())
-    .sort((a, b) => new Date(a.fecha_sesion!).getTime() - new Date(b.fecha_sesion!).getTime())
+  const now = Date.now();
+  const isLiveNow = (m: MeetingRow) => {
+    const start = new Date(m.start_at).getTime();
+    const end = start + m.duration_min * 60 * 1000;
+    return now >= start - 5 * 60 * 1000 && now <= end;
+  };
+  const proximas = meetings
+    .filter((m) => m.status !== "ended" && m.status !== "recorded")
+    .filter((m) => isLiveNow(m) || new Date(m.start_at).getTime() >= now)
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
     .slice(0, 5);
+
 
   const cursosActivos = programas.filter((p) => p.estado === "publicado" || p.estado === "en_curso").length;
   const totalAlumnos = enrollments.length;
