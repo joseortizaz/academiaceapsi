@@ -124,9 +124,12 @@ function EstudianteDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">¡Hola, {user?.nombre}! 👋</h1>
-        <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">¡Hola, {user?.nombre}! 👋</h1>
+          <p className="text-muted-foreground">Aquí tienes el resumen de tu aprendizaje.</p>
+        </div>
+        <NextLiveClassWidget live={liveZoomClass} upcoming={upcomingZoom} />
       </div>
 
       {liveZoomClass && <LiveZoomBanner cls={liveZoomClass} />}
