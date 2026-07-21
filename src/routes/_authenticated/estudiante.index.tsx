@@ -417,10 +417,16 @@ function NextLiveClassWidget({
           hour: "2-digit", minute: "2-digit",
         })}
       </p>
-      {isLive && (
+      {isLive ? (
         <Button asChild size="sm" className="mt-2 w-full bg-red-600 hover:bg-red-700">
           <Link to="/clase-vivo/$meetingId" params={{ meetingId: cls.id }}>
             <Radio className="mr-1 h-3 w-3" /> Unirse
+          </Link>
+        </Button>
+      ) : (
+        <Button asChild size="sm" variant="outline" className="mt-2 w-full">
+          <Link to="/clase-vivo/$meetingId" params={{ meetingId: cls.id }}>
+            <Video className="mr-1 h-3 w-3" /> Unirse a la clase
           </Link>
         </Button>
       )}
