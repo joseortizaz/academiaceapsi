@@ -123,6 +123,10 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           password: sig.password,
           userName: sig.userName || "Participante",
           userEmail: sig.userEmail || undefined,
+          // Requerido por Zoom (desde el 2 de marzo de 2026) para que un usuario no
+          // logueado en Zoom pueda actuar como anfitrión (role 1) de una reunión
+          // programada. Los asistentes (role 0) se unen de forma anónima sin esto.
+          zak: sig.zak || undefined,
         });
         if (cancelled) return;
         setState("in-meeting");
