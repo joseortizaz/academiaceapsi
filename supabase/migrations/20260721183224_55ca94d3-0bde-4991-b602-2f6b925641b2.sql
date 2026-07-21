@@ -1,0 +1,2 @@
+DROP POLICY "Admins manage options" ON public.course_request_options;
+CREATE POLICY "Admins manage options" ON public.course_request_options FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
