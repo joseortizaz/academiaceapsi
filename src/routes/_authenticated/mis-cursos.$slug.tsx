@@ -664,6 +664,7 @@ function CursoPlayer() {
           ) : (
             <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
           )}
+          </div>
         </main>
       </div>
     </div>
