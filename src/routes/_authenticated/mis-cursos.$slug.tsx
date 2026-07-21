@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock,
+  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
@@ -126,6 +126,39 @@ function CursoPlayer() {
       return (data as any) ?? null;
     },
   });
+
+  const { data: liveMeetings = [] } = useQuery({
+    queryKey: ["mc-zoom", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id && enrollment?.estado === "activo",
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data: ce } = await supabase
+        .from("cohort_enrollments")
+        .select("cohort_id")
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      const myCohortIds = new Set((ce ?? []).map((r: any) => r.cohort_id));
+      const { data } = await supabase
+        .from("zoom_meetings_student" as never)
+        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,cohort_id,programa_id")
+        .eq("programa_id", programa!.id)
+        .order("start_at", { ascending: true });
+      const rows = ((data ?? []) as any[]).filter(
+        (r) => r.cohort_id == null || myCohortIds.has(r.cohort_id),
+      );
+      return rows;
+    },
+  });
+
+  const now = Date.now();
+  const liveNow = liveMeetings.find((c: any) => {
+    const start = new Date(c.start_at).getTime();
+    const end = start + (c.duration_min ?? 60) * 60 * 1000;
+    return c.status === "live" || (now >= start - 5 * 60 * 1000 && now <= end);
+  });
+  const nextUpcoming = liveMeetings
+    .filter((c: any) => c.status === "scheduled" && new Date(c.start_at).getTime() > now)
+    .sort((a: any, b: any) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
 
   const cohortStart: Date | null = useMemo(() => {
     const f = cohortInfo?.program_cohorts?.fecha_inicio;
@@ -450,7 +483,58 @@ function CursoPlayer() {
           )}
         </aside>
 
-        <main className="rounded-lg border bg-card p-6">
+        <main className="space-y-4">
+          {(liveNow || nextUpcoming) && (
+            <div
+              className={`rounded-lg border p-4 ${
+                liveNow
+                  ? "border-red-500/40 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent"
+                  : "border-primary/30 bg-primary/5"
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {liveNow ? (
+                    <span className="relative flex h-3 w-3">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                    </span>
+                  ) : (
+                    <Video className="h-5 w-5 text-primary" />
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {liveNow ? (
+                        <Badge className="bg-red-500 text-white hover:bg-red-500">EN VIVO AHORA</Badge>
+                      ) : (
+                        <Badge variant="outline">Próxima clase en vivo</Badge>
+                      )}
+                      <span className="text-sm font-semibold">
+                        {(liveNow ?? nextUpcoming)!.titulo}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {(liveNow ?? nextUpcoming)!.docente_nombre ?? ""}
+                      {" · "}
+                      {new Date((liveNow ?? nextUpcoming)!.start_at).toLocaleString("es-DO", {
+                        weekday: "short", day: "2-digit", month: "short",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </div>
+                {liveNow && (
+                  <Button asChild size="sm" className="bg-red-600 hover:bg-red-700">
+                    <Link to="/clase-vivo/$meetingId" params={{ meetingId: liveNow.id }}>
+                      <Radio className="mr-2 h-4 w-4" /> Unirse a la clase
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-lg border bg-card p-6">
           {activeModule && isLocked(activeModule) ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="rounded-full bg-muted p-4">
@@ -580,6 +664,7 @@ function CursoPlayer() {
           ) : (
             <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
           )}
+          </div>
         </main>
       </div>
     </div>
