@@ -108,6 +108,68 @@ export type Database = {
           },
         ]
       }
+      assessment_submissions: {
+        Row: {
+          assessment_id: string
+          auto_calificado: boolean
+          calificado_por: string | null
+          created_at: string
+          estado: string
+          fecha_calificacion: string | null
+          fecha_entrega: string
+          feedback: string | null
+          id: string
+          porcentaje: number | null
+          puntaje_maximo: number | null
+          puntaje_obtenido: number | null
+          respuestas: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessment_id: string
+          auto_calificado?: boolean
+          calificado_por?: string | null
+          created_at?: string
+          estado?: string
+          fecha_calificacion?: string | null
+          fecha_entrega?: string
+          feedback?: string | null
+          id?: string
+          porcentaje?: number | null
+          puntaje_maximo?: number | null
+          puntaje_obtenido?: number | null
+          respuestas?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessment_id?: string
+          auto_calificado?: boolean
+          calificado_por?: string | null
+          created_at?: string
+          estado?: string
+          fecha_calificacion?: string | null
+          fecha_entrega?: string
+          feedback?: string | null
+          id?: string
+          porcentaje?: number | null
+          puntaje_maximo?: number | null
+          puntaje_obtenido?: number | null
+          respuestas?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_submissions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           created_at: string
@@ -2175,6 +2237,16 @@ export type Database = {
           message: Json
           msg_id: number
           read_ct: number
+        }[]
+      }
+      submit_assessment: {
+        Args: { _assessment_id: string; _respuestas: Json }
+        Returns: {
+          auto_calificado: boolean
+          porcentaje: number
+          puntaje_maximo: number
+          puntaje_obtenido: number
+          submission_id: string
         }[]
       }
       validate_coupon: {
