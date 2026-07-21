@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Estudiantes inscritos ven reuniones (via view)" ON public.zoom_meetings;
