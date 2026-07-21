@@ -1,92 +1,204 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, XCircle, Trophy, FileText, Clock, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
   component: Evaluaciones,
 });
 
-type Pregunta = {
-  pregunta: string;
-  opciones: string[];
-  correcta: number;
-};
-
-type Quiz = {
+type Assessment = {
   id: string;
+  programa_id: string;
   titulo: string;
-  curso: string;
-  duracion: string;
-  preguntas: Pregunta[];
+  descripcion: string | null;
+  instrucciones: string | null;
+  tipo: "examen" | "quiz" | "tarea";
+  puntaje_maximo: number;
+  duracion_minutos: number | null;
+  fecha_limite: string | null;
+  programs?: { titulo: string; slug: string } | null;
 };
 
-type HistorialItem = {
-  curso: string;
-  quiz: string;
-  nota: number;
-  fecha: string;
-  estado: "Aprobado" | "Reprobado";
+type Question = {
+  id: string;
+  enunciado: string;
+  tipo: "opcion_multiple" | "verdadero_falso" | "respuesta_corta" | "desarrollo";
+  opciones: string[] | null;
+  puntaje: number;
+  orden: number;
 };
 
-const QUIZZES: Quiz[] = [];
-const HISTORIAL: HistorialItem[] = [];
+type Submission = {
+  id: string;
+  assessment_id: string;
+  puntaje_obtenido: number | null;
+  puntaje_maximo: number | null;
+  porcentaje: number | null;
+  estado: "entregado" | "calificado" | "revision";
+  feedback: string | null;
+  fecha_entrega: string;
+  auto_calificado: boolean;
+};
+
+const tipoLabel: Record<string, string> = {
+  examen: "Examen", quiz: "Quiz", tarea: "Tarea",
+};
 
 function Evaluaciones() {
-  const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null);
+  const { user } = useAuth();
+  const [active, setActive] = useState<Assessment | null>(null);
+
+  const enrollmentsQ = useQuery({
+    queryKey: ["student-enrollments", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("enrollments")
+        .select("programa_id")
+        .eq("user_id", user!.id)
+        .in("estado", ["activo", "completado"]);
+      if (error) throw error;
+      return data.map((e) => e.programa_id);
+    },
+  });
+
+  const assessmentsQ = useQuery({
+    queryKey: ["student-assessments", enrollmentsQ.data],
+    enabled: !!enrollmentsQ.data && enrollmentsQ.data.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("assessments")
+        .select("id, programa_id, titulo, descripcion, instrucciones, tipo, puntaje_maximo, duracion_minutos, fecha_limite, programs(titulo, slug)")
+        .eq("publicado", true)
+        .in("programa_id", enrollmentsQ.data!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as unknown as Assessment[];
+    },
+  });
+
+  const submissionsQ = useQuery({
+    queryKey: ["student-submissions", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("assessment_submissions")
+        .select("id, assessment_id, puntaje_obtenido, puntaje_maximo, porcentaje, estado, feedback, fecha_entrega, auto_calificado")
+        .eq("user_id", user!.id)
+        .order("fecha_entrega", { ascending: false });
+      if (error) throw error;
+      return data as Submission[];
+    },
+  });
+
+  const submissionsByAssessment = useMemo(() => {
+    const m = new Map<string, Submission>();
+    (submissionsQ.data ?? []).forEach((s) => {
+      if (!m.has(s.assessment_id)) m.set(s.assessment_id, s);
+    });
+    return m;
+  }, [submissionsQ.data]);
+
+  const historial = useMemo(() => {
+    const assessments = assessmentsQ.data ?? [];
+    return (submissionsQ.data ?? []).map((s) => ({
+      submission: s,
+      assessment: assessments.find((a) => a.id === s.assessment_id),
+    }));
+  }, [submissionsQ.data, assessmentsQ.data]);
+
+  const loading = enrollmentsQ.isLoading || assessmentsQ.isLoading;
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Logros</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Tareas</h1>
         <p className="text-muted-foreground">
-          Pon a prueba tus conocimientos y revisa tu desempeño académico.
+          Realiza tus evaluaciones publicadas y revisa tus calificaciones.
         </p>
       </div>
 
-      {activeQuiz ? (
-        <QuizPlayer quiz={activeQuiz} onExit={() => setActiveQuiz(null)} />
+      {active ? (
+        <AssessmentPlayer
+          assessment={active}
+          previous={submissionsByAssessment.get(active.id) ?? null}
+          onExit={() => setActive(null)}
+        />
       ) : (
         <>
           <section>
-            <h2 className="mb-3 text-lg font-bold">Quizzes disponibles</h2>
-            {QUIZZES.length === 0 ? (
+            <h2 className="mb-3 text-lg font-bold">Disponibles</h2>
+            {loading ? (
+              <Card><CardContent className="flex items-center justify-center py-10"><Loader2 className="h-5 w-5 animate-spin" /></CardContent></Card>
+            ) : (assessmentsQ.data?.length ?? 0) === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
                   <ClipboardCheck className="h-10 w-10 text-muted-foreground" />
                   <p className="font-medium">No tienes evaluaciones disponibles</p>
                   <p className="text-sm text-muted-foreground">
-                    Cuando tus docentes publiquen quizzes, aparecerán aquí.
+                    Cuando tus docentes publiquen evaluaciones o tareas, aparecerán aquí.
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
-                {QUIZZES.map((q) => (
-                  <Card key={q.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-base">{q.titulo}</CardTitle>
-                        <Badge variant="outline">{q.duracion}</Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{q.curso}</p>
-                    </CardHeader>
-                    <CardContent className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        {q.preguntas.length} preguntas
-                      </span>
-                      <Button onClick={() => setActiveQuiz(q)} size="sm">
-                        <ClipboardCheck className="mr-2 h-4 w-4" /> Iniciar quiz
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                {assessmentsQ.data!.map((a) => {
+                  const sub = submissionsByAssessment.get(a.id);
+                  const vencido = a.fecha_limite && new Date(a.fecha_limite) < new Date();
+                  return (
+                    <Card key={a.id}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-2">
+                          <CardTitle className="text-base">{a.titulo}</CardTitle>
+                          <Badge variant="outline">{tipoLabel[a.tipo]}</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{a.programs?.titulo}</p>
+                        {a.descripcion && <p className="text-sm text-muted-foreground line-clamp-2">{a.descripcion}</p>}
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                          <span>Puntaje: {a.puntaje_maximo}</span>
+                          {a.duracion_minutos && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{a.duracion_minutos} min</span>}
+                          {a.fecha_limite && (
+                            <span className={vencido ? "text-destructive font-medium" : ""}>
+                              Límite: {new Date(a.fecha_limite).toLocaleDateString("es-DO")}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          {sub ? (
+                            <Badge className={sub.estado === "calificado" ? "bg-emerald-600 hover:bg-emerald-600" : "bg-amber-500 hover:bg-amber-500"}>
+                              {sub.estado === "calificado"
+                                ? `Calificado: ${sub.porcentaje}%`
+                                : "En revisión"}
+                            </Badge>
+                          ) : vencido ? (
+                            <Badge variant="destructive">Vencido</Badge>
+                          ) : (
+                            <Badge variant="secondary">Pendiente</Badge>
+                          )}
+                          <Button size="sm" onClick={() => setActive(a)}>
+                            {sub ? "Ver entrega" : "Comenzar"}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -99,36 +211,38 @@ function Evaluaciones() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="overflow-x-auto">
-                {HISTORIAL.length === 0 ? (
+                {historial.length === 0 ? (
                   <p className="py-8 text-center text-sm text-muted-foreground">
-                    Aún no tienes calificaciones registradas.
+                    Aún no has entregado evaluaciones.
                   </p>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Curso</TableHead>
                         <TableHead>Evaluación</TableHead>
+                        <TableHead>Curso</TableHead>
                         <TableHead>Fecha</TableHead>
                         <TableHead className="text-right">Nota</TableHead>
                         <TableHead>Estado</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {HISTORIAL.map((h, i) => (
-                        <TableRow key={i}>
-                          <TableCell className="font-medium">{h.curso}</TableCell>
-                          <TableCell className="text-muted-foreground">{h.quiz}</TableCell>
+                      {historial.map(({ submission, assessment }) => (
+                        <TableRow key={submission.id}>
+                          <TableCell className="font-medium">{assessment?.titulo ?? "—"}</TableCell>
+                          <TableCell className="text-muted-foreground">{assessment?.programs?.titulo ?? "—"}</TableCell>
                           <TableCell className="text-muted-foreground">
-                            {new Date(h.fecha).toLocaleDateString("es-DO")}
+                            {new Date(submission.fecha_entrega).toLocaleDateString("es-DO")}
                           </TableCell>
-                          <TableCell className="text-right font-bold">{h.nota}</TableCell>
+                          <TableCell className="text-right font-bold">
+                            {submission.porcentaje != null ? `${submission.porcentaje}%` : "—"}
+                          </TableCell>
                           <TableCell>
                             <Badge
-                              variant={h.estado === "Aprobado" ? "default" : "destructive"}
-                              className={h.estado === "Aprobado" ? "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20" : ""}
+                              variant={submission.estado === "calificado" ? "default" : "secondary"}
+                              className={submission.estado === "calificado" ? "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/20" : ""}
                             >
-                              {h.estado}
+                              {submission.estado === "calificado" ? "Calificado" : "En revisión"}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -145,86 +259,200 @@ function Evaluaciones() {
   );
 }
 
-function QuizPlayer({ quiz, onExit }: { quiz: Quiz; onExit: () => void }) {
-  const [respuestas, setRespuestas] = useState<Record<number, number>>({});
-  const [enviado, setEnviado] = useState(false);
+function AssessmentPlayer({
+  assessment, previous, onExit,
+}: { assessment: Assessment; previous: Submission | null; onExit: () => void }) {
+  const qc = useQueryClient();
+  const [respuestas, setRespuestas] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const readOnly = !!previous;
 
-  const aciertos = quiz.preguntas.reduce(
-    (s, p, i) => s + (respuestas[i] === p.correcta ? 1 : 0), 0,
-  );
-  const nota = Math.round((aciertos / quiz.preguntas.length) * 100);
+  const questionsQ = useQuery({
+    queryKey: ["assessment-questions", assessment.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_assessment_questions_for_student", {
+        _assessment_id: assessment.id,
+      });
+      if (error) throw error;
+      return (data ?? []).map((q: {
+        id: string; enunciado: string; tipo: string; opciones: unknown;
+        puntaje: number; orden: number;
+      }) => ({
+        id: q.id,
+        enunciado: q.enunciado,
+        tipo: q.tipo as Question["tipo"],
+        opciones: Array.isArray(q.opciones) ? (q.opciones as string[]) : null,
+        puntaje: q.puntaje,
+        orden: q.orden,
+      })) as Question[];
+    },
+  });
+
+  const handleSubmit = async () => {
+    const questions = questionsQ.data ?? [];
+    const missing = questions.filter((q) => !respuestas[q.id] || respuestas[q.id].trim() === "");
+    if (missing.length > 0) {
+      toast.error(`Debes responder todas las preguntas (${missing.length} pendiente${missing.length > 1 ? "s" : ""}).`);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.rpc("submit_assessment", {
+        _assessment_id: assessment.id,
+        _respuestas: respuestas,
+      });
+      if (error) throw error;
+      const result = Array.isArray(data) ? data[0] : data;
+      if (result?.auto_calificado) {
+        toast.success(`¡Entregado! Calificación: ${result.porcentaje}%`);
+      } else {
+        toast.success("¡Entrega enviada! Tu docente la revisará pronto.");
+      }
+      await qc.invalidateQueries({ queryKey: ["student-submissions"] });
+      onExit();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al enviar");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle>{quiz.titulo}</CardTitle>
-            <p className="text-sm text-muted-foreground">{quiz.curso}</p>
+            <CardTitle>{assessment.titulo}</CardTitle>
+            <p className="text-sm text-muted-foreground">{assessment.programs?.titulo}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onExit}>Salir</Button>
+          <Button variant="ghost" size="sm" onClick={onExit}>Volver</Button>
         </div>
+        {assessment.instrucciones && (
+          <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm">
+            <p className="font-medium flex items-center gap-1"><FileText className="h-4 w-4" /> Instrucciones</p>
+            <p className="mt-1 whitespace-pre-wrap text-muted-foreground">{assessment.instrucciones}</p>
+          </div>
+        )}
+        {previous && (
+          <div className="mt-2 rounded-md border bg-muted/30 p-3 text-sm">
+            <p className="font-medium">Ya entregaste esta evaluación</p>
+            <p className="text-muted-foreground">
+              {previous.estado === "calificado"
+                ? `Nota: ${previous.porcentaje}% (${previous.puntaje_obtenido}/${previous.puntaje_maximo})`
+                : "Pendiente de revisión por tu docente."}
+            </p>
+            {previous.feedback && (
+              <div className="mt-2">
+                <p className="font-medium">Retroalimentación:</p>
+                <p className="text-muted-foreground whitespace-pre-wrap">{previous.feedback}</p>
+              </div>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
-        {quiz.preguntas.map((p, i) => (
-          <div key={i} className="space-y-2">
-            <p className="font-medium">
-              {i + 1}. {p.pregunta}
-            </p>
-            <div className="grid gap-2">
-              {p.opciones.map((op, j) => {
-                const selected = respuestas[i] === j;
-                const correct = enviado && j === p.correcta;
-                const wrong = enviado && selected && j !== p.correcta;
-                return (
-                  <button
-                    key={j}
-                    type="button"
-                    disabled={enviado}
-                    onClick={() => setRespuestas({ ...respuestas, [i]: j })}
-                    className={cn(
-                      "flex items-center justify-between rounded-md border p-3 text-left text-sm transition",
-                      selected && !enviado && "border-primary bg-primary/5",
-                      correct && "border-emerald-500 bg-emerald-500/10",
-                      wrong && "border-red-500 bg-red-500/10",
-                      !enviado && !selected && "hover:bg-muted/50",
-                    )}
-                  >
-                    <span>{op}</span>
-                    {correct && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
-                    {wrong && <XCircle className="h-4 w-4 text-red-600" />}
-                  </button>
-                );
-              })}
+        {questionsQ.isLoading && <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin" /></div>}
+        {questionsQ.data?.map((q, i) => (
+          <div key={q.id} className="space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-medium">{i + 1}. {q.enunciado}</p>
+              <Badge variant="outline" className="shrink-0">{q.puntaje} pts</Badge>
             </div>
+
+            {q.tipo === "opcion_multiple" && q.opciones && (
+              <div className="grid gap-2">
+                {q.opciones.map((op, j) => {
+                  const selected = respuestas[q.id] === op;
+                  return (
+                    <button
+                      key={j}
+                      type="button"
+                      disabled={readOnly}
+                      onClick={() => setRespuestas({ ...respuestas, [q.id]: op })}
+                      className={cn(
+                        "flex items-center justify-between rounded-md border p-3 text-left text-sm transition",
+                        selected && "border-primary bg-primary/5",
+                        !readOnly && !selected && "hover:bg-muted/50",
+                        readOnly && "opacity-60",
+                      )}
+                    >
+                      <span>{op}</span>
+                      {selected && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {q.tipo === "verdadero_falso" && (
+              <div className="grid grid-cols-2 gap-2">
+                {["Verdadero", "Falso"].map((op) => {
+                  const selected = respuestas[q.id] === op;
+                  return (
+                    <button
+                      key={op}
+                      type="button"
+                      disabled={readOnly}
+                      onClick={() => setRespuestas({ ...respuestas, [q.id]: op })}
+                      className={cn(
+                        "rounded-md border p-3 text-sm transition",
+                        selected && "border-primary bg-primary/5",
+                        !readOnly && !selected && "hover:bg-muted/50",
+                        readOnly && "opacity-60",
+                      )}
+                    >
+                      {op}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {q.tipo === "respuesta_corta" && (
+              <Input
+                disabled={readOnly}
+                value={respuestas[q.id] ?? ""}
+                onChange={(e) => setRespuestas({ ...respuestas, [q.id]: e.target.value })}
+                placeholder="Tu respuesta"
+              />
+            )}
+
+            {q.tipo === "desarrollo" && (
+              <div>
+                <Label className="text-xs text-muted-foreground">Respuesta larga (será revisada por tu docente)</Label>
+                <Textarea
+                  disabled={readOnly}
+                  value={respuestas[q.id] ?? ""}
+                  onChange={(e) => setRespuestas({ ...respuestas, [q.id]: e.target.value })}
+                  rows={5}
+                  placeholder="Desarrolla tu respuesta…"
+                />
+              </div>
+            )}
           </div>
         ))}
 
-        {enviado ? (
+        {questionsQ.data?.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground py-6">
+            Esta evaluación aún no tiene preguntas configuradas.
+          </p>
+        )}
+
+        {!readOnly && (questionsQ.data?.length ?? 0) > 0 && (
+          <Button className="w-full" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Enviar entrega
+          </Button>
+        )}
+
+        {readOnly && previous?.estado === "calificado" && previous.porcentaje != null && (
           <div className="rounded-lg border bg-muted/30 p-5 text-center">
             <Trophy className="mx-auto h-10 w-10 text-amber-500" />
-            <p className="mt-2 text-lg font-bold">
-              {aciertos} de {quiz.preguntas.length} correctas
-            </p>
-            <p className="text-3xl font-extrabold text-primary">{nota}%</p>
+            <p className="text-3xl font-extrabold text-primary">{previous.porcentaje}%</p>
             <p className="text-sm text-muted-foreground">
-              {nota >= 70 ? "¡Aprobado! 🎉" : "Sigue practicando 💪"}
+              {previous.porcentaje >= 70 ? "¡Aprobado! 🎉" : "Sigue practicando 💪"}
             </p>
-            <div className="mt-4 flex justify-center gap-2">
-              <Button variant="outline" onClick={() => { setRespuestas({}); setEnviado(false); }}>
-                <RotateCcw className="mr-2 h-4 w-4" /> Reintentar
-              </Button>
-              <Button onClick={onExit}>Finalizar</Button>
-            </div>
           </div>
-        ) : (
-          <Button
-            className="w-full"
-            disabled={Object.keys(respuestas).length !== quiz.preguntas.length}
-            onClick={() => setEnviado(true)}
-          >
-            Enviar respuestas
-          </Button>
         )}
       </CardContent>
     </Card>
