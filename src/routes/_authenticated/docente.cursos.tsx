@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -20,9 +21,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Users, Plus, Video, MessageSquare, Pencil, Trash2 } from "lucide-react";
+import { Users, Plus, Video, MessageSquare, Pencil, Trash2, PlayCircle, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+import { listZoomMeetings } from "@/lib/zoom.functions";
+
 
 export const Route = createFileRoute("/_authenticated/docente/cursos")({
   component: DocenteCursos,
@@ -49,7 +52,7 @@ const emptyLeccion = (programa_id: string): Leccion => ({
 function DocenteCursos() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [openSession, setOpenSession] = useState<string | null>(null);
+  const listMeetingsFn = useServerFn(listZoomMeetings);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [openLec, setOpenLec] = useState(false);
   const [editingLec, setEditingLec] = useState<Leccion>(emptyLeccion(""));
@@ -117,18 +120,33 @@ function DocenteCursos() {
   const refreshLecciones = () =>
     qc.invalidateQueries({ queryKey: ["docente-lecciones", selectedCourse] });
 
-  const handleCreateSession = (e: React.FormEvent<HTMLFormElement>, _programaId: string) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const titulo = (form.elements.namedItem("titulo") as HTMLInputElement).value;
-    toast.success(`Sesión "${titulo}" programada correctamente (simulado).`);
-    form.reset();
-    setOpenSession(null);
-  };
-
   const handleMessage = (nombre: string) => {
     toast.success(`Mensaje enviado a ${nombre} (simulado).`);
   };
+
+  type MeetingRow = {
+    id: string;
+    programa_id: string;
+    titulo: string;
+    start_at: string;
+    duration_min: number;
+    status: "scheduled" | "live" | "ended" | "recorded";
+    zoom_start_url: string | null;
+    cohort?: { nombre: string } | null;
+  };
+  const { data: allMeetings = [] } = useQuery<MeetingRow[]>({
+    queryKey: ["docente-cursos-zoom-meetings"],
+    enabled: programaIds.length > 0,
+    queryFn: async () => (await listMeetingsFn({ data: {} })) as MeetingRow[],
+    refetchInterval: 30_000,
+  });
+  const isLiveNow = (m: MeetingRow) => {
+    const s = new Date(m.start_at).getTime();
+    const e = s + m.duration_min * 60 * 1000;
+    const n = Date.now();
+    return n >= s - 5 * 60 * 1000 && n <= e;
+  };
+
 
   const openCreateLeccion = () => {
     if (!selectedCourse) return;
@@ -216,30 +234,13 @@ function DocenteCursos() {
                     <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedCourse(p.id)}>
                       Ver detalle
                     </Button>
-                    <Dialog open={openSession === p.id} onOpenChange={(o) => setOpenSession(o ? p.id : null)}>
-                      <DialogTrigger asChild>
-                        <Button size="sm" className="flex-1"><Video className="mr-1 h-3 w-3" /> Nueva sesión</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader><DialogTitle>Programar clase en vivo</DialogTitle></DialogHeader>
-                        <form onSubmit={(e) => handleCreateSession(e, p.id)} className="space-y-3">
-                          <div>
-                            <Label htmlFor="titulo">Título</Label>
-                            <Input id="titulo" name="titulo" required placeholder="Ej. Repaso Módulo 4" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><Label htmlFor="fecha">Fecha</Label><Input id="fecha" type="date" required /></div>
-                            <div><Label htmlFor="hora">Hora</Label><Input id="hora" type="time" required /></div>
-                          </div>
-                          <div>
-                            <Label htmlFor="enlace">Enlace Zoom/Meet</Label>
-                            <Input id="enlace" placeholder="https://zoom.us/j/..." required />
-                          </div>
-                          <DialogFooter><Button type="submit">Crear sesión</Button></DialogFooter>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                    <Button asChild size="sm" className="flex-1">
+                      <Link to="/docente/clases-vivo">
+                        <Video className="mr-1 h-3 w-3" /> Nueva sesión
+                      </Link>
+                    </Button>
                   </div>
+
                 </CardContent>
               </Card>
             );
@@ -256,9 +257,11 @@ function DocenteCursos() {
           <Tabs defaultValue="lecciones">
             <TabsList>
               <TabsTrigger value="lecciones">Lecciones</TabsTrigger>
+              <TabsTrigger value="clases">Clases en vivo</TabsTrigger>
               <TabsTrigger value="alumnos">Alumnos inscritos</TabsTrigger>
               <TabsTrigger value="info">Información</TabsTrigger>
             </TabsList>
+
 
             <TabsContent value="lecciones" className="space-y-4">
               <div className="flex justify-between">
@@ -316,8 +319,61 @@ function DocenteCursos() {
               )}
             </TabsContent>
 
+            <TabsContent value="clases" className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Sesiones programadas y en vivo para este curso.
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/docente/clases-vivo">
+                    <Plus className="mr-1 h-4 w-4" /> Programar clase
+                  </Link>
+                </Button>
+              </div>
+              {(() => {
+                const rows = allMeetings
+                  .filter((m) => m.programa_id === selectedCourse)
+                  .filter((m) => m.status !== "ended" && m.status !== "recorded")
+                  .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+                if (rows.length === 0) {
+                  return <p className="text-sm text-muted-foreground">No hay clases en vivo programadas.</p>;
+                }
+                return rows.map((m) => {
+                  const live = isLiveNow(m) || m.status === "live";
+                  return (
+                    <div key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium">{m.titulo}</p>
+                          {live && (
+                            <Badge className="animate-pulse bg-red-500/15 text-red-700 hover:bg-red-500/15">
+                              <Radio className="mr-1 h-3 w-3" /> En vivo
+                            </Badge>
+                          )}
+                          {m.cohort?.nombre ? (
+                            <Badge variant="outline" className="text-xs">Grupo: {m.cohort.nombre}</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">Todos los grupos</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(m.start_at).toLocaleString("es-DO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })} · {m.duration_min} min
+                        </p>
+                      </div>
+                      <Button asChild size="sm" variant={live ? "default" : "outline"}>
+                        <Link to="/clase-vivo/$meetingId" params={{ meetingId: m.id }}>
+                          <PlayCircle className="mr-1 h-3 w-3" /> Iniciar clase
+                        </Link>
+                      </Button>
+                    </div>
+                  );
+                });
+              })()}
+            </TabsContent>
+
             <TabsContent value="alumnos">
               <div className="max-h-96 overflow-y-auto">
+
                 <Table>
                   <TableHeader>
                     <TableRow>
