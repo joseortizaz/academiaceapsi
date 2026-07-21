@@ -1,13 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { listZoomMeetings } from "@/lib/zoom.functions";
 import {
-  Users, BookOpen, ClipboardCheck, MessageCircle, Video, Calendar, ArrowRight,
+  Users, BookOpen, ClipboardCheck, MessageCircle, Video, Calendar, ArrowRight, PlayCircle, Radio,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/docente/")({
   component: DocenteResumen,
