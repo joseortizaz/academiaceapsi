@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -20,9 +21,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Users, Plus, Video, MessageSquare, Pencil, Trash2 } from "lucide-react";
+import { Users, Plus, Video, MessageSquare, Pencil, Trash2, PlayCircle, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+import { listZoomMeetings } from "@/lib/zoom.functions";
+
 
 export const Route = createFileRoute("/_authenticated/docente/cursos")({
   component: DocenteCursos,
