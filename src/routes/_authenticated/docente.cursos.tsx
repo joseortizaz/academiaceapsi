@@ -319,8 +319,61 @@ function DocenteCursos() {
               )}
             </TabsContent>
 
+            <TabsContent value="clases" className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Sesiones programadas y en vivo para este curso.
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/docente/clases-vivo">
+                    <Plus className="mr-1 h-4 w-4" /> Programar clase
+                  </Link>
+                </Button>
+              </div>
+              {(() => {
+                const rows = allMeetings
+                  .filter((m) => m.programa_id === selectedCourse)
+                  .filter((m) => m.status !== "ended" && m.status !== "recorded")
+                  .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+                if (rows.length === 0) {
+                  return <p className="text-sm text-muted-foreground">No hay clases en vivo programadas.</p>;
+                }
+                return rows.map((m) => {
+                  const live = isLiveNow(m) || m.status === "live";
+                  return (
+                    <div key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium">{m.titulo}</p>
+                          {live && (
+                            <Badge className="animate-pulse bg-red-500/15 text-red-700 hover:bg-red-500/15">
+                              <Radio className="mr-1 h-3 w-3" /> En vivo
+                            </Badge>
+                          )}
+                          {m.cohort?.nombre ? (
+                            <Badge variant="outline" className="text-xs">Grupo: {m.cohort.nombre}</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">Todos los grupos</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(m.start_at).toLocaleString("es-DO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })} · {m.duration_min} min
+                        </p>
+                      </div>
+                      <Button asChild size="sm" variant={live ? "default" : "outline"}>
+                        <Link to="/clase-vivo/$meetingId" params={{ meetingId: m.id }}>
+                          <PlayCircle className="mr-1 h-3 w-3" /> Iniciar clase
+                        </Link>
+                      </Button>
+                    </div>
+                  );
+                });
+              })()}
+            </TabsContent>
+
             <TabsContent value="alumnos">
               <div className="max-h-96 overflow-y-auto">
+
                 <Table>
                   <TableHeader>
                     <TableRow>
