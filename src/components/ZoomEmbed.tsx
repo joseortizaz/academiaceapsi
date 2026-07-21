@@ -132,6 +132,14 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         setState("in-meeting");
       } catch (e) {
         if (cancelled) return;
+        // Log el objeto crudo para poder diagnosticar en consola: Zoom incluye
+        // `type`, `reason`, `errorCode` y a veces `method` que aclaran la causa
+        // real de un JOIN_MEETING_FAILED (SDK Key de otra cuenta, ZAK inválido,
+        // meeting inexistente, app no activada, etc.).
+        console.error("[Zoom] Fallo al iniciar reunión embebida:", e, {
+          meetingRowId,
+          info,
+        });
         const msg = stringifyZoomError(e);
         setError(msg);
         setState("fallback");
