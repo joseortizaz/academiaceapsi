@@ -120,14 +120,10 @@ function DocenteCursos() {
   const refreshLecciones = () =>
     qc.invalidateQueries({ queryKey: ["docente-lecciones", selectedCourse] });
 
-  const handleCreateSession = (e: React.FormEvent<HTMLFormElement>, _programaId: string) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const titulo = (form.elements.namedItem("titulo") as HTMLInputElement).value;
-    toast.success(`Sesión "${titulo}" programada correctamente (simulado).`);
-    form.reset();
-    setOpenSession(null);
+  const handleMessage = (nombre: string) => {
+    toast.success(`Mensaje enviado a ${nombre} (simulado).`);
   };
+
 
   const handleMessage = (nombre: string) => {
     toast.success(`Mensaje enviado a ${nombre} (simulado).`);
