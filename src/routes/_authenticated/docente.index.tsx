@@ -133,21 +133,45 @@ function DocenteResumen() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2"><Calendar className="h-4 w-4" /> Próximas clases en vivo</CardTitle>
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/docente/clases-vivo">Gestionar <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            </Button>
           </CardHeader>
           <CardContent className="space-y-2">
             {proximas.length === 0 ? (
               <p className="text-sm text-muted-foreground">No tienes sesiones programadas próximamente.</p>
-            ) : proximas.map((m) => (
-              <div key={m.id} className="flex items-start justify-between gap-3 rounded-md border p-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">{m.titulo}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(m.fecha_sesion!).toLocaleString("es-DO")}</p>
+            ) : proximas.map((m) => {
+              const live = isLiveNow(m) || m.status === "live";
+              return (
+                <div key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium truncate">{m.titulo}</p>
+                      {live && (
+                        <Badge className="animate-pulse bg-red-500/15 text-red-700 hover:bg-red-500/15">
+                          <Radio className="mr-1 h-3 w-3" /> En vivo
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(m.start_at).toLocaleString("es-DO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      {m.cohort?.nombre ? ` · ${m.cohort.nombre}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button asChild size="sm" variant={live ? "default" : "outline"}>
+                      <Link to="/clase-vivo/$meetingId" params={{ meetingId: m.id }}>
+                        <PlayCircle className="mr-1 h-3 w-3" /> Iniciar clase
+                      </Link>
+                    </Button>
+                    <Badge variant="outline" className="gap-1 hidden sm:inline-flex"><Video className="h-3 w-3" /> Zoom</Badge>
+                  </div>
                 </div>
-                <Badge variant="outline" className="gap-1"><Video className="h-3 w-3" /> Zoom</Badge>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
+
       </div>
     </div>
   );
