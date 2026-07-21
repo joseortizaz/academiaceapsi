@@ -483,7 +483,58 @@ function CursoPlayer() {
           )}
         </aside>
 
-        <main className="rounded-lg border bg-card p-6">
+        <main className="space-y-4">
+          {(liveNow || nextUpcoming) && (
+            <div
+              className={`rounded-lg border p-4 ${
+                liveNow
+                  ? "border-red-500/40 bg-gradient-to-r from-red-500/10 via-red-500/5 to-transparent"
+                  : "border-primary/30 bg-primary/5"
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {liveNow ? (
+                    <span className="relative flex h-3 w-3">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                    </span>
+                  ) : (
+                    <Video className="h-5 w-5 text-primary" />
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {liveNow ? (
+                        <Badge className="bg-red-500 text-white hover:bg-red-500">EN VIVO AHORA</Badge>
+                      ) : (
+                        <Badge variant="outline">Próxima clase en vivo</Badge>
+                      )}
+                      <span className="text-sm font-semibold">
+                        {(liveNow ?? nextUpcoming)!.titulo}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {(liveNow ?? nextUpcoming)!.docente_nombre ?? ""}
+                      {" · "}
+                      {new Date((liveNow ?? nextUpcoming)!.start_at).toLocaleString("es-DO", {
+                        weekday: "short", day: "2-digit", month: "short",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </div>
+                {liveNow && (
+                  <Button asChild size="sm" className="bg-red-600 hover:bg-red-700">
+                    <Link to="/clase-vivo/$meetingId" params={{ meetingId: liveNow.id }}>
+                      <Radio className="mr-2 h-4 w-4" /> Unirse a la clase
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-lg border bg-card p-6">
           {activeModule && isLocked(activeModule) ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="rounded-full bg-muted p-4">
