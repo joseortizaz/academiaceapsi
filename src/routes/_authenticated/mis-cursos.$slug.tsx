@@ -127,6 +127,39 @@ function CursoPlayer() {
     },
   });
 
+  const { data: liveMeetings = [] } = useQuery({
+    queryKey: ["mc-zoom", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id && enrollment?.estado === "activo",
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data: ce } = await supabase
+        .from("cohort_enrollments")
+        .select("cohort_id")
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      const myCohortIds = new Set((ce ?? []).map((r: any) => r.cohort_id));
+      const { data } = await supabase
+        .from("zoom_meetings_student" as never)
+        .select("id,titulo,start_at,duration_min,status,zoom_meeting_id,docente_nombre,cohort_id,programa_id")
+        .eq("programa_id", programa!.id)
+        .order("start_at", { ascending: true });
+      const rows = ((data ?? []) as any[]).filter(
+        (r) => r.cohort_id == null || myCohortIds.has(r.cohort_id),
+      );
+      return rows;
+    },
+  });
+
+  const now = Date.now();
+  const liveNow = liveMeetings.find((c: any) => {
+    const start = new Date(c.start_at).getTime();
+    const end = start + (c.duration_min ?? 60) * 60 * 1000;
+    return c.status === "live" || (now >= start - 5 * 60 * 1000 && now <= end);
+  });
+  const nextUpcoming = liveMeetings
+    .filter((c: any) => c.status === "scheduled" && new Date(c.start_at).getTime() > now)
+    .sort((a: any, b: any) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
+
   const cohortStart: Date | null = useMemo(() => {
     const f = cohortInfo?.program_cohorts?.fecha_inicio;
     return f ? new Date(f + "T00:00:00") : null;
