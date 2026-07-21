@@ -219,30 +219,13 @@ function DocenteCursos() {
                     <Button size="sm" variant="outline" className="flex-1" onClick={() => setSelectedCourse(p.id)}>
                       Ver detalle
                     </Button>
-                    <Dialog open={openSession === p.id} onOpenChange={(o) => setOpenSession(o ? p.id : null)}>
-                      <DialogTrigger asChild>
-                        <Button size="sm" className="flex-1"><Video className="mr-1 h-3 w-3" /> Nueva sesión</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader><DialogTitle>Programar clase en vivo</DialogTitle></DialogHeader>
-                        <form onSubmit={(e) => handleCreateSession(e, p.id)} className="space-y-3">
-                          <div>
-                            <Label htmlFor="titulo">Título</Label>
-                            <Input id="titulo" name="titulo" required placeholder="Ej. Repaso Módulo 4" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div><Label htmlFor="fecha">Fecha</Label><Input id="fecha" type="date" required /></div>
-                            <div><Label htmlFor="hora">Hora</Label><Input id="hora" type="time" required /></div>
-                          </div>
-                          <div>
-                            <Label htmlFor="enlace">Enlace Zoom/Meet</Label>
-                            <Input id="enlace" placeholder="https://zoom.us/j/..." required />
-                          </div>
-                          <DialogFooter><Button type="submit">Crear sesión</Button></DialogFooter>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                    <Button asChild size="sm" className="flex-1">
+                      <Link to="/docente/clases-vivo">
+                        <Video className="mr-1 h-3 w-3" /> Nueva sesión
+                      </Link>
+                    </Button>
                   </div>
+
                 </CardContent>
               </Card>
             );
