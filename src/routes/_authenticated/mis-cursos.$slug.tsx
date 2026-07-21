@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock,
+  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
