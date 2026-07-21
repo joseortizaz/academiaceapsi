@@ -124,10 +124,29 @@ function DocenteCursos() {
     toast.success(`Mensaje enviado a ${nombre} (simulado).`);
   };
 
-
-  const handleMessage = (nombre: string) => {
-    toast.success(`Mensaje enviado a ${nombre} (simulado).`);
+  type MeetingRow = {
+    id: string;
+    programa_id: string;
+    titulo: string;
+    start_at: string;
+    duration_min: number;
+    status: "scheduled" | "live" | "ended" | "recorded";
+    zoom_start_url: string | null;
+    cohort?: { nombre: string } | null;
   };
+  const { data: allMeetings = [] } = useQuery<MeetingRow[]>({
+    queryKey: ["docente-cursos-zoom-meetings"],
+    enabled: programaIds.length > 0,
+    queryFn: async () => (await listMeetingsFn({ data: {} })) as MeetingRow[],
+    refetchInterval: 30_000,
+  });
+  const isLiveNow = (m: MeetingRow) => {
+    const s = new Date(m.start_at).getTime();
+    const e = s + m.duration_min * 60 * 1000;
+    const n = Date.now();
+    return n >= s - 5 * 60 * 1000 && n <= e;
+  };
+
 
   const openCreateLeccion = () => {
     if (!selectedCourse) return;
