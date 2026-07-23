@@ -225,12 +225,17 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
     if (isAdmin) {
       role = 1;
     } else if (isDocente) {
+      const { data: teacher } = await supabaseAdmin
+        .from("teachers")
+        .select("id")
+        .eq("user_id", context.userId)
+        .maybeSingle();
       const { data: prog } = await supabaseAdmin
         .from("programs")
         .select("docente_id")
         .eq("id", meeting.programa_id)
         .maybeSingle();
-      role = prog?.docente_id === context.userId ? 1 : 0;
+      role = teacher && prog?.docente_id === teacher.id ? 1 : 0;
     } else {
       const { data: enr } = await supabaseAdmin
         .from("enrollments")
