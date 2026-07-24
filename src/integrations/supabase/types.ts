@@ -2168,9 +2168,7 @@ export type Database = {
           status: string | null
           titulo: string | null
           updated_at: string | null
-          zoom_join_url: string | null
           zoom_meeting_id: string | null
-          zoom_password: string | null
         }
         Relationships: [
           {
