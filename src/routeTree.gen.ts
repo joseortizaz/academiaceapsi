@@ -81,6 +81,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksSyncActiveStudentsRouteImport } from './routes/api/public/hooks/sync-active-students'
+import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './routes/api/public/hooks/reconcile-zoom-recordings'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -481,6 +482,12 @@ const ApiPublicHooksSyncActiveStudentsRoute =
     path: '/api/public/hooks/sync-active-students',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksReconcileZoomRecordingsRoute =
+  ApiPublicHooksReconcileZoomRecordingsRouteImport.update({
+    id: '/api/public/hooks/reconcile-zoom-recordings',
+    path: '/api/public/hooks/reconcile-zoom-recordings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -548,6 +555,7 @@ export interface FileRoutesByFullPath {
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -617,6 +625,7 @@ export interface FileRoutesByTo {
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -692,6 +701,7 @@ export interface FileRoutesById {
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/_authenticated/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -767,6 +777,7 @@ export interface FileRouteTypes {
     | '/docente/'
     | '/estudiante/'
     | '/mis-cursos/'
+    | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/docente'
     | '/estudiante'
     | '/mis-cursos'
+    | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -910,6 +922,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
     | '/_authenticated/mis-cursos/'
+    | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -942,6 +955,7 @@ export interface RootRouteChildren {
   ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksReconcileZoomRecordingsRoute: typeof ApiPublicHooksReconcileZoomRecordingsRoute
   ApiPublicHooksSyncActiveStudentsRoute: typeof ApiPublicHooksSyncActiveStudentsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1456,6 +1470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncActiveStudentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/reconcile-zoom-recordings': {
+      id: '/api/public/hooks/reconcile-zoom-recordings'
+      path: '/api/public/hooks/reconcile-zoom-recordings'
+      fullPath: '/api/public/hooks/reconcile-zoom-recordings'
+      preLoaderRoute: typeof ApiPublicHooksReconcileZoomRecordingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1623,6 +1644,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksReconcileZoomRecordingsRoute:
+    ApiPublicHooksReconcileZoomRecordingsRoute,
   ApiPublicHooksSyncActiveStudentsRoute: ApiPublicHooksSyncActiveStudentsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
