@@ -215,6 +215,13 @@ function UsuariosPage() {
                         <Button size="sm" variant="ghost" onClick={() => setDetalleId(p.id)}>
                           <Eye className="h-4 w-4" />
                         </Button>
+                        {p.id !== current?.id && (
+                          <DeleteButton
+                            label={`la cuenta de ${p.nombre} ${p.apellido} y todos sus datos asociados`}
+                            onConfirm={() => removeUser(p.id)}
+                          />
+                        )}
+
                       </div>
                     </TableCell>
                   </TableRow>
