@@ -84,6 +84,18 @@ function UsuariosPage() {
     qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
   };
 
+  const removeUser = async (id: string) => {
+    try {
+      await deleteUser({ data: { userId: id } });
+      toast.success("Usuario eliminado");
+      qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
+      qc.invalidateQueries({ queryKey: ["admin", "roles"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo eliminar el usuario");
+    }
+  };
+
+
   const filtrados = perfiles.filter((p) => {
     const userRoles = rolesByUser.get(p.id) ?? [];
     if (filtroRol !== "todos" && !userRoles.includes(filtroRol)) return false;
