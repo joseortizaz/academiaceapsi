@@ -17,8 +17,11 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AdminPageHeader, EmptyState } from "@/components/admin/AdminUI";
+import { AdminPageHeader, EmptyState, DeleteButton } from "@/components/admin/AdminUI";
 import { Eye, Search } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteUserAccount } from "@/lib/admin-users.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios")({
   component: UsuariosPage,
@@ -29,6 +32,8 @@ const roles = ["admin", "docente", "estudiante"] as const;
 function UsuariosPage() {
   const { user: current } = useAuth();
   const qc = useQueryClient();
+  const deleteUser = useServerFn(deleteUserAccount);
+
   const [search, setSearch] = useState("");
   const [filtroRol, setFiltroRol] = useState<string>("todos");
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
@@ -80,6 +85,18 @@ function UsuariosPage() {
     toast.success(current ? "Usuario suspendido" : "Usuario activado");
     qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
   };
+
+  const removeUser = async (id: string) => {
+    try {
+      await deleteUser({ data: { userId: id } });
+      toast.success("Usuario eliminado");
+      qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
+      qc.invalidateQueries({ queryKey: ["admin", "roles"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo eliminar el usuario");
+    }
+  };
+
 
   const filtrados = perfiles.filter((p) => {
     const userRoles = rolesByUser.get(p.id) ?? [];
@@ -198,6 +215,13 @@ function UsuariosPage() {
                         <Button size="sm" variant="ghost" onClick={() => setDetalleId(p.id)}>
                           <Eye className="h-4 w-4" />
                         </Button>
+                        {p.id !== current?.id && (
+                          <DeleteButton
+                            label={`la cuenta de ${p.nombre} ${p.apellido} y todos sus datos asociados`}
+                            onConfirm={() => removeUser(p.id)}
+                          />
+                        )}
+
                       </div>
                     </TableCell>
                   </TableRow>
