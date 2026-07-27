@@ -32,6 +32,8 @@ const roles = ["admin", "docente", "estudiante"] as const;
 function UsuariosPage() {
   const { user: current } = useAuth();
   const qc = useQueryClient();
+  const deleteUser = useServerFn(deleteUserAccount);
+
   const [search, setSearch] = useState("");
   const [filtroRol, setFiltroRol] = useState<string>("todos");
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
