@@ -17,8 +17,11 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AdminPageHeader, EmptyState } from "@/components/admin/AdminUI";
+import { AdminPageHeader, EmptyState, DeleteButton } from "@/components/admin/AdminUI";
 import { Eye, Search } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteUserAccount } from "@/lib/admin-users.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios")({
   component: UsuariosPage,
