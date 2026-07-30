@@ -640,8 +640,10 @@ function CursoPlayer() {
                           controls
                           preload="metadata"
                           src={embedSrc}
+                          onEnded={() => autoComplete(activeModule.id)}
                           className="absolute inset-0 h-full w-full object-contain"
                         />
+
                       )}
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
