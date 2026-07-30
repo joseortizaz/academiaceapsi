@@ -203,35 +203,69 @@ function CursoPlayer() {
   const activeModule =
     modulos.find((m) => m.id === activeModuleId) ?? modulos[0];
 
-  const toggleComplete = async (moduloId: string) => {
-    if (!enrollment) return;
-    const existing = progressMap.get(moduloId);
-    const nuevoEstado = !existing?.completado;
-    try {
-      const { error } = existing
-        ? await supabase
-            .from("module_progress")
-            .update({
-              completado: nuevoEstado,
-              fecha_completado: nuevoEstado ? new Date().toISOString() : null,
-            })
-            .eq("id", existing.id)
+  const setProgresoLocal = (moduloId: string, completado: boolean) => {
+    qc.setQueryData(["mc-progress", enrollment?.id], (old: any) => {
+      const rows = Array.isArray(old) ? [...old] : [];
+      const i = rows.findIndex((r: any) => r.modulo_id === moduloId);
+      const patch = {
+        enrollment_id: enrollment?.id,
+        modulo_id: moduloId,
+        completado,
+        fecha_completado: completado ? new Date().toISOString() : null,
+      };
+      if (i >= 0) rows[i] = { ...rows[i], ...patch };
+      else rows.push({ id: `tmp-${moduloId}`, ...patch });
+      return rows;
+    });
+  };
+
+  const persistProgress = async (moduloId: string, nuevoEstado: boolean) => {
+    if (!enrollment) return false;
+    const existing = progressMap.get(moduloId) as any;
+    setProgresoLocal(moduloId, nuevoEstado);
+    const payload = {
+      completado: nuevoEstado,
+      fecha_completado: nuevoEstado ? new Date().toISOString() : null,
+    };
+    const { error } =
+      existing && !String(existing.id).startsWith("tmp-")
+        ? await supabase.from("module_progress").update(payload).eq("id", existing.id)
         : await supabase.from("module_progress").insert({
             enrollment_id: enrollment.id,
             modulo_id: moduloId,
-            completado: nuevoEstado,
-            fecha_completado: nuevoEstado ? new Date().toISOString() : null,
+            ...payload,
           });
-      if (error) throw error;
-      toast.success(nuevoEstado ? "Lección marcada como completada" : "Lección marcada como pendiente");
-      // El porcentaje, estado y fecha_completado de la inscripción los
-      // recalcula automáticamente un trigger en la base de datos.
-      qc.invalidateQueries({ queryKey: ["mc-progress", enrollment.id] });
-      qc.invalidateQueries({ queryKey: ["mc-enrollment", programa?.id, user?.id] });
-    } catch (e: any) {
-      toast.error(e.message ?? "No se pudo actualizar el progreso");
+    if (error) {
+      setProgresoLocal(moduloId, !nuevoEstado);
+      toast.error(error.message ?? "No se pudo actualizar el progreso");
+      return false;
+    }
+    // El porcentaje, estado y fecha_completado de la inscripción los
+    // recalcula automáticamente un trigger en la base de datos.
+    await qc.invalidateQueries({ queryKey: ["mc-progress", enrollment.id] });
+    qc.invalidateQueries({ queryKey: ["mc-enrollment", programa?.id, user?.id] });
+    return true;
+  };
+
+  const toggleComplete = async (moduloId: string) => {
+    if (!enrollment) return;
+    const nuevoEstado = !progressMap.get(moduloId)?.completado;
+    const ok = await persistProgress(moduloId, nuevoEstado);
+    if (ok) {
+      toast.success(
+        nuevoEstado ? "Lección marcada como completada" : "Lección marcada como pendiente",
+      );
     }
   };
+
+  // Marca automáticamente la lección al terminar el video o el audio
+  const autoComplete = async (moduloId: string) => {
+    if (!enrollment) return;
+    if (progressMap.get(moduloId)?.completado) return;
+    const ok = await persistProgress(moduloId, true);
+    if (ok) toast.success("Lección completada automáticamente");
+  };
+
 
   const emitirCertificado = async () => {
     if (!enrollment || !programa || !user || pct < 100) return;
@@ -606,8 +640,10 @@ function CursoPlayer() {
                           controls
                           preload="metadata"
                           src={embedSrc}
+                          onEnded={() => autoComplete(activeModule.id)}
                           className="absolute inset-0 h-full w-full object-contain"
                         />
+
                       )}
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
@@ -628,7 +664,13 @@ function CursoPlayer() {
               {activeModule.audio_url && (
                 <div className="mb-6 rounded-lg border bg-muted/30 p-4">
                   <p className="mb-2 text-sm font-medium">🎧 Audio de la lección</p>
-                  <audio controls src={activeModule.audio_url} className="w-full" />
+                  <audio
+                    controls
+                    src={activeModule.audio_url}
+                    onEnded={() => autoComplete(activeModule.id)}
+                    className="w-full"
+                  />
+
                 </div>
               )}
 
