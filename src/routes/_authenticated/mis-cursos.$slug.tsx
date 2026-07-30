@@ -208,22 +208,22 @@ function CursoPlayer() {
     const existing = progressMap.get(moduloId);
     const nuevoEstado = !existing?.completado;
     try {
-      if (existing) {
-        await supabase
-          .from("module_progress")
-          .update({
+      const { error } = existing
+        ? await supabase
+            .from("module_progress")
+            .update({
+              completado: nuevoEstado,
+              fecha_completado: nuevoEstado ? new Date().toISOString() : null,
+            })
+            .eq("id", existing.id)
+        : await supabase.from("module_progress").insert({
+            enrollment_id: enrollment.id,
+            modulo_id: moduloId,
             completado: nuevoEstado,
             fecha_completado: nuevoEstado ? new Date().toISOString() : null,
-          })
-          .eq("id", existing.id);
-      } else {
-        await supabase.from("module_progress").insert({
-          enrollment_id: enrollment.id,
-          modulo_id: moduloId,
-          completado: nuevoEstado,
-          fecha_completado: nuevoEstado ? new Date().toISOString() : null,
-        });
-      }
+          });
+      if (error) throw error;
+      toast.success(nuevoEstado ? "Lección marcada como completada" : "Lección marcada como pendiente");
       // El porcentaje, estado y fecha_completado de la inscripción los
       // recalcula automáticamente un trigger en la base de datos.
       qc.invalidateQueries({ queryKey: ["mc-progress", enrollment.id] });
