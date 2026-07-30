@@ -664,7 +664,13 @@ function CursoPlayer() {
               {activeModule.audio_url && (
                 <div className="mb-6 rounded-lg border bg-muted/30 p-4">
                   <p className="mb-2 text-sm font-medium">🎧 Audio de la lección</p>
-                  <audio controls src={activeModule.audio_url} className="w-full" />
+                  <audio
+                    controls
+                    src={activeModule.audio_url}
+                    onEnded={() => autoComplete(activeModule.id)}
+                    className="w-full"
+                  />
+
                 </div>
               )}
 
