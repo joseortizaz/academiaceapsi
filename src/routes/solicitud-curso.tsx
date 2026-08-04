@@ -80,6 +80,7 @@ const DEFAULT_PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
     "Diplomado en Gestión Empresarial",
     "Diplomado en Ciberseguridad",
     "Diplomado en Recursos Humanos",
+    "Diplomado Intervención Psicológica Infanto-Juvenil",
   ],
 };
 
