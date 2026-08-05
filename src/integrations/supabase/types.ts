@@ -2191,6 +2191,20 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      enrollment_only_contact_change: {
+        Args: {
+          _estado: string
+          _fecha_completado: string
+          _fecha_inscripcion: string
+          _fecha_vencimiento: string
+          _id: string
+          _pago_id: string
+          _programa_id: string
+          _progreso: number
+          _user_id: string
+        }
+        Returns: boolean
+      }
       gen_verification_code: { Args: never; Returns: string }
       get_assessment_questions_for_student: {
         Args: { _assessment_id: string }
