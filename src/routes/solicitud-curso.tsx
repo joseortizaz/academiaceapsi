@@ -81,6 +81,10 @@ const DEFAULT_PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
     "Diplomado en Ciberseguridad",
     "Diplomado en Recursos Humanos",
     "Diplomado Intervención Psicológica Infanto-Juvenil",
+    "Diplomado Intervención en Trastornos del Neurodesarrollo",
+    "Diplomado en Planificación Estratégica para Psicólogos y Orientadores",
+    "Diplomado en Diagnóstico y Formulación Clínica según el DSM-V-TR",
+    "Diplomado en Psicología Clínica Aplicada: evaluación e intervención en Contextos de Salud",
   ],
 };
 
