@@ -85,6 +85,8 @@ const DEFAULT_PROGRAMAS: Record<"curso" | "diplomado", string[]> = {
     "Diplomado en Planificación Estratégica para Psicólogos y Orientadores",
     "Diplomado en Diagnóstico y Formulación Clínica según el DSM-V-TR",
     "Diplomado en Psicología Clínica Aplicada: evaluación e intervención en Contextos de Salud",
+    "Diplomado Atención al Cliente y Ventas con Enfoque Psicológico",
+    "Diplomado Liderazgo y Gestión Humana",
   ],
 };
 
