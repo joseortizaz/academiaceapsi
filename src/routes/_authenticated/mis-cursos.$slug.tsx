@@ -1,3 +1,4 @@
+import { RecordingPlayer } from "@/components/RecordingPlayer";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
@@ -149,6 +150,9 @@ function CursoPlayer() {
       return rows;
     },
   });
+
+  const recordedMeetings = (liveMeetings as any[]).filter((c) => c.status === "recorded");
+  const [openRecording, setOpenRecording] = useState<string | null>(null);
 
   const now = Date.now();
   const liveNow = liveMeetings.find((c: any) => {
@@ -565,6 +569,42 @@ function CursoPlayer() {
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+
+          {recordedMeetings.length > 0 && (
+            <div className="mb-4 rounded-lg border bg-card p-4">
+              <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                <Video className="h-4 w-4 text-primary" /> Grabaciones de clases
+              </h2>
+              <ul className="divide-y">
+                {recordedMeetings.map((c: any) => (
+                  <li key={c.id} className="py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{c.titulo}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(c.start_at).toLocaleDateString("es-DO", {
+                            day: "2-digit", month: "long", year: "numeric",
+                          })}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={openRecording === c.id ? "secondary" : "outline"}
+                        onClick={() => setOpenRecording(openRecording === c.id ? null : c.id)}
+                      >
+                        {openRecording === c.id ? "Ocultar" : "Ver grabación"}
+                      </Button>
+                    </div>
+                    {openRecording === c.id && (
+                      <div className="mt-3">
+                        <RecordingPlayer meetingRowId={c.id} />
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
