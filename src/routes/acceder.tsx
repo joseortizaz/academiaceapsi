@@ -10,7 +10,7 @@ import { lovable } from "@/integrations/lovable";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/acceder")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
       typeof search.redirect === "string" && search.redirect.startsWith("/")
         ? search.redirect
@@ -186,7 +186,7 @@ function Acceder() {
               ¿No tienes cuenta?{" "}
               <Link
                 to="/registro"
-                search={redirect ? { redirect } : undefined}
+                search={redirect ? { redirect } : {}}
                 className="font-semibold text-primary hover:text-accent"
               >
                 Regístrate aquí
