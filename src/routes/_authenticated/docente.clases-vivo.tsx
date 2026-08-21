@@ -1,3 +1,4 @@
+import { RecordingPlayer } from "@/components/RecordingPlayer";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
