@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RecordingPlayer } from "@/components/RecordingPlayer";
 import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
   Radio, Video, FileVideo,
@@ -70,6 +72,7 @@ function EstudianteDashboard() {
     .filter((c) => c.status === "scheduled" && new Date(c.start_at).getTime() > Date.now())
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())[0];
   const recordedZoom = zoomClasses.filter((c) => c.status === "recorded").slice(0, 4);
+  const [playing, setPlaying] = useState<ZoomMeetingLite | null>(null);
 
 
   const { data } = useQuery({
@@ -319,19 +322,29 @@ function EstudianteDashboard() {
                   <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
                     Grabación disponible
                   </Badge>
-                  {c.recording_share_url && (
-                    <Button asChild size="sm" variant="outline">
-                      <a href={c.recording_share_url} target="_blank" rel="noreferrer">
-                        <PlayCircle className="mr-1 h-3 w-3" /> Ver
-                      </a>
-                    </Button>
-                  )}
+                  <Button size="sm" variant="outline" onClick={() => setPlaying(c)}>
+                    <PlayCircle className="mr-1 h-3 w-3" /> Ver
+                  </Button>
                 </li>
               ))}
             </ul>
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{playing?.titulo}</DialogTitle>
+          </DialogHeader>
+          {playing && (
+            <RecordingPlayer
+              meetingRowId={playing.id}
+              fallbackUrl={playing.recording_share_url}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Anuncios */}
       {(data?.announcements ?? []).length > 0 && (
