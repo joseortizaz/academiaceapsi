@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 export const Route = createFileRoute("/registro")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
       typeof search.redirect === "string" && search.redirect.startsWith("/")
         ? search.redirect
@@ -50,7 +50,7 @@ function Registro() {
       toast.success("Registro exitoso", { description: "Revisa tu correo para confirmar tu cuenta." });
       navigate({
         to: "/acceder",
-        search: redirect ? { redirect } : undefined,
+        search: redirect ? { redirect } : {},
       });
       return;
     }
@@ -110,7 +110,7 @@ function Registro() {
               ¿Ya tienes cuenta?{" "}
               <Link
                 to="/acceder"
-                search={redirect ? { redirect } : undefined}
+                search={redirect ? { redirect } : {}}
                 className="font-semibold text-primary hover:text-accent"
               >
                 Accede aquí

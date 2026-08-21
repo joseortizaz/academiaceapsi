@@ -1,3 +1,4 @@
+import { RecordingPlayer } from "@/components/RecordingPlayer";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -202,17 +203,24 @@ function DocenteClasesVivo() {
           <DialogHeader>
             <DialogTitle>{preview?.titulo}</DialogTitle>
           </DialogHeader>
-          {preview?.recording_share_url ? (
+          {preview && (preview.status === "recorded" || preview.recording_share_url) ? (
             <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Las grabaciones de Zoom abren en una ventana externa.
-                {preview.recording_duration_min ? ` Duración: ${preview.recording_duration_min} min.` : ""}
-              </p>
-              <Button asChild>
-                <a href={preview.recording_share_url} target="_blank" rel="noreferrer">
-                  Ver grabación en Zoom <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
+              <RecordingPlayer
+                meetingRowId={preview.id}
+                fallbackUrl={preview.recording_share_url}
+              />
+              {preview.recording_duration_min ? (
+                <p className="text-sm text-muted-foreground">
+                  Duración: {preview.recording_duration_min} min.
+                </p>
+              ) : null}
+              {preview.recording_share_url && (
+                <Button asChild variant="outline" size="sm">
+                  <a href={preview.recording_share_url} target="_blank" rel="noreferrer">
+                    Abrir en Zoom <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              )}
             </div>
           ) : (
             <p className="py-6 text-center text-sm text-muted-foreground">

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/programas/$slug")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { inscribir?: 1 } => ({
     inscribir: search.inscribir === 1 || search.inscribir === "1" ? 1 : undefined,
   }),
   component: DetallePrograma,
