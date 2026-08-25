@@ -159,6 +159,36 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     };
   }, [meetingRowId, sigFn]);
 
+  // Reajustar el tamaño del video del SDK cuando cambie el viewport.
+  useEffect(() => {
+    if (state !== "in-meeting") return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const apply = () => {
+      const root = containerRef.current;
+      const client = clientRef.current as {
+        updateVideoOptions?: (o: unknown) => void;
+      } | null;
+      if (!root || !client?.updateVideoOptions) return;
+      try {
+        client.updateVideoOptions({ viewSizes: currentViewSizes(root) });
+      } catch {
+        // el SDK puede rechazar el ajuste durante transiciones de vista
+      }
+    };
+    const onResize = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(apply, 200);
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    apply();
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, [state]);
+
   if (state === "fallback") {
     const primary = info && info.role === 1 && info.startUrl ? info.startUrl : info?.joinUrl;
     return (
