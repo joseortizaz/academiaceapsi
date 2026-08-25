@@ -27,8 +27,11 @@ function CursoPlayer() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+
 
   const { data: programa } = useQuery({
     queryKey: ["mc-programa", slug],
