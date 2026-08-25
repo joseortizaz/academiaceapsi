@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,13 +12,22 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, CheckCircle2, XCircle, Trophy, FileText, Clock, Loader2 } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    assessmentId:
+      typeof search.assessmentId === "string" ? search.assessmentId : undefined,
+    returnTo:
+      typeof search.returnTo === "string" && search.returnTo.startsWith("/")
+        ? search.returnTo
+        : undefined,
+  }),
   component: Evaluaciones,
 });
+
 
 type Assessment = {
   id: string;
