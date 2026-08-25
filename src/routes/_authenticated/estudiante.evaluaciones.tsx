@@ -140,22 +140,43 @@ function Evaluaciones() {
 
   const loading = enrollmentsQ.isLoading || assessmentsQ.isLoading;
 
+  // Abre automáticamente la evaluación indicada en la URL (?assessmentId=...)
+  useEffect(() => {
+    if (autoOpened || !assessmentId) return;
+    const found = (assessmentsQ.data ?? []).find((a) => a.id === assessmentId);
+    if (found) {
+      setActive(found);
+      setAutoOpened(true);
+    }
+  }, [assessmentId, assessmentsQ.data, autoOpened]);
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Tareas</h1>
-        <p className="text-muted-foreground">
-          Realiza tus evaluaciones publicadas y revisa tus calificaciones.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Tareas</h1>
+          <p className="text-muted-foreground">
+            Realiza tus evaluaciones publicadas y revisa tus calificaciones.
+          </p>
+        </div>
+        {returnTo && (
+          <Button variant="outline" size="sm" onClick={goBackToCourse}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Volver al curso
+          </Button>
+        )}
       </div>
 
       {active ? (
         <AssessmentPlayer
           assessment={active}
           previous={submissionsByAssessment.get(active.id) ?? null}
-          onExit={() => setActive(null)}
+          onExit={() => {
+            setActive(null);
+            if (returnTo) goBackToCourse();
+          }}
         />
       ) : (
+
         <>
           <section>
             <h2 className="mb-3 text-lg font-bold">Disponibles</h2>
