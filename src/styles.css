@@ -148,3 +148,44 @@
     color: var(--color-foreground);
   }
 }
+
+/*
+ * Zoom Meeting SDK (Embedded 3.13.2): el SDK inyecta nodos con anchos/altos
+ * fijos en píxeles dentro de #zoom-meeting-root. Los forzamos a llenar el
+ * contenedor para que la llamada quede fija y no genere scroll en la página.
+ */
+.zoom-embed-shell {
+  contain: layout paint size;
+}
+
+#zoom-meeting-root,
+#zoom-meeting-root > div,
+#zoom-meeting-root #zmmtg-root,
+#zoom-meeting-root .zoom-app,
+#zoom-meeting-root .meeting-app,
+#zoom-meeting-root .meeting-client,
+#zoom-meeting-root .meeting-client-inner,
+#zoom-meeting-root .meeting-client-view,
+#zoom-meeting-root .zmwebsdk-MuiPaper-root,
+#zoom-meeting-root .zmwebsdk-makeStyles-root,
+#zoom-meeting-root iframe {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-width: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  position: relative !important;
+}
+
+#zoom-meeting-root video,
+#zoom-meeting-root canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* El SDK puede montar su root a nivel de body en algunos flujos. */
+body > #zmmtg-root {
+  display: none;
+}

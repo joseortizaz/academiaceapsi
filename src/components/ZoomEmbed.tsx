@@ -70,6 +70,17 @@ async function loadZoomEmbedded(): Promise<{
   return ZoomMtgEmbedded as never;
 }
 
+// El SDK espera tamaños en píxeles; los derivamos del contenedor real para que
+// el video llene el espacio disponible en vez de un 1000x600 fijo.
+function currentViewSizes(root: HTMLElement) {
+  const width = Math.max(320, Math.round(root.clientWidth || window.innerWidth));
+  const height = Math.max(300, Math.round(root.clientHeight || window.innerHeight * 0.7));
+  return {
+    default: { width, height },
+    ribbon: { width: Math.min(300, width), height },
+  };
+}
+
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -107,10 +118,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           customize: {
             video: {
               isResizable: true,
-              viewSizes: {
-                default: { width: 1000, height: 600 },
-                ribbon: { width: 300, height: 700 },
-              },
+              viewSizes: currentViewSizes(root),
             },
           },
         });
@@ -162,6 +170,36 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     };
   }, [meetingRowId, sigFn]);
 
+  // Reajustar el tamaño del video del SDK cuando cambie el viewport.
+  useEffect(() => {
+    if (state !== "in-meeting") return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const apply = () => {
+      const root = containerRef.current;
+      const client = clientRef.current as {
+        updateVideoOptions?: (o: unknown) => void;
+      } | null;
+      if (!root || !client?.updateVideoOptions) return;
+      try {
+        client.updateVideoOptions({ viewSizes: currentViewSizes(root) });
+      } catch {
+        // el SDK puede rechazar el ajuste durante transiciones de vista
+      }
+    };
+    const onResize = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(apply, 200);
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    apply();
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, [state]);
+
   if (state === "fallback") {
     const primary = info && info.role === 1 && info.startUrl ? info.startUrl : info?.joinUrl;
     return (
@@ -208,8 +246,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div className="relative min-h-[600px] w-full overflow-hidden rounded-lg border bg-black">
-        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
+      <div className="zoom-embed-shell relative h-[calc(100dvh-190px)] max-h-[calc(100dvh-190px)] min-h-[400px] w-full overflow-hidden rounded-lg border bg-black">
+        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full overflow-hidden" />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
