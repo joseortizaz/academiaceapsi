@@ -69,7 +69,15 @@ const tipoLabel: Record<string, string> = {
 
 function Evaluaciones() {
   const { user } = useAuth();
+  const { assessmentId, returnTo } = Route.useSearch();
+  const navigate = useNavigate();
   const [active, setActive] = useState<Assessment | null>(null);
+  const [autoOpened, setAutoOpened] = useState(false);
+
+  const goBackToCourse = () => {
+    if (returnTo) navigate({ to: returnTo } as never);
+  };
+
 
   const enrollmentsQ = useQuery({
     queryKey: ["student-enrollments", user?.id],
