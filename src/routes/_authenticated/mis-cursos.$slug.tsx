@@ -723,15 +723,64 @@ function CursoPlayer() {
                     </Badge>
                   )}
                 </div>
-                <Button
-                  variant={progressMap.get(activeModule.id)?.completado ? "outline" : "default"}
-                  onClick={() => toggleComplete(activeModule.id)}
-                >
-                  {progressMap.get(activeModule.id)?.completado
-                    ? "Marcar como pendiente"
-                    : "Marcar completado"}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => prevModule && goToModule(prevModule.id)}
+                    disabled={!prevModule}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Lección anterior
+                  </Button>
+
+                  {progressMap.get(activeModule.id)?.completado ? (
+                    <>
+                      {nextModule && (
+                        <Button onClick={() => goToModule(nextModule.id)}>
+                          Siguiente lección <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleComplete(activeModule.id)}
+                      >
+                        Marcar como pendiente
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={completeAndContinue} disabled={advancing}>
+                      {nextModule ? "Completado y continuar" : "Finalizar lección"}
+                      {nextModule && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Button>
+                  )}
+                </div>
               </div>
+
+              {pendingAssessmentFor(activeModule.id) && (
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+                  <span className="flex items-center gap-2">
+                    <ClipboardCheck className="h-4 w-4 text-amber-600" />
+                    Esta lección requiere la evaluación{" "}
+                    <strong>{pendingAssessmentFor(activeModule.id)!.titulo}</strong>
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      navigate({
+                        to: "/estudiante/evaluaciones",
+                        search: {
+                          assessmentId: pendingAssessmentFor(activeModule.id)!.id,
+                          returnTo: `/mis-cursos/${slug}`,
+                        },
+                      } as never)
+                    }
+                  >
+                    Ir a la evaluación
+                  </Button>
+                </div>
+              )}
+
 
               {activeModule.video_url && (() => {
                 const raw = activeModule.video_url.trim();
