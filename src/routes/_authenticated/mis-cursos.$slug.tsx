@@ -1,5 +1,5 @@
 import { RecordingPlayer } from "@/components/RecordingPlayer";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,10 +11,12 @@ import { Progress } from "@/components/ui/progress";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
+  ArrowLeft, ArrowRight, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
+  ClipboardCheck,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+
 
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
@@ -25,8 +27,11 @@ function CursoPlayer() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+
 
   const { data: programa } = useQuery({
     queryKey: ["mc-programa", slug],
@@ -87,6 +92,35 @@ function CursoPlayer() {
       return data ?? [];
     },
   });
+
+  // Evaluaciones publicadas que son prerrequisito de una lección y que el
+  // estudiante todavía no ha entregado.
+  const { data: pendingAssessments = [] } = useQuery({
+    queryKey: ["mc-gate-assessments", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id,
+    queryFn: async () => {
+      const { data: list } = await supabase
+        .from("assessments")
+        .select("id, titulo, modulo_id")
+        .eq("programa_id", programa!.id)
+        .eq("publicado", true)
+        .not("modulo_id", "is", null);
+      const rows = (list ?? []) as { id: string; titulo: string; modulo_id: string | null }[];
+      if (rows.length === 0) return [];
+      const { data: subs } = await supabase
+        .from("assessment_submissions")
+        .select("assessment_id")
+        .eq("user_id", user!.id)
+        .in("assessment_id", rows.map((r) => r.id));
+      const entregadas = new Set((subs ?? []).map((s) => s.assessment_id));
+      return rows.filter((r) => !entregadas.has(r.id));
+    },
+  });
+
+  const pendingAssessmentFor = (moduloId: string) =>
+    pendingAssessments.find((a) => a.modulo_id === moduloId) ?? null;
+
+
 
   const { data: links = [] } = useQuery({
     queryKey: ["mc-links", programa?.id],
@@ -269,6 +303,62 @@ function CursoPlayer() {
     const ok = await persistProgress(moduloId, true);
     if (ok) toast.success("Lección completada automáticamente");
   };
+
+  const activeIndex = activeModule ? modulos.findIndex((m) => m.id === activeModule.id) : -1;
+  const prevModule = activeIndex > 0 ? modulos[activeIndex - 1] : null;
+  const nextModule =
+    activeIndex >= 0 && activeIndex < modulos.length - 1 ? modulos[activeIndex + 1] : null;
+
+  const scrollTop = () =>
+    typeof window !== "undefined" && window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const goToModule = (id: string) => {
+    setActiveModuleId(id);
+    scrollTop();
+  };
+
+  // Marca la lección como completada y avanza (evaluación prerrequisito o siguiente lección)
+  const completeAndContinue = async () => {
+    if (!activeModule || !enrollment) return;
+    setAdvancing(true);
+    try {
+      if (!progressMap.get(activeModule.id)?.completado) {
+        const ok = await persistProgress(activeModule.id, true);
+        if (!ok) return;
+      }
+
+      const gate = pendingAssessmentFor(activeModule.id);
+      if (gate) {
+        toast.success("¡Lección completada! Ahora realiza la evaluación.");
+        navigate({
+          to: "/estudiante/evaluaciones",
+          search: {
+            assessmentId: gate.id,
+            returnTo: `/mis-cursos/${slug}`,
+          },
+        } as never);
+        return;
+      }
+
+      if (!nextModule) {
+        toast.success("¡Felicidades! Completaste la última lección del programa 🎉");
+        return;
+      }
+
+      if (isLocked(nextModule)) {
+        toast.info(
+          `La siguiente lección se desbloquea el ${formatFecha(getUnlockDate(nextModule)!)}`,
+        );
+        return;
+      }
+
+      toast.success("¡Lección completada! Continuando…");
+      goToModule(nextModule.id);
+    } finally {
+      setAdvancing(false);
+    }
+  };
+
 
 
   const emitirCertificado = async () => {
@@ -633,15 +723,64 @@ function CursoPlayer() {
                     </Badge>
                   )}
                 </div>
-                <Button
-                  variant={progressMap.get(activeModule.id)?.completado ? "outline" : "default"}
-                  onClick={() => toggleComplete(activeModule.id)}
-                >
-                  {progressMap.get(activeModule.id)?.completado
-                    ? "Marcar como pendiente"
-                    : "Marcar completado"}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => prevModule && goToModule(prevModule.id)}
+                    disabled={!prevModule}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Lección anterior
+                  </Button>
+
+                  {progressMap.get(activeModule.id)?.completado ? (
+                    <>
+                      {nextModule && (
+                        <Button onClick={() => goToModule(nextModule.id)}>
+                          Siguiente lección <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleComplete(activeModule.id)}
+                      >
+                        Marcar como pendiente
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={completeAndContinue} disabled={advancing}>
+                      {nextModule ? "Completado y continuar" : "Finalizar lección"}
+                      {nextModule && <ArrowRight className="ml-2 h-4 w-4" />}
+                    </Button>
+                  )}
+                </div>
               </div>
+
+              {pendingAssessmentFor(activeModule.id) && (
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
+                  <span className="flex items-center gap-2">
+                    <ClipboardCheck className="h-4 w-4 text-amber-600" />
+                    Esta lección requiere la evaluación{" "}
+                    <strong>{pendingAssessmentFor(activeModule.id)!.titulo}</strong>
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      navigate({
+                        to: "/estudiante/evaluaciones",
+                        search: {
+                          assessmentId: pendingAssessmentFor(activeModule.id)!.id,
+                          returnTo: `/mis-cursos/${slug}`,
+                        },
+                      } as never)
+                    }
+                  >
+                    Ir a la evaluación
+                  </Button>
+                </div>
+              )}
+
 
               {activeModule.video_url && (() => {
                 const raw = activeModule.video_url.trim();

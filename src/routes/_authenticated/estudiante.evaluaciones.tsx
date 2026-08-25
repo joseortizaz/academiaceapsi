@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,13 +12,22 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, CheckCircle2, XCircle, Trophy, FileText, Clock, Loader2 } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    assessmentId:
+      typeof search.assessmentId === "string" ? search.assessmentId : undefined,
+    returnTo:
+      typeof search.returnTo === "string" && search.returnTo.startsWith("/")
+        ? search.returnTo
+        : undefined,
+  }),
   component: Evaluaciones,
 });
+
 
 type Assessment = {
   id: string;
@@ -60,7 +69,15 @@ const tipoLabel: Record<string, string> = {
 
 function Evaluaciones() {
   const { user } = useAuth();
+  const { assessmentId, returnTo } = Route.useSearch();
+  const navigate = useNavigate();
   const [active, setActive] = useState<Assessment | null>(null);
+  const [autoOpened, setAutoOpened] = useState(false);
+
+  const goBackToCourse = () => {
+    if (returnTo) navigate({ to: returnTo } as never);
+  };
+
 
   const enrollmentsQ = useQuery({
     queryKey: ["student-enrollments", user?.id],
@@ -123,22 +140,43 @@ function Evaluaciones() {
 
   const loading = enrollmentsQ.isLoading || assessmentsQ.isLoading;
 
+  // Abre automáticamente la evaluación indicada en la URL (?assessmentId=...)
+  useEffect(() => {
+    if (autoOpened || !assessmentId) return;
+    const found = (assessmentsQ.data ?? []).find((a) => a.id === assessmentId);
+    if (found) {
+      setActive(found);
+      setAutoOpened(true);
+    }
+  }, [assessmentId, assessmentsQ.data, autoOpened]);
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Tareas</h1>
-        <p className="text-muted-foreground">
-          Realiza tus evaluaciones publicadas y revisa tus calificaciones.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Evaluaciones y Tareas</h1>
+          <p className="text-muted-foreground">
+            Realiza tus evaluaciones publicadas y revisa tus calificaciones.
+          </p>
+        </div>
+        {returnTo && (
+          <Button variant="outline" size="sm" onClick={goBackToCourse}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Volver al curso
+          </Button>
+        )}
       </div>
 
       {active ? (
         <AssessmentPlayer
           assessment={active}
           previous={submissionsByAssessment.get(active.id) ?? null}
-          onExit={() => setActive(null)}
+          onExit={() => {
+            setActive(null);
+            if (returnTo) goBackToCourse();
+          }}
         />
       ) : (
+
         <>
           <section>
             <h2 className="mb-3 text-lg font-bold">Disponibles</h2>

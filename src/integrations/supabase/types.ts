@@ -222,7 +222,22 @@ export type Database = {
           titulo?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "assessments_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "program_modules_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       balance_activo_webhook_logs: {
         Row: {
