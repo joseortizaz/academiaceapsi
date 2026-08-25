@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.notify_students_on_assessment_published() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.notify_teacher_on_assessment_submission() FROM PUBLIC, anon, authenticated;
