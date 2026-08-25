@@ -70,6 +70,17 @@ async function loadZoomEmbedded(): Promise<{
   return ZoomMtgEmbedded as never;
 }
 
+// El SDK espera tamaños en píxeles; los derivamos del contenedor real para que
+// el video llene el espacio disponible en vez de un 1000x600 fijo.
+function currentViewSizes(root: HTMLElement) {
+  const width = Math.max(320, Math.round(root.clientWidth || window.innerWidth));
+  const height = Math.max(300, Math.round(root.clientHeight || window.innerHeight * 0.7));
+  return {
+    default: { width, height },
+    ribbon: { width: Math.min(300, width), height },
+  };
+}
+
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
