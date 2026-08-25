@@ -93,6 +93,35 @@ function CursoPlayer() {
     },
   });
 
+  // Evaluaciones publicadas que son prerrequisito de una lección y que el
+  // estudiante todavía no ha entregado.
+  const { data: pendingAssessments = [] } = useQuery({
+    queryKey: ["mc-gate-assessments", programa?.id, user?.id],
+    enabled: !!programa?.id && !!user?.id,
+    queryFn: async () => {
+      const { data: list } = await supabase
+        .from("assessments")
+        .select("id, titulo, modulo_id")
+        .eq("programa_id", programa!.id)
+        .eq("publicado", true)
+        .not("modulo_id", "is", null);
+      const rows = (list ?? []) as { id: string; titulo: string; modulo_id: string | null }[];
+      if (rows.length === 0) return [];
+      const { data: subs } = await supabase
+        .from("assessment_submissions")
+        .select("assessment_id")
+        .eq("user_id", user!.id)
+        .in("assessment_id", rows.map((r) => r.id));
+      const entregadas = new Set((subs ?? []).map((s) => s.assessment_id));
+      return rows.filter((r) => !entregadas.has(r.id));
+    },
+  });
+
+  const pendingAssessmentFor = (moduloId: string) =>
+    pendingAssessments.find((a) => a.modulo_id === moduloId) ?? null;
+
+
+
   const { data: links = [] } = useQuery({
     queryKey: ["mc-links", programa?.id],
     enabled: !!programa?.id && enrollment?.estado === "activo",
