@@ -248,20 +248,25 @@ export function AssessmentsManager({ scope }: Props) {
                   </Select>
                 </div>
                 <div>
-                  <Label>Módulo (opcional)</Label>
+                  <Label>Lección que requiere esta evaluación (opcional)</Label>
                   <Select
                     value={s.modulo_id ?? "none"}
                     onValueChange={(v) => set({ modulo_id: v === "none" ? null : v })}
                   >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">— Sin módulo —</SelectItem>
+                      <SelectItem value="none">— Sin lección (sin prerrequisito) —</SelectItem>
                       {(modulosQ.data ?? []).map((m) => (
                         <SelectItem key={m.id} value={m.id}>{m.titulo}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Si eliges una lección, el estudiante deberá realizar esta evaluación
+                    al completarla, antes de continuar a la siguiente.
+                  </p>
                 </div>
+
               </div>
               <div>
                 <Label>Descripción</Label>
