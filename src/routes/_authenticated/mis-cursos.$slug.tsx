@@ -304,6 +304,62 @@ function CursoPlayer() {
     if (ok) toast.success("Lección completada automáticamente");
   };
 
+  const activeIndex = activeModule ? modulos.findIndex((m) => m.id === activeModule.id) : -1;
+  const prevModule = activeIndex > 0 ? modulos[activeIndex - 1] : null;
+  const nextModule =
+    activeIndex >= 0 && activeIndex < modulos.length - 1 ? modulos[activeIndex + 1] : null;
+
+  const scrollTop = () =>
+    typeof window !== "undefined" && window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const goToModule = (id: string) => {
+    setActiveModuleId(id);
+    scrollTop();
+  };
+
+  // Marca la lección como completada y avanza (evaluación prerrequisito o siguiente lección)
+  const completeAndContinue = async () => {
+    if (!activeModule || !enrollment) return;
+    setAdvancing(true);
+    try {
+      if (!progressMap.get(activeModule.id)?.completado) {
+        const ok = await persistProgress(activeModule.id, true);
+        if (!ok) return;
+      }
+
+      const gate = pendingAssessmentFor(activeModule.id);
+      if (gate) {
+        toast.success("¡Lección completada! Ahora realiza la evaluación.");
+        navigate({
+          to: "/estudiante/evaluaciones",
+          search: {
+            assessmentId: gate.id,
+            returnTo: `/mis-cursos/${slug}`,
+          },
+        } as never);
+        return;
+      }
+
+      if (!nextModule) {
+        toast.success("¡Felicidades! Completaste la última lección del programa 🎉");
+        return;
+      }
+
+      if (isLocked(nextModule)) {
+        toast.info(
+          `La siguiente lección se desbloquea el ${formatFecha(getUnlockDate(nextModule)!)}`,
+        );
+        return;
+      }
+
+      toast.success("¡Lección completada! Continuando…");
+      goToModule(nextModule.id);
+    } finally {
+      setAdvancing(false);
+    }
+  };
+
+
 
   const emitirCertificado = async () => {
     if (!enrollment || !programa || !user || pct < 100) return;
