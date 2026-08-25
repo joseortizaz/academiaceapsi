@@ -1,5 +1,5 @@
 import { RecordingPlayer } from "@/components/RecordingPlayer";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,10 +11,12 @@ import { Progress } from "@/components/ui/progress";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import {
-  ArrowLeft, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
+  ArrowLeft, ArrowRight, CheckCircle2, Circle, Video, Download, Award, Lock, Radio,
+  ClipboardCheck,
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+
 
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
