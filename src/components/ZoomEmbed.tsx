@@ -107,10 +107,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           customize: {
             video: {
               isResizable: true,
-              viewSizes: {
-                default: { width: 1000, height: 600 },
-                ribbon: { width: 300, height: 700 },
-              },
+              viewSizes: currentViewSizes(root),
             },
           },
         });
