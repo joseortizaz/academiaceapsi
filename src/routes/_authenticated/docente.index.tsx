@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { useTeacherPrograms } from "@/hooks/use-teacher-programs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ function DocenteResumen() {
 
 
   const cursosActivos = programas.filter((p) => p.estado === "publicado" || p.estado === "en_curso").length;
-  const totalAlumnos = enrollments.length;
+  
 
   const kpis = [
     { label: "Alumnos asignados", value: totalAlumnos, icon: Users, color: "text-blue-600" },
