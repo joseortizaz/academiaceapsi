@@ -2,6 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
+export type TeacherEnrollment = {
+  id: string;
+  programa_id: string;
+  user_id: string;
+  estado: string;
+  progreso_porcentaje: number | null;
+};
+
 export type TeacherProgramScope = { programa_id: string; is_owner: boolean };
 
 /**
@@ -92,11 +100,15 @@ export function useTeacherPrograms() {
   });
 
   // Dedup por id de inscripción
-  const byId = new Map<string, any>();
-  for (const e of [...ownedEnrollments, ...(cohortEnrollments as any[])]) {
+  const byId = new Map<string, TeacherEnrollment>();
+  const merged = [
+    ...(ownedEnrollments as TeacherEnrollment[]),
+    ...(cohortEnrollments as TeacherEnrollment[]),
+  ];
+  for (const e of merged) {
     if (e?.id) byId.set(e.id, e);
   }
-  const enrollments = Array.from(byId.values());
+  const enrollments: TeacherEnrollment[] = Array.from(byId.values());
   const totalAlumnos = new Set(enrollments.map((e) => e.user_id)).size;
 
   return {
