@@ -2258,6 +2258,13 @@ export type Database = {
         }
         Returns: number
       }
+      my_teacher_programs: {
+        Args: never
+        Returns: {
+          is_owner: boolean
+          programa_id: string
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
