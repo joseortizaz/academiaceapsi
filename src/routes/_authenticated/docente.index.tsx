@@ -19,37 +19,8 @@ export const Route = createFileRoute("/_authenticated/docente/")({
 
 function DocenteResumen() {
   const { user } = useAuth();
+  const { teacher, programas, totalAlumnos } = useTeacherPrograms();
 
-  const { data: teacher } = useQuery({
-    queryKey: ["docente-record", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("teachers").select("*").eq("user_id", user!.id).maybeSingle();
-      return data;
-    },
-  });
-
-  const { data: programas = [] } = useQuery({
-    queryKey: ["docente-programas", teacher?.id],
-    enabled: !!teacher?.id,
-    queryFn: async () => {
-      const { data } = await supabase.from("programs").select("*").eq("docente_id", teacher!.id);
-      return data ?? [];
-    },
-  });
-
-  const programaIds = programas.map((p) => p.id);
-
-  const { data: enrollments = [] } = useQuery({
-    queryKey: ["docente-enrollments", programaIds],
-    enabled: programaIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("enrollments").select("*").in("programa_id", programaIds);
-      return data ?? [];
-    },
-  });
 
   const listMeetingsFn = useServerFn(listZoomMeetings);
   type MeetingRow = {
