@@ -42,11 +42,12 @@ function DocenteComunidad() {
     },
   });
 
+  const { programaIds } = useTeacherPrograms();
   const { data: programas = [] } = useQuery({
-    queryKey: ["docente-comunidad-programas", teacher?.id],
-    enabled: !!teacher?.id,
+    queryKey: ["docente-comunidad-programas", programaIds],
+    enabled: programaIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("programs").select("id,titulo,slug").eq("docente_id", teacher!.id);
+      const { data } = await supabase.from("programs").select("id,titulo,slug").in("id", programaIds);
       return data ?? [];
     },
   });
