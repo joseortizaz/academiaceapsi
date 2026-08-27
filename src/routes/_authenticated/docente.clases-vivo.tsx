@@ -76,11 +76,12 @@ function DocenteClasesVivo() {
     },
   });
 
+  const { programaIds } = useTeacherPrograms();
   const { data: programas = [] } = useQuery({
-    queryKey: ["docente-programas-zoom", teacher?.id],
-    enabled: !!teacher?.id,
+    queryKey: ["docente-programas-zoom", programaIds],
+    enabled: programaIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("programs").select("id,titulo").eq("docente_id", teacher!.id);
+      const { data } = await supabase.from("programs").select("id,titulo").in("id", programaIds);
       return data ?? [];
     },
   });
