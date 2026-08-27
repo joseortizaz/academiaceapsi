@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -2257,6 +2257,13 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      my_teacher_programs: {
+        Args: never
+        Returns: {
+          is_owner: boolean
+          programa_id: string
+        }[]
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }

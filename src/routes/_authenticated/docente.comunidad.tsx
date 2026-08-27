@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useTeacherPrograms } from "@/hooks/use-teacher-programs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,11 +43,12 @@ function DocenteComunidad() {
     },
   });
 
+  const { programaIds } = useTeacherPrograms();
   const { data: programas = [] } = useQuery({
-    queryKey: ["docente-comunidad-programas", teacher?.id],
-    enabled: !!teacher?.id,
+    queryKey: ["docente-comunidad-programas", programaIds],
+    enabled: programaIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("programs").select("id,titulo,slug").eq("docente_id", teacher!.id);
+      const { data } = await supabase.from("programs").select("id,titulo,slug").in("id", programaIds);
       return data ?? [];
     },
   });

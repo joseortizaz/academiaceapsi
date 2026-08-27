@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useTeacherPrograms } from "@/hooks/use-teacher-programs";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,37 +58,8 @@ function DocenteCursos() {
   const [openLec, setOpenLec] = useState(false);
   const [editingLec, setEditingLec] = useState<Leccion>(emptyLeccion(""));
 
-  const { data: teacher } = useQuery({
-    queryKey: ["docente-record", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase.from("teachers").select("*").eq("user_id", user!.id).maybeSingle();
-      return data;
-    },
-  });
+  const { teacher, programas, programaIds, enrollments } = useTeacherPrograms();
 
-  const { data: programas = [] } = useQuery({
-    queryKey: ["docente-cursos", teacher?.id],
-    enabled: !!teacher?.id,
-    queryFn: async () => {
-      const { data } = await supabase.from("programs").select("*").eq("docente_id", teacher!.id);
-      return data ?? [];
-    },
-  });
-
-  const programaIds = programas.map((p) => p.id);
-
-  const { data: enrollments = [] } = useQuery({
-    queryKey: ["docente-cursos-enrollments", programaIds],
-    enabled: programaIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("enrollments")
-        .select("id,programa_id,user_id,estado,progreso_porcentaje")
-        .in("programa_id", programaIds);
-      return data ?? [];
-    },
-  });
 
   const userIds = Array.from(new Set(enrollments.map((e) => e.user_id)));
   type Alumno = { id: string; nombre: string | null; apellido: string | null; avatar_url: string | null };

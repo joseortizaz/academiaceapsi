@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
+import { useTeacherPrograms } from "@/hooks/use-teacher-programs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -76,11 +77,12 @@ function DocenteClasesVivo() {
     },
   });
 
+  const { programaIds } = useTeacherPrograms();
   const { data: programas = [] } = useQuery({
-    queryKey: ["docente-programas-zoom", teacher?.id],
-    enabled: !!teacher?.id,
+    queryKey: ["docente-programas-zoom", programaIds],
+    enabled: programaIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase.from("programs").select("id,titulo").eq("docente_id", teacher!.id);
+      const { data } = await supabase.from("programs").select("id,titulo").in("id", programaIds);
       return data ?? [];
     },
   });

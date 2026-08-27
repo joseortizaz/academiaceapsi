@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { useTeacherPrograms } from "@/hooks/use-teacher-programs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,37 +19,8 @@ export const Route = createFileRoute("/_authenticated/docente/")({
 
 function DocenteResumen() {
   const { user } = useAuth();
+  const { teacher, programas, totalAlumnos } = useTeacherPrograms();
 
-  const { data: teacher } = useQuery({
-    queryKey: ["docente-record", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("teachers").select("*").eq("user_id", user!.id).maybeSingle();
-      return data;
-    },
-  });
-
-  const { data: programas = [] } = useQuery({
-    queryKey: ["docente-programas", teacher?.id],
-    enabled: !!teacher?.id,
-    queryFn: async () => {
-      const { data } = await supabase.from("programs").select("*").eq("docente_id", teacher!.id);
-      return data ?? [];
-    },
-  });
-
-  const programaIds = programas.map((p) => p.id);
-
-  const { data: enrollments = [] } = useQuery({
-    queryKey: ["docente-enrollments", programaIds],
-    enabled: programaIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("enrollments").select("*").in("programa_id", programaIds);
-      return data ?? [];
-    },
-  });
 
   const listMeetingsFn = useServerFn(listZoomMeetings);
   type MeetingRow = {
@@ -81,7 +52,7 @@ function DocenteResumen() {
 
 
   const cursosActivos = programas.filter((p) => p.estado === "publicado" || p.estado === "en_curso").length;
-  const totalAlumnos = enrollments.length;
+  
 
   const kpis = [
     { label: "Alumnos asignados", value: totalAlumnos, icon: Users, color: "text-blue-600" },
