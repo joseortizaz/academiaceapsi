@@ -207,7 +207,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("id, programa_id, cohort_id, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
+      .select("id, programa_id, cohort_id, modulo_id, created_by, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
       .eq("id", data.meetingRowId)
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
@@ -221,18 +221,15 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
     if (isAdmin) {
       role = 1;
     } else if (isDocente) {
-      const { data: teacher } = await supabaseAdmin
-        .from("teachers")
-        .select("id")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-      const { data: prog } = await supabaseAdmin
-        .from("programs")
-        .select("docente_id")
-        .eq("id", meeting.programa_id)
-        .maybeSingle();
-      role = teacher && prog?.docente_id === teacher.id ? 1 : 0;
+      const scope = await getTeacherScopeForProgram(context.userId, meeting.programa_id);
+      const isHost =
+        scope.isOwner ||
+        meeting.created_by === context.userId ||
+        (!!meeting.cohort_id && scope.cohortIds.includes(meeting.cohort_id)) ||
+        (!!meeting.modulo_id && scope.moduleIds.includes(meeting.modulo_id));
+      role = isHost ? 1 : 0;
     } else {
+
       const { data: enr } = await supabaseAdmin
         .from("enrollments")
         .select("estado")
