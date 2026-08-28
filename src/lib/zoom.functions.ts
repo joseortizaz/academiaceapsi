@@ -128,11 +128,16 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: row } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("zoom_meeting_id, programa_id")
+      .select("zoom_meeting_id, programa_id, cohort_id, modulo_id")
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Reunión no encontrada.");
-    await assertCanManageProgram(context.userId, row.programa_id);
+    await assertCanManageProgramResource(context.userId, {
+      programaId: row.programa_id,
+      cohortId: row.cohort_id ?? null,
+      moduloId: row.modulo_id ?? null,
+    });
+
     if (row?.zoom_meeting_id) {
       try {
         await zoomApi(`/meetings/${row.zoom_meeting_id}`, { method: "DELETE" });
