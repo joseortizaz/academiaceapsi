@@ -3,14 +3,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getZakToken, signMeetingSdkJwt, zoomApi } from "./zoom.server";
-
-async function getUserRoles(userId: string): Promise<string[]> {
-  const { data } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId);
-  return (data ?? []).map((r) => r.role as string);
-}
+import {
+  assertCanManageProgramResource,
+  getTeacherGlobalScope,
+  getTeacherScopeForProgram,
+  getUserRoles,
+} from "./teacher-access.server";
 
 async function assertAdminOrDocente(userId: string) {
   const roles = await getUserRoles(userId);
@@ -19,27 +17,6 @@ async function assertAdminOrDocente(userId: string) {
   }
 }
 
-async function assertCanManageProgram(userId: string, programaId: string) {
-  const roles = await getUserRoles(userId);
-  if (roles.includes("admin")) return;
-  if (!roles.includes("docente")) {
-    throw new Error("No autorizado: se requiere rol admin o docente.");
-  }
-  const { data: teacher } = await supabaseAdmin
-    .from("teachers")
-    .select("id")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (!teacher) throw new Error("No se encontró tu perfil de docente.");
-  const { data: prog } = await supabaseAdmin
-    .from("programs")
-    .select("docente_id")
-    .eq("id", programaId)
-    .maybeSingle();
-  if (!prog || prog.docente_id !== teacher.id) {
-    throw new Error("No tienes permiso para gestionar reuniones de este programa.");
-  }
-}
 
 /** Diagnóstico simple: pide /users/me con el token S2S. */
 export const getZoomConnectionStatus = createServerFn({ method: "GET" })
@@ -76,9 +53,8 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     }).parse,
   )
   .handler(async ({ data, context }) => {
-    await assertCanManageProgram(context.userId, data.programaId);
-
-    // Validate cohort belongs to the same program
+    // Validar primero que el cohort pertenezca al programa, para que la
+    // verificación de permisos por cohorte no pueda ser burlada.
     if (data.cohortId) {
       const { data: cohort } = await supabaseAdmin
         .from("program_cohorts")
@@ -89,6 +65,13 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
         throw new Error("El grupo seleccionado no pertenece a este programa.");
       }
     }
+
+    await assertCanManageProgramResource(context.userId, {
+      programaId: data.programaId,
+      cohortId: data.cohortId ?? null,
+      moduloId: data.moduloId ?? null,
+    });
+
 
     const meeting = await zoomApi<{
       id: number;
@@ -145,11 +128,16 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: row } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("zoom_meeting_id, programa_id")
+      .select("zoom_meeting_id, programa_id, cohort_id, modulo_id")
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Reunión no encontrada.");
-    await assertCanManageProgram(context.userId, row.programa_id);
+    await assertCanManageProgramResource(context.userId, {
+      programaId: row.programa_id,
+      cohortId: row.cohort_id ?? null,
+      moduloId: row.modulo_id ?? null,
+    });
+
     if (row?.zoom_meeting_id) {
       try {
         await zoomApi(`/meetings/${row.zoom_meeting_id}`, { method: "DELETE" });
@@ -167,11 +155,10 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
     z.object({ programaId: z.string().uuid().optional() }).parse,
   )
   .handler(async ({ data, context }) => {
-    // Authorization: admin ve todo; docente solo sus programas; resto: denegado.
-    const roles = await getUserRoles(context.userId);
-    const isAdmin = roles.includes("admin");
-    const isDocente = roles.includes("docente");
-    if (!isAdmin && !isDocente) {
+    // Authorization: admin ve todo; docente sus programas (por titularidad,
+    // cohorte o módulo); resto: denegado.
+    const scope = await getTeacherGlobalScope(context.userId);
+    if (!scope.isAdmin && !scope.isDocente) {
       throw new Error("No autorizado.");
     }
 
@@ -182,27 +169,36 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
 
     if (data.programaId) q = q.eq("programa_id", data.programaId);
 
-    if (!isAdmin) {
-      // Docente: limitar a programas de los que es titular.
-      const { data: teacher } = await supabaseAdmin
-        .from("teachers")
-        .select("id")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-      if (!teacher) return [];
-      const { data: progs } = await supabaseAdmin
-        .from("programs")
-        .select("id")
-        .eq("docente_id", teacher.id);
-      const ids = (progs ?? []).map((p) => p.id);
+    const owned = new Set(scope.ownedProgramIds);
+    if (!scope.isAdmin) {
+      if (!scope.teacherId) return [];
+      const ids = Array.from(
+        new Set([
+          ...scope.ownedProgramIds,
+          ...Object.keys(scope.cohortIdsByProgram),
+          ...Object.keys(scope.moduleIdsByProgram),
+        ]),
+      );
       if (ids.length === 0) return [];
       q = q.in("programa_id", ids);
     }
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    if (scope.isAdmin) return rows ?? [];
+
+    // Docente no titular: solo reuniones de SUS cohortes/módulos o creadas por él.
+    return (rows ?? []).filter((m: any) => {
+      if (owned.has(m.programa_id)) return true;
+      if (m.created_by === context.userId) return true;
+      const myCohorts = scope.cohortIdsByProgram[m.programa_id] ?? [];
+      const myModules = scope.moduleIdsByProgram[m.programa_id] ?? [];
+      if (m.cohort_id && myCohorts.includes(m.cohort_id)) return true;
+      if (m.modulo_id && myModules.includes(m.modulo_id)) return true;
+      return false;
+    });
   });
+
 
 /** Devuelve la firma del Meeting SDK validando rol/inscripción del usuario. */
 export const getMeetingSdkSignature = createServerFn({ method: "POST" })
@@ -211,7 +207,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("id, programa_id, cohort_id, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
+      .select("id, programa_id, cohort_id, modulo_id, created_by, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
       .eq("id", data.meetingRowId)
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
@@ -225,18 +221,15 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
     if (isAdmin) {
       role = 1;
     } else if (isDocente) {
-      const { data: teacher } = await supabaseAdmin
-        .from("teachers")
-        .select("id")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-      const { data: prog } = await supabaseAdmin
-        .from("programs")
-        .select("docente_id")
-        .eq("id", meeting.programa_id)
-        .maybeSingle();
-      role = teacher && prog?.docente_id === teacher.id ? 1 : 0;
+      const scope = await getTeacherScopeForProgram(context.userId, meeting.programa_id);
+      const isHost =
+        scope.isOwner ||
+        meeting.created_by === context.userId ||
+        (!!meeting.cohort_id && scope.cohortIds.includes(meeting.cohort_id)) ||
+        (!!meeting.modulo_id && scope.moduleIds.includes(meeting.modulo_id));
+      role = isHost ? 1 : 0;
     } else {
+
       const { data: enr } = await supabaseAdmin
         .from("enrollments")
         .select("estado")
