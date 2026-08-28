@@ -9,6 +9,11 @@ import {
   getTeacherScopeForProgram,
   getUserRoles,
 } from "./teacher-access.server";
+import {
+  getOrAssignZoomLicense,
+  resolveResponsibleTeacherId,
+} from "./zoom-licenses.server";
+
 
 async function assertAdminOrDocente(userId: string) {
   const roles = await getUserRoles(userId);
