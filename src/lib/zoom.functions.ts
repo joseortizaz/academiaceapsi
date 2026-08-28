@@ -53,9 +53,8 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
     }).parse,
   )
   .handler(async ({ data, context }) => {
-    await assertCanManageProgram(context.userId, data.programaId);
-
-    // Validate cohort belongs to the same program
+    // Validar primero que el cohort pertenezca al programa, para que la
+    // verificación de permisos por cohorte no pueda ser burlada.
     if (data.cohortId) {
       const { data: cohort } = await supabaseAdmin
         .from("program_cohorts")
@@ -66,6 +65,13 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
         throw new Error("El grupo seleccionado no pertenece a este programa.");
       }
     }
+
+    await assertCanManageProgramResource(context.userId, {
+      programaId: data.programaId,
+      cohortId: data.cohortId ?? null,
+      moduloId: data.moduloId ?? null,
+    });
+
 
     const meeting = await zoomApi<{
       id: number;
