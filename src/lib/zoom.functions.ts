@@ -71,19 +71,32 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       }
     }
 
-    await assertCanManageProgramResource(context.userId, {
+    const scope = await assertCanManageProgramResource(context.userId, {
       programaId: data.programaId,
       cohortId: data.cohortId ?? null,
       moduloId: data.moduloId ?? null,
     });
 
+    // Docente responsable de la reunión: él mismo si es docente con scope
+    // válido; si es admin, el docente dueño según cohorte → módulo → programa.
+    const responsibleTeacherId = scope.teacherId
+      ? scope.teacherId
+      : await resolveResponsibleTeacherId({
+          programaId: data.programaId,
+          cohortId: data.cohortId ?? null,
+          moduloId: data.moduloId ?? null,
+        });
+
+    // Cada docente usa su propia licencia/aula virtual de Zoom (asignación fija).
+    const { email: hostEmail } = await getOrAssignZoomLicense(responsibleTeacherId);
 
     const meeting = await zoomApi<{
       id: number;
       join_url: string;
       start_url: string;
       password?: string;
-    }>("/users/me/meetings", {
+    }>(`/users/${encodeURIComponent(hostEmail)}/meetings`, {
+
       method: "POST",
       body: JSON.stringify({
         topic: data.titulo,
