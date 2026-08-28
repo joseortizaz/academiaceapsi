@@ -299,7 +299,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
     let zak: string | undefined;
     if (role === 1) {
       try {
-        zak = await getZakToken("me");
+        zak = await getZakToken((meeting as any).zoom_host_email || "me");
       } catch (e) {
         console.warn("No se pudo obtener ZAK token para el host:", e);
       }
