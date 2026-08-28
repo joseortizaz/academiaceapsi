@@ -133,6 +133,8 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
         status: "scheduled",
         auto_record: data.autoRecord,
         created_by: context.userId,
+        zoom_host_email: hostEmail,
+
       })
       .select("*")
       .single();
