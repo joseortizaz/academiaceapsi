@@ -155,11 +155,10 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
     z.object({ programaId: z.string().uuid().optional() }).parse,
   )
   .handler(async ({ data, context }) => {
-    // Authorization: admin ve todo; docente solo sus programas; resto: denegado.
-    const roles = await getUserRoles(context.userId);
-    const isAdmin = roles.includes("admin");
-    const isDocente = roles.includes("docente");
-    if (!isAdmin && !isDocente) {
+    // Authorization: admin ve todo; docente sus programas (por titularidad,
+    // cohorte o módulo); resto: denegado.
+    const scope = await getTeacherGlobalScope(context.userId);
+    if (!scope.isAdmin && !scope.isDocente) {
       throw new Error("No autorizado.");
     }
 
@@ -170,27 +169,36 @@ export const listZoomMeetings = createServerFn({ method: "GET" })
 
     if (data.programaId) q = q.eq("programa_id", data.programaId);
 
-    if (!isAdmin) {
-      // Docente: limitar a programas de los que es titular.
-      const { data: teacher } = await supabaseAdmin
-        .from("teachers")
-        .select("id")
-        .eq("user_id", context.userId)
-        .maybeSingle();
-      if (!teacher) return [];
-      const { data: progs } = await supabaseAdmin
-        .from("programs")
-        .select("id")
-        .eq("docente_id", teacher.id);
-      const ids = (progs ?? []).map((p) => p.id);
+    const owned = new Set(scope.ownedProgramIds);
+    if (!scope.isAdmin) {
+      if (!scope.teacherId) return [];
+      const ids = Array.from(
+        new Set([
+          ...scope.ownedProgramIds,
+          ...Object.keys(scope.cohortIdsByProgram),
+          ...Object.keys(scope.moduleIdsByProgram),
+        ]),
+      );
       if (ids.length === 0) return [];
       q = q.in("programa_id", ids);
     }
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+    if (scope.isAdmin) return rows ?? [];
+
+    // Docente no titular: solo reuniones de SUS cohortes/módulos o creadas por él.
+    return (rows ?? []).filter((m: any) => {
+      if (owned.has(m.programa_id)) return true;
+      if (m.created_by === context.userId) return true;
+      const myCohorts = scope.cohortIdsByProgram[m.programa_id] ?? [];
+      const myModules = scope.moduleIdsByProgram[m.programa_id] ?? [];
+      if (m.cohort_id && myCohorts.includes(m.cohort_id)) return true;
+      if (m.modulo_id && myModules.includes(m.modulo_id)) return true;
+      return false;
+    });
   });
+
 
 /** Devuelve la firma del Meeting SDK validando rol/inscripción del usuario. */
 export const getMeetingSdkSignature = createServerFn({ method: "POST" })
