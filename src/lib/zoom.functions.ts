@@ -3,14 +3,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getZakToken, signMeetingSdkJwt, zoomApi } from "./zoom.server";
-
-async function getUserRoles(userId: string): Promise<string[]> {
-  const { data } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId);
-  return (data ?? []).map((r) => r.role as string);
-}
+import {
+  assertCanManageProgramResource,
+  getTeacherGlobalScope,
+  getTeacherScopeForProgram,
+  getUserRoles,
+} from "./teacher-access.server";
 
 async function assertAdminOrDocente(userId: string) {
   const roles = await getUserRoles(userId);
@@ -19,27 +17,6 @@ async function assertAdminOrDocente(userId: string) {
   }
 }
 
-async function assertCanManageProgram(userId: string, programaId: string) {
-  const roles = await getUserRoles(userId);
-  if (roles.includes("admin")) return;
-  if (!roles.includes("docente")) {
-    throw new Error("No autorizado: se requiere rol admin o docente.");
-  }
-  const { data: teacher } = await supabaseAdmin
-    .from("teachers")
-    .select("id")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (!teacher) throw new Error("No se encontró tu perfil de docente.");
-  const { data: prog } = await supabaseAdmin
-    .from("programs")
-    .select("docente_id")
-    .eq("id", programaId)
-    .maybeSingle();
-  if (!prog || prog.docente_id !== teacher.id) {
-    throw new Error("No tienes permiso para gestionar reuniones de este programa.");
-  }
-}
 
 /** Diagnóstico simple: pide /users/me con el token S2S. */
 export const getZoomConnectionStatus = createServerFn({ method: "GET" })
