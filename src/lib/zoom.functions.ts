@@ -9,6 +9,11 @@ import {
   getTeacherScopeForProgram,
   getUserRoles,
 } from "./teacher-access.server";
+import {
+  getOrAssignZoomLicense,
+  resolveResponsibleTeacherId,
+} from "./zoom-licenses.server";
+
 
 async function assertAdminOrDocente(userId: string) {
   const roles = await getUserRoles(userId);
@@ -66,19 +71,32 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       }
     }
 
-    await assertCanManageProgramResource(context.userId, {
+    const scope = await assertCanManageProgramResource(context.userId, {
       programaId: data.programaId,
       cohortId: data.cohortId ?? null,
       moduloId: data.moduloId ?? null,
     });
 
+    // Docente responsable de la reunión: él mismo si es docente con scope
+    // válido; si es admin, el docente dueño según cohorte → módulo → programa.
+    const responsibleTeacherId = scope.teacherId
+      ? scope.teacherId
+      : await resolveResponsibleTeacherId({
+          programaId: data.programaId,
+          cohortId: data.cohortId ?? null,
+          moduloId: data.moduloId ?? null,
+        });
+
+    // Cada docente usa su propia licencia/aula virtual de Zoom (asignación fija).
+    const { email: hostEmail } = await getOrAssignZoomLicense(responsibleTeacherId);
 
     const meeting = await zoomApi<{
       id: number;
       join_url: string;
       start_url: string;
       password?: string;
-    }>("/users/me/meetings", {
+    }>(`/users/${encodeURIComponent(hostEmail)}/meetings`, {
+
       method: "POST",
       body: JSON.stringify({
         topic: data.titulo,
@@ -115,6 +133,8 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
         status: "scheduled",
         auto_record: data.autoRecord,
         created_by: context.userId,
+        zoom_host_email: hostEmail,
+
       })
       .select("*")
       .single();
@@ -207,7 +227,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("id, programa_id, cohort_id, modulo_id, created_by, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, titulo")
+      .select("id, programa_id, cohort_id, modulo_id, created_by, zoom_meeting_id, zoom_password, zoom_join_url, zoom_start_url, zoom_host_email, titulo")
       .eq("id", data.meetingRowId)
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
@@ -279,7 +299,7 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
     let zak: string | undefined;
     if (role === 1) {
       try {
-        zak = await getZakToken("me");
+        zak = await getZakToken((meeting as any).zoom_host_email || "me");
       } catch (e) {
         console.warn("No se pudo obtener ZAK token para el host:", e);
       }

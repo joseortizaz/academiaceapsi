@@ -1900,6 +1900,51 @@ export type Database = {
         }
         Relationships: []
       }
+      zoom_licenses: {
+        Row: {
+          active: boolean
+          assigned_at: string | null
+          created_at: string
+          email: string
+          id: string
+          teacher_id: string | null
+          zoom_user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          assigned_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          teacher_id?: string | null
+          zoom_user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          assigned_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          teacher_id?: string | null
+          zoom_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zoom_licenses_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: true
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zoom_licenses_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: true
+            referencedRelation: "teachers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       zoom_meetings: {
         Row: {
           auto_record: boolean
@@ -1919,6 +1964,7 @@ export type Database = {
           status: string
           titulo: string
           updated_at: string
+          zoom_host_email: string | null
           zoom_join_url: string
           zoom_meeting_id: string
           zoom_password: string | null
@@ -1942,6 +1988,7 @@ export type Database = {
           status?: string
           titulo: string
           updated_at?: string
+          zoom_host_email?: string | null
           zoom_join_url: string
           zoom_meeting_id: string
           zoom_password?: string | null
@@ -1965,6 +2012,7 @@ export type Database = {
           status?: string
           titulo?: string
           updated_at?: string
+          zoom_host_email?: string | null
           zoom_join_url?: string
           zoom_meeting_id?: string
           zoom_password?: string | null
