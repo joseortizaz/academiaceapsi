@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { CertificateTemplate, type CertificateTemplateData } from "./CertificateTemplate";
 import { exportCertificateNodeToPDF } from "@/lib/certificate-pdf";
 
@@ -23,6 +24,9 @@ export function CertificatePreviewDialog({ open, onOpenChange, data }: Props) {
         nodeRef.current,
         `Certificado-${data.certificateNumber}.pdf`,
       );
+    } catch (e) {
+      console.error("Error exportando certificado a PDF:", e);
+      toast.error("No se pudo generar el certificado. Intenta de nuevo.");
     } finally {
       setDownloading(false);
     }
