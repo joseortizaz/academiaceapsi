@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TestCertPdfRouteImport } from './routes/test-cert-pdf'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -87,6 +88,11 @@ import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './rou
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestCertPdfRoute = TestCertPdfRouteImport.update({
+  id: '/test-cert-pdf',
+  path: '/test-cert-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
@@ -510,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/test-cert-pdf': typeof TestCertPdfRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
@@ -584,6 +591,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/test-cert-pdf': typeof TestCertPdfRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -658,6 +666,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/test-cert-pdf': typeof TestCertPdfRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
@@ -735,6 +744,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/test-cert-pdf'
     | '/unsubscribe'
     | '/admin'
     | '/certificados'
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/test-cert-pdf'
     | '/unsubscribe'
     | '/certificados'
     | '/email/unsubscribe'
@@ -882,6 +893,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/test-cert-pdf'
     | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/certificados'
@@ -959,6 +971,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
+  TestCertPdfRoute: typeof TestCertPdfRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
@@ -985,6 +998,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-cert-pdf': {
+      id: '/test-cert-pdf'
+      path: '/test-cert-pdf'
+      fullPath: '/test-cert-pdf'
+      preLoaderRoute: typeof TestCertPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/solicitud-curso': {
@@ -1656,6 +1676,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
+  TestCertPdfRoute: TestCertPdfRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
