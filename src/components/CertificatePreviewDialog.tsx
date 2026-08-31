@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { CertificateTemplate, type CertificateTemplateData } from "./CertificateTemplate";
 import { exportCertificateNodeToPDF } from "@/lib/certificate-pdf";
 
