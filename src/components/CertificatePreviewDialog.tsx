@@ -23,6 +23,9 @@ export function CertificatePreviewDialog({ open, onOpenChange, data }: Props) {
         nodeRef.current,
         `Certificado-${data.certificateNumber}.pdf`,
       );
+    } catch (e) {
+      console.error("Error exportando certificado a PDF:", e);
+      toast.error("No se pudo generar el certificado. Intenta de nuevo.");
     } finally {
       setDownloading(false);
     }
