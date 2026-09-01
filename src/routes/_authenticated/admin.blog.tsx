@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { ImageUploader } from "@/components/admin/ImageUploader";
+
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
@@ -173,9 +175,14 @@ function BlogPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>URL imagen de portada</Label>
-                <Input value={s.imagen_url ?? ""} onChange={(e) => set({ imagen_url: e.target.value })} />
+                <Label>Imagen de portada</Label>
+                <ImageUploader
+                  value={s.imagen_url ?? ""}
+                  onChange={(url) => set({ imagen_url: url })}
+                  folder="blog"
+                />
               </div>
+
               <div className="grid gap-2">
                 <Label>Categoría</Label>
                 <Select
