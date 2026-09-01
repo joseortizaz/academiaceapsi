@@ -24,7 +24,11 @@ export function RichText({ html, className }: RichTextProps) {
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5",
+        "prose prose-lg max-w-none",
+        "[&_h2]:text-foreground [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4",
+        "[&_h3]:text-foreground [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3",
+        "[&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-muted/50 [&_blockquote]:p-4 [&_blockquote]:rounded-r-lg [&_blockquote]:italic [&_blockquote]:text-lg",
+        "[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5",
         className,
       )}
       dangerouslySetInnerHTML={{ __html: clean }}

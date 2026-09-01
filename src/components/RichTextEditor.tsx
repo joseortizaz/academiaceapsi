@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  Heading2, Heading3, Type,
+  Heading2, Heading3, Type, Quote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +46,9 @@ function Toolbar({ editor }: { editor: Editor }) {
       </ToolbarBtn>
       <ToolbarBtn title="Texto normal" active={!editor.isActive("heading")} onClick={() => editor.chain().focus().setParagraph().run()}>
         <Type className="h-4 w-4" />
+      </ToolbarBtn>
+      <ToolbarBtn title="Cita" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <Quote className="h-4 w-4" />
       </ToolbarBtn>
       <span className="mx-1 h-5 w-px bg-border" />
       <ToolbarBtn title="Negrita" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
