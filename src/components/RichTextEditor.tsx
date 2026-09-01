@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Heading2, Heading3, Type,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

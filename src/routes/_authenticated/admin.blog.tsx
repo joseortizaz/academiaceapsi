@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { RichTextEditor } from "@/components/RichTextEditor";
 
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
