@@ -6,7 +6,7 @@ import { PublicLayout } from "@/components/site/PublicLayout";
 import { RichText } from "@/components/RichText";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowLeft, Loader2 } from "lucide-react";
-import { formatFecha } from "./blog";
+import { formatFecha } from "./blog.index";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,

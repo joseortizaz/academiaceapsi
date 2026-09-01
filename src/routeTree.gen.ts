@@ -20,11 +20,11 @@ import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as DocentesRouteImport } from './routes/docentes'
 import { Route as ContactosRouteImport } from './routes/contactos'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
@@ -140,11 +140,6 @@ const ContactosRoute = ContactosRouteImport.update({
   path: '/contactos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AccederRoute = AccederRouteImport.update({
   id: '/acceder',
   path: '/acceder',
@@ -163,6 +158,11 @@ const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProgramasRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const VerifyCodeRoute = VerifyCodeRouteImport.update({
   id: '/verify/$code',
@@ -185,9 +185,9 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   id: '/estudiante',
@@ -505,7 +505,6 @@ const ApiPublicHooksReconcileZoomRecordingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -526,6 +525,7 @@ export interface FileRoutesByFullPath {
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/blog/': typeof BlogIndexRoute
   '/programas/': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
@@ -581,7 +581,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -598,6 +597,7 @@ export interface FileRoutesByTo {
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/blog': typeof BlogIndexRoute
   '/programas': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
@@ -655,7 +655,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -676,6 +675,7 @@ export interface FileRoutesById {
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/blog/': typeof BlogIndexRoute
   '/programas/': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
@@ -733,7 +733,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/acceder'
-    | '/blog'
     | '/contactos'
     | '/docentes'
     | '/eventos'
@@ -754,6 +753,7 @@ export interface FileRouteTypes {
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/blog/'
     | '/programas/'
     | '/.lovable/oauth/consent'
     | '/admin/anuncios'
@@ -809,7 +809,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/acceder'
-    | '/blog'
     | '/contactos'
     | '/docentes'
     | '/eventos'
@@ -826,6 +825,7 @@ export interface FileRouteTypes {
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/blog'
     | '/programas'
     | '/.lovable/oauth/consent'
     | '/admin/anuncios'
@@ -882,7 +882,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/acceder'
-    | '/blog'
     | '/contactos'
     | '/docentes'
     | '/eventos'
@@ -903,6 +902,7 @@ export interface FileRouteTypes {
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/blog/'
     | '/programas/'
     | '/.lovable/oauth/consent'
     | '/_authenticated/admin/anuncios'
@@ -960,7 +960,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccederRoute: typeof AccederRoute
-  BlogRoute: typeof BlogRouteWithChildren
   ContactosRoute: typeof ContactosRoute
   DocentesRoute: typeof DocentesRoute
   EventosRoute: typeof EventosRoute
@@ -972,9 +971,11 @@ export interface RootRouteChildren {
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   VerificarNumeroRoute: typeof VerificarNumeroRoute
   VerifyCodeRoute: typeof VerifyCodeRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
   ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
@@ -1069,13 +1070,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/acceder': {
       id: '/acceder'
       path: '/acceder'
@@ -1103,6 +1097,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/programas/'
       preLoaderRoute: typeof ProgramasIndexRouteImport
       parentRoute: typeof ProgramasRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/verify/$code': {
       id: '/verify/$code'
@@ -1134,10 +1135,10 @@ declare module '@tanstack/react-router' {
     }
     '/blog/$slug': {
       id: '/blog/$slug'
-      path: '/$slug'
+      path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/estudiante': {
       id: '/_authenticated/estudiante'
@@ -1646,16 +1647,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 interface ProgramasRouteChildren {
   ProgramasSlugRoute: typeof ProgramasSlugRoute
   ProgramasIndexRoute: typeof ProgramasIndexRoute
@@ -1674,7 +1665,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccederRoute: AccederRoute,
-  BlogRoute: BlogRouteWithChildren,
   ContactosRoute: ContactosRoute,
   DocentesRoute: DocentesRoute,
   EventosRoute: EventosRoute,
@@ -1686,9 +1676,11 @@ const rootRouteChildren: RootRouteChildren = {
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   VerificarNumeroRoute: VerificarNumeroRoute,
   VerifyCodeRoute: VerifyCodeRoute,
+  BlogIndexRoute: BlogIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
   ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
