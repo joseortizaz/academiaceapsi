@@ -173,8 +173,13 @@ function BlogPage() {
               <Textarea rows={2} value={s.resumen ?? ""} onChange={(e) => set({ resumen: e.target.value })} />
             </div>
             <div className="grid gap-2">
-              <Label>Contenido (Markdown / HTML)</Label>
-              <Textarea rows={8} value={s.contenido} onChange={(e) => set({ contenido: e.target.value })} required />
+              <Label>Contenido</Label>
+              <RichTextEditor
+                value={s.contenido}
+                onChange={(html) => set({ contenido: html })}
+                placeholder="Escribe el contenido del artículo..."
+                minHeight={220}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
