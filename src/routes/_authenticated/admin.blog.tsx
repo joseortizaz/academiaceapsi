@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { RichTextEditor } from "@/components/RichTextEditor";
 
 import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
@@ -71,6 +72,8 @@ function BlogPage() {
 
   const save = async (v: Post) => {
     if (!v.autor_id && !user?.id) return toast.error("Sesión no encontrada");
+    const plain = (v.contenido ?? "").replace(/<[^>]*>/g, "").trim();
+    if (!plain) return toast.error("El contenido del artículo es obligatorio");
     const payload = {
       ...v,
       autor_id: v.autor_id || user!.id,
@@ -170,8 +173,13 @@ function BlogPage() {
               <Textarea rows={2} value={s.resumen ?? ""} onChange={(e) => set({ resumen: e.target.value })} />
             </div>
             <div className="grid gap-2">
-              <Label>Contenido (Markdown / HTML)</Label>
-              <Textarea rows={8} value={s.contenido} onChange={(e) => set({ contenido: e.target.value })} required />
+              <Label>Contenido</Label>
+              <RichTextEditor
+                value={s.contenido}
+                onChange={(html) => set({ contenido: html })}
+                placeholder="Escribe el contenido del artículo..."
+                minHeight={220}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">

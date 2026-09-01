@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Heading2, Heading3, Type,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,16 @@ function ToolbarBtn({
 function Toolbar({ editor }: { editor: Editor }) {
   return (
     <div className="flex flex-wrap items-center gap-1 border-b bg-muted/30 px-2 py-1">
+      <ToolbarBtn title="Título (H2)" active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <Heading2 className="h-4 w-4" />
+      </ToolbarBtn>
+      <ToolbarBtn title="Subtítulo (H3)" active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <Heading3 className="h-4 w-4" />
+      </ToolbarBtn>
+      <ToolbarBtn title="Texto normal" active={!editor.isActive("heading")} onClick={() => editor.chain().focus().setParagraph().run()}>
+        <Type className="h-4 w-4" />
+      </ToolbarBtn>
+      <span className="mx-1 h-5 w-px bg-border" />
       <ToolbarBtn title="Negrita" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
         <Bold className="h-4 w-4" />
       </ToolbarBtn>
