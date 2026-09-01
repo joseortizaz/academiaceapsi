@@ -109,7 +109,7 @@ function BlogPost() {
                 className="mt-6 aspect-[16/8] w-full rounded-xl object-cover"
               />
             )}
-            <RichText html={toHtml(post.contenido)} className="mt-8" />
+            <RichText html={toHtml(post.contenido)} className="mt-8" size="lg" />
             {post.tags && post.tags.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {post.tags.map((t: string) => (

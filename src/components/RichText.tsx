@@ -4,14 +4,21 @@ import { cn } from "@/lib/utils";
 interface RichTextProps {
   html: string | null | undefined;
   className?: string;
+  size?: "sm" | "base" | "lg";
 }
+
+const sizeClass: Record<NonNullable<RichTextProps["size"]>, string> = {
+  sm: "prose-sm",
+  base: "prose-base",
+  lg: "prose-lg",
+};
 
 // Detect legacy plain-text values (no HTML tags). Render as preserved whitespace.
 function isHtml(s: string) {
   return /<\/?[a-z][\s\S]*>/i.test(s);
 }
 
-export function RichText({ html, className }: RichTextProps) {
+export function RichText({ html, className, size = "sm" }: RichTextProps) {
   if (!html) return null;
   if (!isHtml(html)) {
     return (
@@ -24,7 +31,8 @@ export function RichText({ html, className }: RichTextProps) {
   return (
     <div
       className={cn(
-        "prose prose-lg max-w-none",
+        "prose max-w-none",
+        sizeClass[size],
         "[&_h2]:text-foreground [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4",
         "[&_h3]:text-foreground [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3",
         "[&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-muted/50 [&_blockquote]:p-4 [&_blockquote]:rounded-r-lg [&_blockquote]:italic [&_blockquote]:text-lg",
