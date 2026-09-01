@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TmpEditorTestRouteImport } from './routes/tmp-editor-test'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -88,6 +89,11 @@ import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './rou
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TmpEditorTestRoute = TmpEditorTestRouteImport.update({
+  id: '/tmp-editor-test',
+  path: '/tmp-editor-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
@@ -515,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/tmp-editor-test': typeof TmpEditorTestRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/certificados': typeof AuthenticatedCertificadosRoute
@@ -590,6 +597,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/tmp-editor-test': typeof TmpEditorTestRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -665,6 +673,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
+  '/tmp-editor-test': typeof TmpEditorTestRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
@@ -743,6 +752,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/tmp-editor-test'
     | '/unsubscribe'
     | '/admin'
     | '/certificados'
@@ -818,6 +828,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/tmp-editor-test'
     | '/unsubscribe'
     | '/certificados'
     | '/blog/$slug'
@@ -892,6 +903,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre-nosotros'
     | '/solicitud-curso'
+    | '/tmp-editor-test'
     | '/unsubscribe'
     | '/_authenticated/admin'
     | '/_authenticated/certificados'
@@ -970,6 +982,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
+  TmpEditorTestRoute: typeof TmpEditorTestRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -998,6 +1011,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tmp-editor-test': {
+      id: '/tmp-editor-test'
+      path: '/tmp-editor-test'
+      fullPath: '/tmp-editor-test'
+      preLoaderRoute: typeof TmpEditorTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/solicitud-curso': {
@@ -1675,6 +1695,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
+  TmpEditorTestRoute: TmpEditorTestRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
