@@ -29,6 +29,7 @@ import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
@@ -182,6 +183,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   id: '/estudiante',
@@ -499,7 +505,7 @@ const ApiPublicHooksReconcileZoomRecordingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -515,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -574,7 +581,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -586,6 +593,7 @@ export interface FileRoutesByTo {
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -647,7 +655,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/acceder': typeof AccederRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -663,6 +671,7 @@ export interface FileRoutesById {
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
@@ -740,6 +749,7 @@ export interface FileRouteTypes {
     | '/certificados'
     | '/docente'
     | '/estudiante'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
@@ -811,6 +821,7 @@ export interface FileRouteTypes {
     | '/solicitud-curso'
     | '/unsubscribe'
     | '/certificados'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
@@ -948,7 +960,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccederRoute: typeof AccederRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   ContactosRoute: typeof ContactosRoute
   DocentesRoute: typeof DocentesRoute
   EventosRoute: typeof EventosRoute
@@ -1119,6 +1131,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/_authenticated/estudiante': {
       id: '/_authenticated/estudiante'
@@ -1627,6 +1646,16 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 interface ProgramasRouteChildren {
   ProgramasSlugRoute: typeof ProgramasSlugRoute
   ProgramasIndexRoute: typeof ProgramasIndexRoute
@@ -1645,7 +1674,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccederRoute: AccederRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   ContactosRoute: ContactosRoute,
   DocentesRoute: DocentesRoute,
   EventosRoute: EventosRoute,
