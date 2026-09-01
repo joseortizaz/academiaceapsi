@@ -4,9 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PublicLayout } from "@/components/site/PublicLayout";
 import { RichText } from "@/components/RichText";
+import { marked } from "marked";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowLeft, Loader2 } from "lucide-react";
 import { formatFecha } from "./blog.index";
+
+function toHtml(content: string | null | undefined) {
+  if (!content) return "";
+  const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
+  return isHtml ? content : (marked.parse(content, { async: false }) as string);
+}
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
@@ -102,7 +109,7 @@ function BlogPost() {
                 className="mt-6 aspect-[16/8] w-full rounded-xl object-cover"
               />
             )}
-            <RichText html={post.contenido} className="mt-8 prose-base" />
+            <RichText html={toHtml(post.contenido)} className="mt-8 prose-base" />
             {post.tags && post.tags.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {post.tags.map((t: string) => (
