@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
-  Heading2, Heading3, Type,
+  Heading2, Heading3, Type, Quote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +46,9 @@ function Toolbar({ editor }: { editor: Editor }) {
       </ToolbarBtn>
       <ToolbarBtn title="Texto normal" active={!editor.isActive("heading")} onClick={() => editor.chain().focus().setParagraph().run()}>
         <Type className="h-4 w-4" />
+      </ToolbarBtn>
+      <ToolbarBtn title="Cita" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <Quote className="h-4 w-4" />
       </ToolbarBtn>
       <span className="mx-1 h-5 w-px bg-border" />
       <ToolbarBtn title="Negrita" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
@@ -91,7 +94,7 @@ export function RichTextEditor({ value, onChange, placeholder, minHeight = 140 }
     content: value || "",
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none px-3 py-2 focus:outline-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5",
+        class: "prose prose-sm max-w-none px-3 py-2 focus:outline-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_h2]:text-foreground [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h3]:text-foreground [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-5 [&_h3]:mb-2 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-muted/50 [&_blockquote]:p-3 [&_blockquote]:rounded-r-lg [&_blockquote]:italic",
         style: `min-height: ${minHeight}px`,
       },
     },
