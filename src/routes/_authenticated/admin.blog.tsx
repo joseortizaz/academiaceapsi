@@ -72,6 +72,8 @@ function BlogPage() {
 
   const save = async (v: Post) => {
     if (!v.autor_id && !user?.id) return toast.error("Sesión no encontrada");
+    const plain = (v.contenido ?? "").replace(/<[^>]*>/g, "").trim();
+    if (!plain) return toast.error("El contenido del artículo es obligatorio");
     const payload = {
       ...v,
       autor_id: v.autor_id || user!.id,
