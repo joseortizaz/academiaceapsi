@@ -88,7 +88,7 @@ export function signMeetingSdkJwt(params: {
   const payload = {
     appKey: sdkKey,
     sdkKey,
-    mn: params.meetingNumber,
+    mn: Number(params.meetingNumber),
     role: params.role,
     iat,
     exp,

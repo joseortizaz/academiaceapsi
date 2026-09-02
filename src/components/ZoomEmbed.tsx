@@ -127,7 +127,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         await client.join({
           signature: sig.signature,
           sdkKey: sig.sdkKey,
-          meetingNumber: sig.meetingNumber,
+          meetingNumber: Number(sig.meetingNumber),
           password: sig.password,
           userName: sig.userName || "Participante",
           userEmail: sig.userEmail || undefined,
