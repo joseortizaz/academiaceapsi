@@ -87,10 +87,15 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
           moduloId: data.moduloId ?? null,
         });
 
-    // Cada docente usa su propia licencia/aula virtual de Zoom (asignación fija).
-    const { email: hostEmail } = await getOrAssignZoomLicense(responsibleTeacherId);
+    // Las licencias son un recurso compartido por franja horaria.
+    const { email: hostEmail } = await getOrAssignZoomLicense(
+      responsibleTeacherId,
+      data.startAt,
+      data.durationMin,
+    );
 
     const meeting = await zoomApi<{
+
       id: number;
       join_url: string;
       start_url: string;
