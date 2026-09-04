@@ -112,9 +112,9 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
         settings: {
           host_video: true,
           participant_video: false,
-          join_before_host: false,
+          join_before_host: true,
           mute_upon_entry: true,
-          waiting_room: true,
+          waiting_room: false,
           auto_recording: data.autoRecord ? "cloud" : "none",
           approval_type: 2,
         },
