@@ -185,12 +185,19 @@
   max-height: 100% !important;
 }
 
-/* Red de seguridad para los contenedores reales que el SDK de Zoom inyecta
-   (clases de react-draggable / react-resizable). Sin esto, el SDK puede
-   reservar un lienzo mucho más alto que el contenedor visible y dibujar la
-   barra de controles fuera del área alcanzable. */
-#zoom-meeting-root .react-draggable,
-#zoom-meeting-root .react-resizable {
+/* Red de seguridad: el SDK de Zoom (react-draggable > ... > Paper con galería
+   + barra de controles) calcula su propio alto de galería (~1400px) de forma
+   independiente al contenedor real (~440px). Sin esto, la barra de controles
+   (audio/cámara/salir/etc., que siempre es el último hijo de ese Paper) se
+   renderiza muy por debajo del área visible, donde queda recortada por
+   overflow:hidden e inalcanzable con el mouse. `client.updateVideoOptions()`
+   NO corrige esto (solo afecta la resolución del video, no este layout), así
+   que forzamos flexbox en cada nivel usando selectores estructurales
+   (`> *`, `:last-child`) — no dependen de los nombres de clase (hashes de
+   Emotion) del SDK, que pueden cambiar entre builds. */
+#zoom-meeting-root .react-draggable {
+  display: flex !important;
+  flex-direction: column !important;
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
@@ -201,6 +208,29 @@
   position: relative !important;
   top: 0 !important;
   left: 0 !important;
+}
+
+#zoom-meeting-root .react-draggable > *,
+#zoom-meeting-root .react-draggable > * > *,
+#zoom-meeting-root .react-draggable > * > * > * {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#zoom-meeting-root .react-draggable > * > * > * > * {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#zoom-meeting-root .react-draggable > * > * > * > *:last-child {
+  flex: 0 0 auto !important;
+  overflow: visible !important;
 }
 
 #zoom-meeting-root .react-resizable-handle {
