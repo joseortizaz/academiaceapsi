@@ -185,6 +185,28 @@
   max-height: 100% !important;
 }
 
+/* Red de seguridad para los contenedores reales que el SDK de Zoom inyecta
+   (clases de react-draggable / react-resizable). Sin esto, el SDK puede
+   reservar un lienzo mucho más alto que el contenedor visible y dibujar la
+   barra de controles fuera del área alcanzable. */
+#zoom-meeting-root .react-draggable,
+#zoom-meeting-root .react-resizable {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+#zoom-meeting-root .react-resizable-handle {
+  display: none !important;
+}
+
 /* El SDK puede montar su root a nivel de body en algunos flujos. */
 body > #zmmtg-root {
   display: none;
