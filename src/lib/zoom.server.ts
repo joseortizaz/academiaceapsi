@@ -136,7 +136,19 @@ export async function zoomApi<T = unknown>(path: string, init: RequestInit = {})
  * Requiere el scope `user:read:token` en la app Server-to-Server OAuth.
  */
 export async function getZakToken(userId = "me"): Promise<string> {
-  const data = await zoomApi<{ token: string }>(`/users/${encodeURIComponent(userId)}/token?type=zak`);
+  // El ZAK debe obtenerse con OAuth de la MISMA app que firma el JWT del
+  // Meeting SDK ("General app 423"); usar el S2S de otra app provoca el
+  // error 3712 "Signature is invalid" al unirse como host.
+  const accessToken = await getZoomSdkAppAccessToken();
+  const res = await fetch(
+    `${ZOOM_API_BASE}/users/${encodeURIComponent(userId)}/token?type=zak`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  const text = await res.text();
+  const data = text ? (JSON.parse(text) as { token?: string }) : null;
+  if (!res.ok) {
+    throw new Error(`Zoom API /users/${userId}/token falló [${res.status}]: ${text}`);
+  }
   if (!data?.token) throw new Error("Zoom no devolvió un token ZAK para el host.");
   return data.token;
 }
