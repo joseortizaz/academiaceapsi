@@ -1,4 +1,75 @@
 import crypto from "node:crypto";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+/**
+ * Obtiene (y refresca si es necesario) el access token OAuth de la app
+ * Meeting SDK ("General app 423"), el MISMO que firma los JWT del SDK.
+ * El ZAK debe provenir de esta app y no del S2S "Academia Ceapsi", o Zoom
+ * rechaza el join como "Signature is invalid" (3712).
+ */
+async function getZoomSdkAppAccessToken(): Promise<string> {
+  const clientId = process.env.ZOOM_SDK_KEY;
+  const clientSecret = process.env.ZOOM_SDK_SECRET;
+  if (!clientId || !clientSecret) {
+    throw new Error("Faltan ZOOM_SDK_KEY / ZOOM_SDK_SECRET.");
+  }
+
+  const { data: row, error } = await (supabaseAdmin as any)
+    .from("zoom_oauth_tokens")
+    .select("access_token, refresh_token, expires_at")
+    .eq("id", "sdk_app")
+    .maybeSingle();
+  if (error) throw new Error(`No se pudo leer zoom_oauth_tokens: ${error.message}`);
+  if (!row) {
+    throw new Error(
+      "La app Meeting SDK de Zoom no está autorizada por OAuth (falta refresh token). Repite la autorización.",
+    );
+  }
+
+  const expiresAt = row.expires_at ? new Date(row.expires_at).getTime() : 0;
+  if (row.access_token && expiresAt > Date.now() + 30_000) {
+    return row.access_token as string;
+  }
+  if (!row.refresh_token) {
+    throw new Error(
+      "La app Meeting SDK de Zoom no está autorizada por OAuth (falta refresh token). Repite la autorización.",
+    );
+  }
+
+  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+  const res = await fetch(
+    `https://zoom.us/oauth/token?grant_type=refresh_token&refresh_token=${encodeURIComponent(row.refresh_token)}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basic}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    },
+  );
+  const text = await res.text();
+  let json: any = null;
+  try {
+    json = JSON.parse(text);
+  } catch {}
+  if (!res.ok || !json?.access_token) {
+    throw new Error(`No se pudo refrescar el token OAuth de la app SDK de Zoom [${res.status}]: ${text}`);
+  }
+
+  const newExpiresAt = new Date(Date.now() + Number(json.expires_in ?? 3600) * 1000).toISOString();
+  const { error: upErr } = await (supabaseAdmin as any)
+    .from("zoom_oauth_tokens")
+    .update({
+      access_token: json.access_token,
+      refresh_token: json.refresh_token ?? row.refresh_token,
+      expires_at: newExpiresAt,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", "sdk_app");
+  if (upErr) throw new Error(`No se pudo guardar el token refrescado: ${upErr.message}`);
+
+  return json.access_token as string;
+}
 
 const ZOOM_API_BASE = "https://api.zoom.us/v2";
 const ZOOM_OAUTH_URL = "https://zoom.us/oauth/token";
@@ -65,7 +136,19 @@ export async function zoomApi<T = unknown>(path: string, init: RequestInit = {})
  * Requiere el scope `user:read:token` en la app Server-to-Server OAuth.
  */
 export async function getZakToken(userId = "me"): Promise<string> {
-  const data = await zoomApi<{ token: string }>(`/users/${encodeURIComponent(userId)}/token?type=zak`);
+  // El ZAK debe obtenerse con OAuth de la MISMA app que firma el JWT del
+  // Meeting SDK ("General app 423"); usar el S2S de otra app provoca el
+  // error 3712 "Signature is invalid" al unirse como host.
+  const accessToken = await getZoomSdkAppAccessToken();
+  const res = await fetch(
+    `${ZOOM_API_BASE}/users/${encodeURIComponent(userId)}/token?type=zak`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  const text = await res.text();
+  const data = text ? (JSON.parse(text) as { token?: string }) : null;
+  if (!res.ok) {
+    throw new Error(`Zoom API /users/${userId}/token falló [${res.status}]: ${text}`);
+  }
   if (!data?.token) throw new Error("Zoom no devolvió un token ZAK para el host.");
   return data.token;
 }
