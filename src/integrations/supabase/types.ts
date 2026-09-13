@@ -2028,6 +2028,30 @@ export type Database = {
           },
         ]
       }
+      zoom_oauth_tokens: {
+        Row: {
+          access_token: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       zoom_webhook_logs: {
         Row: {
           created_at: string
