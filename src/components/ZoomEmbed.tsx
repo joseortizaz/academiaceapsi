@@ -107,6 +107,9 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         const root = await waitForRef(containerRef);
         if (cancelled || !root) return;
 
+        await waitForStableSize(root);
+        if (cancelled) return;
+
         const client = ZoomMtgEmbedded.createClient();
         clientRef.current = client;
 
@@ -170,33 +173,33 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     };
   }, [meetingRowId, sigFn]);
 
-  // Reajustar el tamaño del video del SDK cuando cambie el viewport.
+  // Reajustar el tamaño del video del SDK cuando cambie el contenedor.
   useEffect(() => {
     if (state !== "in-meeting") return;
+    const root = containerRef.current;
+    if (!root) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
     const apply = () => {
-      const root = containerRef.current;
-      const client = clientRef.current as {
-        updateVideoOptions?: (o: unknown) => void;
-      } | null;
-      if (!root || !client?.updateVideoOptions) return;
+      const client = clientRef.current as { updateVideoOptions?: (o: unknown) => void } | null;
+      if (!client?.updateVideoOptions) return;
       try {
         client.updateVideoOptions({ viewSizes: currentViewSizes(root) });
       } catch {
         // el SDK puede rechazar el ajuste durante transiciones de vista
       }
     };
-    const onResize = () => {
+    const schedule = () => {
       if (timer) clearTimeout(timer);
-      timer = setTimeout(apply, 200);
+      timer = setTimeout(apply, 150);
     };
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onResize);
+    const ro = new ResizeObserver(schedule);
+    ro.observe(root);
+    window.addEventListener("orientationchange", schedule);
     apply();
     return () => {
       if (timer) clearTimeout(timer);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", onResize);
+      ro.disconnect();
+      window.removeEventListener("orientationchange", schedule);
     };
   }, [state]);
 
@@ -287,4 +290,24 @@ async function waitForRef<T>(ref: React.MutableRefObject<T | null>, timeoutMs = 
     await new Promise((r) => setTimeout(r, 30));
   }
   return ref.current;
+}
+
+// Espera a que termine el layout (2 frames) y a que la altura del contenedor
+// se estabilice antes de medirlo. Sin esto, `client.init()` puede recibir un
+// alto incorrecto (p. ej. el contenedor aún no tiene su altura final por
+// `h-[calc(100dvh-190px)]`), y el SDK de Zoom dibuja toda su UI (incluida la
+// barra de controles de cámara/mic) fuera del área visible, dejándola
+// invisible e inclickeable.
+async function waitForStableSize(el: HTMLElement, timeoutMs = 2000): Promise<void> {
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+  const start = Date.now();
+  let last = -1;
+  while (Date.now() - start < timeoutMs) {
+    const h = el.clientHeight;
+    if (h > 0 && h === last) return;
+    last = h;
+    await new Promise((r) => setTimeout(r, 50));
+  }
 }
