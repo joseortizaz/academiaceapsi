@@ -41,6 +41,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
 import { Route as ApiPublicZoomOauthCallbackRouteImport } from './routes/api/public/zoom-oauth-callback'
+import { Route as ApiPublicTmpVerifyZoomFixRouteImport } from './routes/api/public/tmp-verify-zoom-fix'
 import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
 import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
 import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
@@ -248,6 +249,12 @@ const ApiPublicZoomOauthCallbackRoute =
   ApiPublicZoomOauthCallbackRouteImport.update({
     id: '/api/public/zoom-oauth-callback',
     path: '/api/public/zoom-oauth-callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTmpVerifyZoomFixRoute =
+  ApiPublicTmpVerifyZoomFixRouteImport.update({
+    id: '/api/public/tmp-verify-zoom-fix',
+    path: '/api/public/tmp-verify-zoom-fix',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicCourseRequestRoute = ApiPublicCourseRequestRouteImport.update({
@@ -570,6 +577,7 @@ export interface FileRoutesByFullPath {
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
+  '/api/public/tmp-verify-zoom-fix': typeof ApiPublicTmpVerifyZoomFixRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -643,6 +651,7 @@ export interface FileRoutesByTo {
   '/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
+  '/api/public/tmp-verify-zoom-fix': typeof ApiPublicTmpVerifyZoomFixRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -722,6 +731,7 @@ export interface FileRoutesById {
   '/_authenticated/mis-cursos/$slug': typeof AuthenticatedMisCursosSlugRoute
   '/api/public/balance-activo-webhook': typeof ApiPublicBalanceActivoWebhookRoute
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
+  '/api/public/tmp-verify-zoom-fix': typeof ApiPublicTmpVerifyZoomFixRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -801,6 +811,7 @@ export interface FileRouteTypes {
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/course-request'
+    | '/api/public/tmp-verify-zoom-fix'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
@@ -874,6 +885,7 @@ export interface FileRouteTypes {
     | '/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/course-request'
+    | '/api/public/tmp-verify-zoom-fix'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
@@ -952,6 +964,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mis-cursos/$slug'
     | '/api/public/balance-activo-webhook'
     | '/api/public/course-request'
+    | '/api/public/tmp-verify-zoom-fix'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
     | '/lovable/email/suppression'
@@ -992,6 +1005,7 @@ export interface RootRouteChildren {
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicBalanceActivoWebhookRoute: typeof ApiPublicBalanceActivoWebhookRoute
   ApiPublicCourseRequestRoute: typeof ApiPublicCourseRequestRoute
+  ApiPublicTmpVerifyZoomFixRoute: typeof ApiPublicTmpVerifyZoomFixRoute
   ApiPublicZoomOauthCallbackRoute: typeof ApiPublicZoomOauthCallbackRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -1229,6 +1243,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/zoom-oauth-callback'
       fullPath: '/api/public/zoom-oauth-callback'
       preLoaderRoute: typeof ApiPublicZoomOauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tmp-verify-zoom-fix': {
+      id: '/api/public/tmp-verify-zoom-fix'
+      path: '/api/public/tmp-verify-zoom-fix'
+      fullPath: '/api/public/tmp-verify-zoom-fix'
+      preLoaderRoute: typeof ApiPublicTmpVerifyZoomFixRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/course-request': {
@@ -1705,6 +1726,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicBalanceActivoWebhookRoute: ApiPublicBalanceActivoWebhookRoute,
   ApiPublicCourseRequestRoute: ApiPublicCourseRequestRoute,
+  ApiPublicTmpVerifyZoomFixRoute: ApiPublicTmpVerifyZoomFixRoute,
   ApiPublicZoomOauthCallbackRoute: ApiPublicZoomOauthCallbackRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
