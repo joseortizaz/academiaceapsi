@@ -61,6 +61,7 @@ type Submission = {
   feedback: string | null;
   fecha_entrega: string;
   auto_calificado: boolean;
+  respuestas?: Record<string, unknown> | null;
 };
 
 const tipoLabel: Record<string, string> = {
