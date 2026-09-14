@@ -337,6 +337,66 @@ function EstudianteDashboard() {
         </Card>
       </div>
 
+      {/* Evaluaciones y tareas */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ClipboardCheck className="h-4 w-4 text-primary" /> Evaluaciones y tareas
+            {tareasPendientes.length > 0 && (
+              <Badge variant="destructive">{tareasPendientes.length} pendiente{tareasPendientes.length > 1 ? "s" : ""}</Badge>
+            )}
+          </CardTitle>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/estudiante/evaluaciones">
+              Ver todas <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {tareas.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              Aún no tienes evaluaciones o tareas asignadas.
+            </p>
+          ) : (
+            <ul className="divide-y">
+              {tareas.slice(0, 5).map((t: any) => {
+                const vencido = t.fecha_limite && new Date(t.fecha_limite) < new Date();
+                return (
+                  <li key={t.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{t.titulo}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {t.programs?.titulo}
+                        {t.fecha_limite
+                          ? ` · Límite: ${new Date(t.fecha_limite).toLocaleDateString("es-DO")}`
+                          : ""}
+                      </p>
+                    </div>
+                    {t.entrega ? (
+                      <Badge className="bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15">
+                        {t.entrega.estado === "calificado" ? `Calificado: ${t.entrega.porcentaje}%` : "En revisión"}
+                      </Badge>
+                    ) : vencido ? (
+                      <Badge variant="destructive">Vencido</Badge>
+                    ) : (
+                      <Badge variant="secondary">Pendiente</Badge>
+                    )}
+                    <Button asChild size="sm" variant={t.entrega ? "outline" : "default"}>
+                      <Link
+                        to="/estudiante/evaluaciones"
+                        search={{ assessmentId: t.id, returnTo: undefined }}
+                      >
+                        {t.entrega ? "Ver entrega" : "Comenzar"}
+                      </Link>
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
       {recordedZoom.length > 0 && (
         <Card>
           <CardHeader>
