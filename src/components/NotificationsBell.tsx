@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,19 @@ type Notif = {
 export function NotificationsBell() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+
+  // Los enlaces de notificación pueden traer query string
+  // (ej: /estudiante/evaluaciones?assessmentId=...), que <Link to> no acepta.
+  const goTo = (enlace: string) => {
+    const href = enlace.startsWith("/") ? enlace : `/${enlace}`;
+    try {
+      router.navigate({ href } as never);
+    } catch {
+      window.location.href = href;
+    }
+  };
 
   const { data: notifs = [] } = useQuery({
     queryKey: ["notifications", user?.id],
@@ -125,9 +137,13 @@ export function NotificationsBell() {
                 )}
               >
                 {n.enlace ? (
-                  <Link to={n.enlace as never} className="flex-1" onClick={() => { markOne(n.id); setOpen(false); }}>
+                  <button
+                    type="button"
+                    className="flex-1 text-left"
+                    onClick={() => { markOne(n.id); setOpen(false); goTo(n.enlace!); }}
+                  >
                     {body}
-                  </Link>
+                  </button>
                 ) : (
                   <button className="flex-1 text-left" onClick={() => markOne(n.id)}>{body}</button>
                 )}
