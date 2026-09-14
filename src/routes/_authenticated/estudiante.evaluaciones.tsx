@@ -353,16 +353,27 @@ function AssessmentPlayer({
 
   const handleSubmit = async () => {
     const questions = questionsQ.data ?? [];
-    const missing = questions.filter((q) => !respuestas[q.id] || respuestas[q.id].trim() === "");
-    if (missing.length > 0) {
-      toast.error(`Debes responder todas las preguntas (${missing.length} pendiente${missing.length > 1 ? "s" : ""}).`);
-      return;
+    const esEntregaArchivo = questions.length === 0;
+    let payload: Record<string, string> = respuestas;
+
+    if (esEntregaArchivo) {
+      if (!archivoUrl) {
+        toast.error("Sube el documento de tu entrega antes de enviarla.");
+        return;
+      }
+      payload = { archivo_url: archivoUrl, comentario: comentario.trim() };
+    } else {
+      const missing = questions.filter((q) => !respuestas[q.id] || respuestas[q.id].trim() === "");
+      if (missing.length > 0) {
+        toast.error(`Debes responder todas las preguntas (${missing.length} pendiente${missing.length > 1 ? "s" : ""}).`);
+        return;
+      }
     }
     setSubmitting(true);
     try {
       const { data, error } = await supabase.rpc("submit_assessment", {
         _assessment_id: assessment.id,
-        _respuestas: respuestas,
+        _respuestas: payload,
       });
       if (error) throw error;
       const result = Array.isArray(data) ? data[0] : data;
