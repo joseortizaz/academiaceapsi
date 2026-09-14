@@ -506,13 +506,59 @@ function AssessmentPlayer({
           </div>
         ))}
 
-        {questionsQ.data?.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-6">
-            Esta evaluación aún no tiene preguntas configuradas.
-          </p>
+        {questionsQ.data?.length === 0 && !readOnly && (
+          <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+            <div>
+              <p className="font-medium">Entrega tu documento</p>
+              <p className="text-sm text-muted-foreground">
+                Sube el archivo con tu trabajo. Tu docente lo revisará y te dará una calificación.
+              </p>
+            </div>
+            <FileUploader
+              bucket="assignment-submissions"
+              folder={`entregas/${assessment.id}`}
+              value={archivoUrl}
+              onChange={setArchivoUrl}
+              maxMb={50}
+              label="Subir documento"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+              hint="PDF, Word, Excel, PowerPoint o imagen · máx. 50 MB"
+            />
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Comentario para tu docente (opcional)</Label>
+              <Textarea
+                rows={3}
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+                placeholder="Escribe una nota sobre tu entrega…"
+              />
+            </div>
+          </div>
         )}
 
-        {!readOnly && (questionsQ.data?.length ?? 0) > 0 && (
+        {questionsQ.data?.length === 0 && readOnly && (
+          <div className="rounded-lg border bg-muted/20 p-4 text-sm">
+            <p className="font-medium">Tu entrega</p>
+            {prevArchivo ? (
+              <a
+                href={prevArchivo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 text-primary underline"
+              >
+                <FileText className="h-4 w-4" /> Ver documento entregado
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            ) : (
+              <p className="text-muted-foreground">No se adjuntó ningún documento.</p>
+            )}
+            {prevComentario && (
+              <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{prevComentario}</p>
+            )}
+          </div>
+        )}
+
+        {!readOnly && !questionsQ.isLoading && (
           <Button className="w-full" onClick={handleSubmit} disabled={submitting}>
             {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Enviar entrega
