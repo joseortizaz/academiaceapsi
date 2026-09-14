@@ -12,9 +12,10 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { FileUploader } from "@/components/FileUploader";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -61,6 +62,7 @@ type Submission = {
   feedback: string | null;
   fecha_entrega: string;
   auto_calificado: boolean;
+  respuestas?: Record<string, unknown> | null;
 };
 
 const tipoLabel: Record<string, string> = {
@@ -114,7 +116,7 @@ function Evaluaciones() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("assessment_submissions")
-        .select("id, assessment_id, puntaje_obtenido, puntaje_maximo, porcentaje, estado, feedback, fecha_entrega, auto_calificado")
+        .select("id, assessment_id, puntaje_obtenido, puntaje_maximo, porcentaje, estado, feedback, fecha_entrega, auto_calificado, respuestas")
         .eq("user_id", user!.id)
         .order("fecha_entrega", { ascending: false });
       if (error) throw error;
@@ -316,7 +318,17 @@ function AssessmentPlayer({
   const qc = useQueryClient();
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [archivoUrl, setArchivoUrl] = useState<string | null>(null);
+  const [comentario, setComentario] = useState("");
   const readOnly = !!previous;
+  const prevArchivo =
+    typeof previous?.respuestas?.["archivo_url"] === "string"
+      ? (previous!.respuestas!["archivo_url"] as string)
+      : null;
+  const prevComentario =
+    typeof previous?.respuestas?.["comentario"] === "string"
+      ? (previous!.respuestas!["comentario"] as string)
+      : "";
 
   const questionsQ = useQuery({
     queryKey: ["assessment-questions", assessment.id],
@@ -341,16 +353,27 @@ function AssessmentPlayer({
 
   const handleSubmit = async () => {
     const questions = questionsQ.data ?? [];
-    const missing = questions.filter((q) => !respuestas[q.id] || respuestas[q.id].trim() === "");
-    if (missing.length > 0) {
-      toast.error(`Debes responder todas las preguntas (${missing.length} pendiente${missing.length > 1 ? "s" : ""}).`);
-      return;
+    const esEntregaArchivo = questions.length === 0;
+    let payload: Record<string, string> = respuestas;
+
+    if (esEntregaArchivo) {
+      if (!archivoUrl) {
+        toast.error("Sube el documento de tu entrega antes de enviarla.");
+        return;
+      }
+      payload = { archivo_url: archivoUrl, comentario: comentario.trim() };
+    } else {
+      const missing = questions.filter((q) => !respuestas[q.id] || respuestas[q.id].trim() === "");
+      if (missing.length > 0) {
+        toast.error(`Debes responder todas las preguntas (${missing.length} pendiente${missing.length > 1 ? "s" : ""}).`);
+        return;
+      }
     }
     setSubmitting(true);
     try {
       const { data, error } = await supabase.rpc("submit_assessment", {
         _assessment_id: assessment.id,
-        _respuestas: respuestas,
+        _respuestas: payload,
       });
       if (error) throw error;
       const result = Array.isArray(data) ? data[0] : data;
@@ -483,13 +506,59 @@ function AssessmentPlayer({
           </div>
         ))}
 
-        {questionsQ.data?.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-6">
-            Esta evaluación aún no tiene preguntas configuradas.
-          </p>
+        {questionsQ.data?.length === 0 && !readOnly && (
+          <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+            <div>
+              <p className="font-medium">Entrega tu documento</p>
+              <p className="text-sm text-muted-foreground">
+                Sube el archivo con tu trabajo. Tu docente lo revisará y te dará una calificación.
+              </p>
+            </div>
+            <FileUploader
+              bucket="assignment-submissions"
+              folder={`entregas/${assessment.id}`}
+              value={archivoUrl}
+              onChange={setArchivoUrl}
+              maxMb={50}
+              label="Subir documento"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+              hint="PDF, Word, Excel, PowerPoint o imagen · máx. 50 MB"
+            />
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Comentario para tu docente (opcional)</Label>
+              <Textarea
+                rows={3}
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+                placeholder="Escribe una nota sobre tu entrega…"
+              />
+            </div>
+          </div>
         )}
 
-        {!readOnly && (questionsQ.data?.length ?? 0) > 0 && (
+        {questionsQ.data?.length === 0 && readOnly && (
+          <div className="rounded-lg border bg-muted/20 p-4 text-sm">
+            <p className="font-medium">Tu entrega</p>
+            {prevArchivo ? (
+              <a
+                href={prevArchivo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 text-primary underline"
+              >
+                <FileText className="h-4 w-4" /> Ver documento entregado
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            ) : (
+              <p className="text-muted-foreground">No se adjuntó ningún documento.</p>
+            )}
+            {prevComentario && (
+              <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{prevComentario}</p>
+            )}
+          </div>
+        )}
+
+        {!readOnly && !questionsQ.isLoading && (
           <Button className="w-full" onClick={handleSubmit} disabled={submitting}>
             {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Enviar entrega

@@ -237,6 +237,13 @@ export type Database = {
             referencedRelation: "program_modules_catalog"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "assessments_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
         ]
       }
       balance_activo_webhook_logs: {
