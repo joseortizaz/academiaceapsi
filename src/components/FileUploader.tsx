@@ -46,11 +46,11 @@ export function FileUploader({
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${user.id}/${folder}/${Date.now()}-${safe}`;
       const { error } = await supabase.storage
-        .from("course-materials")
+        .from(bucket)
         .upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
       const { data, error: signErr } = await supabase.storage
-        .from("course-materials")
+        .from(bucket)
         .createSignedUrl(path, 60 * 60 * 24 * 365);
       if (signErr || !data?.signedUrl) throw signErr ?? new Error("No se pudo firmar URL");
       onChange(data.signedUrl);
