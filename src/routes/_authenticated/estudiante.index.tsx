@@ -113,6 +113,41 @@ function EstudianteDashboard() {
     },
   });
 
+  // Evaluaciones y tareas publicadas de sus programas
+  const { data: tareas = [] } = useQuery({
+    queryKey: ["estudiante-dash-assessments", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data: enrolls } = await supabase
+        .from("enrollments")
+        .select("programa_id")
+        .eq("user_id", user!.id)
+        .in("estado", ["activo", "completado"]);
+      const ids = (enrolls ?? []).map((e) => e.programa_id);
+      if (ids.length === 0) return [];
+
+      const [{ data: assess }, { data: subs }] = await Promise.all([
+        supabase
+          .from("assessments")
+          .select("id,titulo,tipo,fecha_limite,puntaje_maximo,programa_id,programs(titulo)")
+          .eq("publicado", true)
+          .in("programa_id", ids)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("assessment_submissions")
+          .select("assessment_id,estado,porcentaje")
+          .eq("user_id", user!.id),
+      ]);
+      const subMap = new Map((subs ?? []).map((s) => [s.assessment_id, s]));
+      return (assess ?? []).map((a: any) => ({
+        ...a,
+        entrega: subMap.get(a.id) ?? null,
+      }));
+    },
+  });
+
+  const tareasPendientes = tareas.filter((t: any) => !t.entrega);
+
   const enrollments = data?.enrollments ?? [];
   const activos = enrollments.filter((e) => e.estado === "activo");
   const finalizados = enrollments.filter((e) => e.estado === "completado");
