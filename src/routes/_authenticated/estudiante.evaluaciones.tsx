@@ -182,6 +182,19 @@ function Evaluaciones() {
             <h2 className="mb-3 text-lg font-bold">Disponibles</h2>
             {loading ? (
               <Card><CardContent className="flex items-center justify-center py-10"><Loader2 className="h-5 w-5 animate-spin" /></CardContent></Card>
+            ) : enrollmentsQ.error || assessmentsQ.error ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                  <ClipboardCheck className="h-10 w-10 text-destructive" />
+                  <p className="font-medium">No pudimos cargar tus evaluaciones</p>
+                  <p className="text-sm text-muted-foreground">
+                    Vuelve a intentarlo en unos minutos o escribe a soporte.
+                  </p>
+                  <Button size="sm" variant="outline" onClick={() => { enrollmentsQ.refetch(); assessmentsQ.refetch(); }}>
+                    Reintentar
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (assessmentsQ.data?.length ?? 0) === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center">
