@@ -347,7 +347,7 @@ function EstudianteDashboard() {
             )}
           </CardTitle>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/estudiante/evaluaciones">
+            <Link to="/estudiante/evaluaciones" search={{ assessmentId: undefined, returnTo: undefined }}>
               Ver todas <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
