@@ -318,7 +318,17 @@ function AssessmentPlayer({
   const qc = useQueryClient();
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [archivoUrl, setArchivoUrl] = useState<string | null>(null);
+  const [comentario, setComentario] = useState("");
   const readOnly = !!previous;
+  const prevArchivo =
+    typeof previous?.respuestas?.["archivo_url"] === "string"
+      ? (previous!.respuestas!["archivo_url"] as string)
+      : null;
+  const prevComentario =
+    typeof previous?.respuestas?.["comentario"] === "string"
+      ? (previous!.respuestas!["comentario"] as string)
+      : "";
 
   const questionsQ = useQuery({
     queryKey: ["assessment-questions", assessment.id],
