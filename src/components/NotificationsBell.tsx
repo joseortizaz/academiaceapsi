@@ -137,9 +137,13 @@ export function NotificationsBell() {
                 )}
               >
                 {n.enlace ? (
-                  <Link to={n.enlace as never} className="flex-1" onClick={() => { markOne(n.id); setOpen(false); }}>
+                  <button
+                    type="button"
+                    className="flex-1 text-left"
+                    onClick={() => { markOne(n.id); setOpen(false); goTo(n.enlace!); }}
+                  >
                     {body}
-                  </Link>
+                  </button>
                 ) : (
                   <button className="flex-1 text-left" onClick={() => markOne(n.id)}>{body}</button>
                 )}
