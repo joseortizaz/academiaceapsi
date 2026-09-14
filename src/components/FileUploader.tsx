@@ -28,6 +28,7 @@ export function FileUploader({
   maxMb = 25,
   label = "Subir archivo",
   hint = "PDF, Word, Excel o PowerPoint · máx. 25 MB",
+  bucket = "course-materials",
 }: Props) {
   const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
