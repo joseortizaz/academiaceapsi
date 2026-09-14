@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RecordingPlayer } from "@/components/RecordingPlayer";
 import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
-  Radio, Video, FileVideo,
+  Radio, Video, FileVideo, ClipboardCheck,
 } from "lucide-react";
 
 type ZoomMeetingLite = {
