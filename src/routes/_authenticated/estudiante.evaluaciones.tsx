@@ -12,9 +12,10 @@ import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft } from "lucide-react";
+import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLeft, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { FileUploader } from "@/components/FileUploader";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -115,7 +116,7 @@ function Evaluaciones() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("assessment_submissions")
-        .select("id, assessment_id, puntaje_obtenido, puntaje_maximo, porcentaje, estado, feedback, fecha_entrega, auto_calificado")
+        .select("id, assessment_id, puntaje_obtenido, puntaje_maximo, porcentaje, estado, feedback, fecha_entrega, auto_calificado, respuestas")
         .eq("user_id", user!.id)
         .order("fecha_entrega", { ascending: false });
       if (error) throw error;
