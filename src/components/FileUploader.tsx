@@ -14,6 +14,7 @@ type Props = {
   maxMb?: number;
   label?: string;
   hint?: string;
+  bucket?: string;
 };
 
 const DEFAULT_ACCEPT =
