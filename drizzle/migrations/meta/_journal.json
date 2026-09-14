@@ -8,6 +8,13 @@
       "when": 1789394016830,
       "tag": "0000_assignment_submissions_uploads",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789395007324,
+      "tag": "0001_fix_submit_assessment_ambiguous_column",
+      "breakpoints": true
     }
   ]
 }
