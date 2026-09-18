@@ -241,6 +241,30 @@
   display: none !important;
 }
 
+/* Red de seguridad adicional: en ciertos modos de galería (varios
+   participantes con cámara apagada), el propio SDK posiciona su lienzo de
+   video/galería (canvas o svg) SUPERPUESTO sobre la barra de controles en
+   lugar de apilarlo debajo en el flujo normal, aunque el alto ya esté
+   correctamente acotado. Esto hace que los botones reporten coordenadas
+   "visibles" pero en realidad reciban los clics el canvas/svg de encima.
+   Forzamos que el contenido de galería quede en una capa de apilamiento
+   inferior y que cualquier otro hijo directo (la barra de controles) quede
+   siempre por encima, sin depender de su nombre de clase. */
+#zoom-meeting-root .css-108w4cc > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#zoom-meeting-root .css-108w4cc > *:last-child {
+  z-index: 20 !important;
+}
+
+#zoom-meeting-root .css-108w4cc canvas,
+#zoom-meeting-root .css-108w4cc svg {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
 /* El SDK puede montar su root a nivel de body en algunos flujos. */
 body > #zmmtg-root {
   display: none;
