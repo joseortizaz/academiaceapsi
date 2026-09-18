@@ -77,19 +77,25 @@ export function AssessmentsManager({ scope }: Props) {
   const programsQ = useQuery({
     queryKey: ["assessments-programs", scope, user?.id],
     queryFn: async () => {
-      let q = supabase.from("programs").select("id, titulo, docente_id").order("titulo");
       if (scope === "docente" && user?.id) {
-        const { data: teacher } = await supabase
-          .from("teachers").select("id").eq("user_id", user.id).maybeSingle();
-        if (!teacher?.id) return [];
-        q = q.eq("docente_id", teacher.id);
+        // Incluye programas asignados por programa, grupo/cohorte o módulo
+        const { data: scopes, error: rpcErr } = await (supabase.rpc as any)("my_teacher_programs");
+        if (rpcErr) throw rpcErr;
+        const ids = ((scopes ?? []) as { programa_id: string }[]).map((s) => s.programa_id);
+        if (ids.length === 0) return [];
+        const { data, error } = await supabase
+          .from("programs").select("id, titulo, docente_id").in("id", ids).order("titulo");
+        if (error) throw error;
+        return data ?? [];
       }
-      const { data, error } = await q;
+      const { data, error } = await supabase
+        .from("programs").select("id, titulo, docente_id").order("titulo");
       if (error) throw error;
       return data ?? [];
     },
     enabled: !!user,
   });
+
 
   const modulosQ = useQuery({
     queryKey: ["assessments-modulos", programaId],

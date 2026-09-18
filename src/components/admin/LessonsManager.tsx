@@ -73,15 +73,16 @@ export function LessonsManager({ scope }: Props) {
     enabled: scope === "admin" || !!user?.id,
     queryFn: async () => {
       if (scope === "docente") {
-        const { data: teacher } = await supabase
-          .from("teachers").select("id").eq("user_id", user!.id).maybeSingle();
-        if (!teacher?.id) return [];
+        const { data: scopes } = await (supabase.rpc as any)("my_teacher_programs");
+        const ids = ((scopes ?? []) as { programa_id: string }[]).map((s) => s.programa_id);
+        if (ids.length === 0) return [];
         const { data } = await supabase
-          .from("programs").select("id,titulo,tipo").eq("docente_id", teacher.id).order("titulo");
+          .from("programs").select("id,titulo,tipo").in("id", ids).order("titulo");
         return data ?? [];
       }
       return (await supabase.from("programs").select("id,titulo,tipo").order("titulo")).data ?? [];
     },
+
   });
 
   const programa = programas.find((p: any) => p.id === programaId) as
