@@ -265,6 +265,36 @@
   position: relative !important;
 }
 
+/* La galería de video (`.css-1ju5x5d`, ya acotada correctamente en alto por
+   flexbox) contiene una cadena de envoltorios internos del SDK
+   (Box > div > div > canvas/svg) que NO tienen alto explícito — cada uno
+   se autoajusta ("height:auto") al contenido de su hijo. Esto rompe la
+   resolución de porcentajes en cascada: el canvas termina usando su alto
+   intrínseco completo (hasta ~1646px en vistas de galería con varios
+   participantes con cámara apagada) en lugar de ajustarse a los ~450px
+   reales disponibles, y como consecuencia se sale visualmente del área
+   recortada (overflow:hidden) del contenedor, tapando la barra de
+   controles a pesar de que su z-index ya es menor. Igual que se hizo para
+   `.react-draggable > *` más arriba, forzamos alto 100% de forma explícita
+   en cada nivel de la cadena para que el porcentaje se resuelva
+   correctamente hasta llegar al canvas/svg. */
+#zoom-meeting-root .css-1ju5x5d > *,
+#zoom-meeting-root .css-1ju5x5d > * > *,
+#zoom-meeting-root .css-1ju5x5d > * > * > * {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#zoom-meeting-root .css-1ju5x5d canvas,
+#zoom-meeting-root .css-1ju5x5d svg {
+  height: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 /* El SDK puede montar su root a nivel de body en algunos flujos. */
 body > #zmmtg-root {
   display: none;
