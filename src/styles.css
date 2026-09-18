@@ -231,15 +231,10 @@
   overflow: hidden !important;
 }
 
-#zoom-meeting-root .css-108w4cc > * {
+#zoom-meeting-root .css-1ju5x5d {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow: hidden !important;
-}
-
-#zoom-meeting-root .css-108w4cc > *:last-child {
-  flex: 0 0 auto !important;
-  overflow: visible !important;
 }
 
 #zoom-meeting-root .react-resizable-handle {
