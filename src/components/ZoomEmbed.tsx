@@ -122,6 +122,10 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
             video: {
               isResizable: true,
               viewSizes: currentViewSizes(root),
+              // Evita la vista de galería por defecto: su algoritmo de cuadrícula
+              // genera un canvas con alto interno incorrecto (p. ej. 1646px) que
+              // tapa la barra de controles. "speaker" es init-only en el SDK.
+              defaultViewType: "speaker",
             },
           },
         });
