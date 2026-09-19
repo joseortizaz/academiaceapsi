@@ -56,10 +56,7 @@ const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(self \"https://*.zoom.us\"), microphone=(self \"https://*.zoom.us\"), display-capture=(self \"https://*.zoom.us\"), fullscreen=*",
-  "Cross-Origin-Opener-Policy": "same-origin",
-  // Aislamiento de origen cruzado requerido por el Meeting SDK de Zoom para
-  // habilitar SharedArrayBuffer (renderizador de video completo).
-  "Cross-Origin-Embedder-Policy": "credentialless",
+  "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
 };
 
 function withSecurityHeaders(response: Response): Response {
