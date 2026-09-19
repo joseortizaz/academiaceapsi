@@ -157,6 +157,7 @@ function DocenteCalificaciones() {
   });
 
   const filtered = rows.filter((r) => {
+    if (assessmentFilter && r.sub.assessment_id !== assessmentFilter) return false;
     if (filter === "pendiente" && r.calificado) return false;
     if (filter === "calificado" && !r.calificado) return false;
     if (search && !`${r.alumno} ${r.curso} ${r.tarea}`.toLowerCase().includes(search.toLowerCase()))
