@@ -212,7 +212,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div className="relative min-h-[600px] max-h-[calc(100dvh-190px)] w-full overflow-hidden rounded-lg border bg-black">
+      <div className="relative min-h-[600px] w-full overflow-hidden rounded-lg border bg-black">
         <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
