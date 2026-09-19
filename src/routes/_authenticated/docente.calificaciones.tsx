@@ -220,6 +220,11 @@ function DocenteCalificaciones() {
       <div>
         <h1 className="text-2xl font-bold">Calificaciones</h1>
         <p className="text-muted-foreground">{pendientes} entregas pendientes de revisión.</p>
+        {assessmentFilter && (
+          <Button variant="link" className="h-auto p-0" onClick={() => setAssessmentFilter(null)}>
+            Mostrando una sola evaluación · Ver todas las entregas
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
