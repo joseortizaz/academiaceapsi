@@ -70,17 +70,6 @@ async function loadZoomEmbedded(): Promise<{
   return ZoomMtgEmbedded as never;
 }
 
-// El SDK espera tamaños en píxeles; los derivamos del contenedor real para que
-// el video llene el espacio disponible en vez de un 1000x600 fijo.
-function currentViewSizes(root: HTMLElement) {
-  const width = Math.max(320, Math.round(root.clientWidth || window.innerWidth));
-  const height = Math.max(300, Math.round(root.clientHeight || window.innerHeight * 0.7));
-  return {
-    default: { width, height },
-    ribbon: { width: Math.min(300, width), height },
-  };
-}
-
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -107,9 +96,6 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         const root = await waitForRef(containerRef);
         if (cancelled || !root) return;
 
-        await waitForStableSize(root);
-        if (cancelled) return;
-
         const client = ZoomMtgEmbedded.createClient();
         clientRef.current = client;
 
@@ -121,7 +107,10 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           customize: {
             video: {
               isResizable: true,
-              viewSizes: currentViewSizes(root),
+              viewSizes: {
+                default: { width: 1000, height: 600 },
+                ribbon: { width: 300, height: 700 },
+              },
               // Evita la vista de galería por defecto: su algoritmo de cuadrícula
               // genera un canvas con alto interno incorrecto (p. ej. 1646px) que
               // tapa la barra de controles. "speaker" es init-only en el SDK.
@@ -177,36 +166,6 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     };
   }, [meetingRowId, sigFn]);
 
-  // Reajustar el tamaño del video del SDK cuando cambie el contenedor.
-  useEffect(() => {
-    if (state !== "in-meeting") return;
-    const root = containerRef.current;
-    if (!root) return;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const apply = () => {
-      const client = clientRef.current as { updateVideoOptions?: (o: unknown) => void } | null;
-      if (!client?.updateVideoOptions) return;
-      try {
-        client.updateVideoOptions({ viewSizes: currentViewSizes(root) });
-      } catch {
-        // el SDK puede rechazar el ajuste durante transiciones de vista
-      }
-    };
-    const schedule = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(apply, 150);
-    };
-    const ro = new ResizeObserver(schedule);
-    ro.observe(root);
-    window.addEventListener("orientationchange", schedule);
-    apply();
-    return () => {
-      if (timer) clearTimeout(timer);
-      ro.disconnect();
-      window.removeEventListener("orientationchange", schedule);
-    };
-  }, [state]);
-
   if (state === "fallback") {
     const primary = info && info.role === 1 && info.startUrl ? info.startUrl : info?.joinUrl;
     return (
@@ -253,8 +212,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div className="zoom-embed-shell relative h-[calc(100dvh-190px)] max-h-[calc(100dvh-190px)] min-h-[400px] w-full overflow-hidden rounded-lg border bg-black">
-        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full overflow-hidden" />
+      <div className="relative min-h-[600px] max-h-[calc(100dvh-190px)] w-full overflow-hidden rounded-lg border bg-black">
+        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -294,24 +253,4 @@ async function waitForRef<T>(ref: React.MutableRefObject<T | null>, timeoutMs = 
     await new Promise((r) => setTimeout(r, 30));
   }
   return ref.current;
-}
-
-// Espera a que termine el layout (2 frames) y a que la altura del contenedor
-// se estabilice antes de medirlo. Sin esto, `client.init()` puede recibir un
-// alto incorrecto (p. ej. el contenedor aún no tiene su altura final por
-// `h-[calc(100dvh-190px)]`), y el SDK de Zoom dibuja toda su UI (incluida la
-// barra de controles de cámara/mic) fuera del área visible, dejándola
-// invisible e inclickeable.
-async function waitForStableSize(el: HTMLElement, timeoutMs = 2000): Promise<void> {
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-  });
-  const start = Date.now();
-  let last = -1;
-  while (Date.now() - start < timeoutMs) {
-    const h = el.clientHeight;
-    if (h > 0 && h === last) return;
-    last = h;
-    await new Promise((r) => setTimeout(r, 50));
-  }
 }
