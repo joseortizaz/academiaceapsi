@@ -47,6 +47,12 @@ function DocenteCalificaciones() {
   const [nota, setNota] = useState("");
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
+  // Enlace desde la notificación: /docente/calificaciones?assessmentId=...
+  const [assessmentFilter, setAssessmentFilter] = useState<string | null>(() =>
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("assessmentId")
+      : null,
+  );
 
   // Programas del docente por cualquiera de las vías (titular, grupo o módulo)
   const scopesQ = useQuery({
