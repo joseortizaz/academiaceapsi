@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-// unpdf se importa dinámicamente dentro del handler: su bundle (pdfjs) es enorme
-// y rompe el análisis estático del plugin de build si entra al grafo de importación.
+// Los PDF se envían directamente al modelo de IA (Gemini los lee en base64),
+// sin librerías locales de extracción: el bundle de pdfjs rompía el build.
 
 async function assertAdminOrDocente(userId: string) {
   const { data } = await supabaseAdmin
@@ -121,15 +121,10 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     const pdfRes = await fetch(data.pdfUrl, { redirect: "error" });
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
+    if (buf.byteLength > 15 * 1024 * 1024) throw new Error("El PDF supera el tamaño máximo (15 MB).");
 
-    // Extraer texto (import dinámico, solo en servidor)
-    const { extractText, getDocumentProxy } = await import("unpdf");
-    const pdf = await getDocumentProxy(buf);
-    const { text } = await extractText(pdf, { mergePages: true });
-    const cleaned = (Array.isArray(text) ? text.join("\n") : text)
-      .replace(/\s+/g, " ").trim().slice(0, 18000);
-
-    if (cleaned.length < 50) throw new Error("El PDF no contiene texto extraíble (¿está escaneado?).");
+    // El modelo (Gemini) lee el PDF directamente: se envía como archivo adjunto en base64.
+    const pdfBase64 = Buffer.from(buf).toString("base64");
 
     const tipoInstruccion =
       tipo === "opcion_multiple" ? "Todas las preguntas deben ser de opción múltiple con 4 opciones."
@@ -157,15 +152,25 @@ Devuelve EXACTAMENTE este JSON:
 Reglas:
 - "opciones" es un arreglo de 4 strings para opción múltiple, o null para verdadero/falso.
 - "respuesta_correcta" debe coincidir EXACTAMENTE con una opción (o "verdadero"/"falso").
-- Las preguntas deben ser claras, sin ambigüedad y basadas en el material.
-
-MATERIAL:
-"""
-${cleaned}
-"""`;
+- Las preguntas deben ser claras, sin ambigüedad y basadas en el material del PDF adjunto.`;
 
     const content = await callLovableAI(
-      [{ role: "system", content: system }, { role: "user", content: user }],
+      [
+        { role: "system", content: system },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: user },
+            {
+              type: "file",
+              file: {
+                filename: "material.pdf",
+                file_data: `data:application/pdf;base64,${pdfBase64}`,
+              },
+            },
+          ],
+        },
+      ],
       { responseFormat: "json_object" },
     );
 
