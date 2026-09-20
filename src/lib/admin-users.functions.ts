@@ -23,12 +23,35 @@ export const deleteUserAccount = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Leer identidad ANTES de eliminar, para poder registrarla en la auditoría.
+    const { data: perfilPrevio } = await supabaseAdmin
+      .from("profiles")
+      .select("nombre,apellido")
+      .eq("id", data.userId)
+      .maybeSingle();
+    const { data: authPrevio } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    const nombrePrevio =
+      `${perfilPrevio?.nombre ?? ""} ${perfilPrevio?.apellido ?? ""}`.trim() || null;
+    const correoPrevio = authPrevio?.user?.email ?? null;
+
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error(error.message);
 
     // Limpieza defensiva por si no hay cascada
     await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
     await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: userId,
+      accion: "eliminar_cuenta",
+      entidad: "usuario",
+      entidadId: data.userId,
+      entidadEtiqueta: nombrePrevio ?? correoPrevio,
+      sujetoId: data.userId,
+      detalle: { correo: correoPrevio },
+      sensible: true,
+    });
 
     return { success: true };
   });
