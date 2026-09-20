@@ -3,6 +3,7 @@ import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
 import {
   LEGAL_ADDRESS,
   LEGAL_ENTITY_NAME,
+  LEGAL_ENTITY_SHORT,
   PRIVACY_EMAIL,
   PRIVACY_LAST_UPDATED,
   PRIVACY_PHONE,

@@ -1,6 +1,7 @@
 export const SITE_URL = "https://academiaceapsi.com";
 
-export const LEGAL_ENTITY_NAME = "Academia Ceapsi RD";
+export const LEGAL_ENTITY_NAME = "Centro de Aprendizaje y Cambio Ceapsi, SRL";
+export const LEGAL_ENTITY_SHORT = "Ceapsi, SRL";
 export const LEGAL_ADDRESS =
   "Presidente Hipólito Irigoyen No. 5, Zona Universitaria, Distrito Nacional, República Dominicana";
 export const PRIVACY_EMAIL = "admin@ceapsird.com";
