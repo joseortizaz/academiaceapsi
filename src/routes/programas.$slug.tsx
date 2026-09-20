@@ -431,69 +431,6 @@ function DetallePrograma() {
               )}
             </div>
           </div>
-          <aside className="rounded-xl border bg-card p-6 shadow-sm">
-            <div className="overflow-hidden rounded-lg bg-muted">
-              {programa.imagen_url ? (
-                <img src={programa.imagen_url} alt={programa.titulo} className="aspect-video w-full object-cover" />
-              ) : (
-                <div className="flex aspect-video items-center justify-center text-primary/30">
-                  <GraduationCap className="h-16 w-16" />
-                </div>
-              )}
-            </div>
-            <div className="mt-4">
-              {programa.precio_descuento ? (
-                <div>
-                  <span className="text-3xl font-bold text-primary">
-                    RD$ {Number(programa.precio_descuento).toLocaleString("es-DO")}
-                  </span>
-                  <span className="ml-2 text-sm text-muted-foreground line-through">
-                    RD$ {Number(programa.precio).toLocaleString("es-DO")}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-3xl font-bold text-primary">
-                  {Number(programa.precio) > 0
-                    ? `RD$ ${Number(programa.precio).toLocaleString("es-DO")}`
-                    : "Gratis"}
-                </span>
-              )}
-            </div>
-            {existing ? (
-              <Button asChild className="mt-4 w-full">
-                <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
-              </Button>
-            ) : (
-              <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading}>
-                {authLoading
-                  ? "Cargando…"
-                  : isAuthenticated
-                    ? "Inscribirme ahora"
-                    : "Acceder para inscribirme"}
-              </Button>
-            )}
-            {programa.syllabus_url && (
-              <Button asChild variant="outline" className="mt-2 w-full">
-                <a href={programa.syllabus_url} target="_blank" rel="noopener noreferrer">
-                  Descargar syllabus
-                </a>
-              </Button>
-            )}
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <Button variant="outline" size="sm" onClick={copiarEnlace}>
-                <Link2 className="mr-1.5 h-4 w-4" /> Copiar enlace
-              </Button>
-              <Button variant="outline" size="sm" onClick={compartirWhatsApp}>
-                <MessageCircle className="mr-1.5 h-4 w-4" /> WhatsApp
-              </Button>
-            </div>
-
-          </aside>
-        </div>
-      </section>
-
-      <section className="container mx-auto grid gap-10 px-4 py-12 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-10">
           <div>
             <h2 className="text-2xl font-bold">Descripción del programa</h2>
             <RichText html={programa.descripcion} className="mt-3 text-foreground/90" />
