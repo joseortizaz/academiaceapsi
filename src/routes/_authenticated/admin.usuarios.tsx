@@ -673,7 +673,7 @@ function ActividadUsuario({ userId }: { userId: string }) {
 
       <Link
         to="/admin/auditoria"
-        search={{ usuario: userId }}
+        search={{ usuario: userId, sensibles: undefined }}
         className="inline-block text-sm text-primary underline"
       >
         Ver toda la auditoría de este usuario
