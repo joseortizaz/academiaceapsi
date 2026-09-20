@@ -54,6 +54,7 @@ const nav = [
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
   { to: "/admin/integraciones", label: "Integraciones", icon: Plug },
+  { to: "/admin/auditoria", label: "Auditoría", icon: ShieldCheck },
 ];
 
 function AdminLayout() {
