@@ -115,6 +115,15 @@ function corto(v: unknown, max = 60) {
   return s.length > max ? s.slice(0, max) + "…" : s;
 }
 
+/** Acciones de actividad declaradas por el navegador del usuario. */
+export const ACCIONES_NAVEGADOR = new Set([
+  "ver_leccion",
+  "descargar_material",
+  "ver_grabacion",
+  "descargar_certificado",
+  "abrir_evaluacion",
+]);
+
 export type Contexto = {
   nombres?: Map<string, string>;
   programas?: Map<string, string>;
@@ -156,6 +165,26 @@ export function describirEvento(ev: AuditEvent, ctx: Contexto = {}): string {
       return `${actor} asignó una licencia de Zoom${ev.entidad_etiqueta ? ` (${ev.entidad_etiqueta})` : ""}`;
     case "generar_contenido_ia":
       return `${actor} usó la generación con IA${ev.detalle?.["tipo"] ? ` (${ev.detalle["tipo"]})` : ""}`;
+    case "ver_leccion":
+      return `${actor} abrió la lección ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "completar_leccion":
+      return `${actor} completó la lección ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "comentar_leccion":
+      return `${actor} comentó en la lección ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "responder_comentario":
+      return `${actor} respondió un comentario en ${etiqueta || "una lección"}${enPrograma(ev, ctx)}`.trim();
+    case "publicar_comunidad":
+      return `${actor} publicó en la comunidad ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "descargar_material":
+      return `${actor} descargó el material ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "ver_grabacion":
+      return `${actor} vio la grabación de ${etiqueta || "una clase en vivo"}${enPrograma(ev, ctx)}`.trim();
+    case "descargar_certificado":
+      return `${actor} descargó el certificado ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "abrir_evaluacion":
+      return `${actor} abrió la evaluación ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "entrar_clase_vivo":
+      return `${actor} entró a la clase en vivo ${etiqueta}${enPrograma(ev, ctx)}`.trim();
     case "exportar_auditoria":
       return `${actor} exportó el registro de auditoría (${ev.detalle?.["filas"] ?? 0} filas)`;
     default:
