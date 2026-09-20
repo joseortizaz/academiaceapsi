@@ -59,8 +59,11 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
-        <div className="container mx-auto px-4 py-5 text-center text-xs text-primary-foreground/70">
-          © {new Date().getFullYear()} Academia Ceapsi RD. Todos los derechos reservados.
+        <div className="container mx-auto flex flex-col items-center justify-between gap-2 px-4 py-5 text-center text-xs text-primary-foreground/70 sm:flex-row sm:text-left">
+          <span>© {new Date().getFullYear()} Academia Ceapsi RD. Todos los derechos reservados.</span>
+          <Link to="/privacidad" className="underline underline-offset-4 hover:text-accent">
+            Aviso de privacidad
+          </Link>
         </div>
       </div>
     </footer>

@@ -27,12 +27,17 @@ function Registro() {
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const continueTo = redirect ?? "/estudiante";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!privacyAccepted) {
+      toast.error("Debes aceptar el Aviso de Privacidad para crear tu cuenta.");
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -96,11 +101,24 @@ function Registro() {
                 <Input id="password" type="password" required placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               <div className="flex items-start gap-2">
-                <Checkbox id="terminos" required />
-                <Label htmlFor="terminos" className="text-xs font-normal text-muted-foreground">
-                  Acepto los términos del servicio y la política de privacidad de Academia Ceapsi RD.
+                <Checkbox
+                  id="privacidad"
+                  checked={privacyAccepted}
+                  onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                  required
+                />
+                <Label htmlFor="privacidad" className="text-xs font-normal leading-relaxed text-muted-foreground">
+                  He leído y acepto el{" "}
+                  <Link to="/privacidad" target="_blank" className="font-medium text-primary underline underline-offset-2">
+                    Aviso de Privacidad
+                  </Link>{" "}
+                  y autorizo de forma libre, expresa y consciente el tratamiento de mis datos personales conforme a la Ley 172-13, incluida su transferencia a proveedores en el exterior necesarios para prestar el servicio.
                 </Label>
               </div>
+              <p className="text-xs text-muted-foreground">
+                Responsable: Academia Ceapsi RD · Ejerza sus derechos en{" "}
+                <a href="mailto:admin@ceapsird.com" className="text-primary underline underline-offset-2">admin@ceapsird.com</a>.
+              </p>
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Creando cuenta..." : "Crear cuenta"}
               </Button>

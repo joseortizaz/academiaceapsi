@@ -774,6 +774,12 @@ function DetallePrograma() {
                 required
               />
             </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Usaremos estos datos para gestionar tu inscripción conforme a nuestro{" "}
+              <Link to="/privacidad" target="_blank" className="font-medium text-primary underline underline-offset-2">
+                Aviso de Privacidad
+              </Link>.
+            </p>
           </div>
 
           <DialogFooter>

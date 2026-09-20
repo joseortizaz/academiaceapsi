@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { PublicLayout } from "@/components/site/PublicLayout";
@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -137,6 +138,7 @@ function SolicitudCurso() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [programas, setProgramas] = useState<Record<"curso" | "diplomado", string[]>>(DEFAULT_PROGRAMAS);
 
   useEffect(() => {
@@ -172,6 +174,10 @@ function SolicitudCurso() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!privacyAccepted) {
+      toast.error("Debes aceptar el Aviso de Privacidad.");
+      return;
+    }
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       const fieldErrors: Partial<Record<keyof FormState, string>> = {};
@@ -206,6 +212,7 @@ function SolicitudCurso() {
       });
       setSuccess(true);
       setForm(INITIAL);
+      setPrivacyAccepted(false);
     } catch (err) {
       toast.error("Error de conexión", {
         description: err instanceof Error ? err.message : "Intenta nuevamente.",
@@ -343,6 +350,19 @@ function SolicitudCurso() {
                       </SelectContent>
                     </Select>
                   </Field>
+
+                  <div className="flex items-start gap-2 sm:col-span-2">
+                    <Checkbox
+                      id="privacidad-solicitud"
+                      checked={privacyAccepted}
+                      onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                      required
+                    />
+                    <Label htmlFor="privacidad-solicitud" className="text-xs font-normal leading-relaxed text-muted-foreground">
+                      Acepto el{" "}<Link to="/privacidad" target="_blank" className="font-medium text-primary underline underline-offset-2">Aviso de Privacidad</Link>{" "}
+                      y el tratamiento de mis datos para responder mi solicitud.
+                    </Label>
+                  </div>
 
                   <div className="sm:col-span-2">
                     <div className="my-2 border-t border-border" />
