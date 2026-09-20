@@ -244,3 +244,8 @@ const FEMENINAS = new Set([
 function articulo(ent: string) {
   return FEMENINAS.has(ent) ? "la" : "el";
 }
+
+function enPrograma(ev: AuditEvent, ctx: Contexto): string {
+  const p = ev.programa_id ? ctx.programas?.get(ev.programa_id) : null;
+  return p ? ` en "${p}"` : "";
+}
