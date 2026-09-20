@@ -18,6 +18,7 @@ import {
   Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
+import { ProgramReviews } from "@/components/reviews/ProgramReviews";
 
 export const Route = createFileRoute("/programas/$slug")({
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
@@ -523,6 +524,12 @@ function DetallePrograma() {
               )}
             </div>
           )}
+
+          <ProgramReviews
+            programaId={programa.id}
+            programaTitulo={programa.titulo}
+            slug={programa.slug}
+          />
         </div>
 
         <aside className="space-y-6">

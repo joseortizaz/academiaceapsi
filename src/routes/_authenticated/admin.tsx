@@ -23,6 +23,7 @@ import {
   Award,
   Users2,
   FileText,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,7 @@ const nav = [
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/certificados", label: "Certificados", icon: Award },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
+  { to: "/admin/resenas", label: "Valoraciones", icon: Star },
   { to: "/admin/eventos", label: "Eventos", icon: Images },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
