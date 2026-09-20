@@ -282,5 +282,17 @@ export const changeProvisionalPassword = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
 
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      categoria: "acceso",
+      accion: "cambio_password",
+      entidad: "usuario",
+      entidadId: context.userId,
+      entidadEtiqueta: existing.user.email ?? null,
+      sujetoId: context.userId,
+      detalle: { motivo: "provisional" },
+    });
+
     return { success: true };
   });
