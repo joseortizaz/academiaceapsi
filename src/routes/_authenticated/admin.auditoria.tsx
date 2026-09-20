@@ -23,12 +23,16 @@ import {
 import { AdminPageHeader, EmptyState } from "@/components/admin/AdminUI";
 import { ShieldAlert } from "lucide-react";
 import {
-  AuditEvent, CATEGORIAS, ENTIDADES, ROLES, describirEvento, nombreCampo, nombreEntidad, valorLegible,
+  AuditEvent, ACCIONES_NAVEGADOR, CATEGORIAS, ENTIDADES, ROLES, describirEvento, nombreCampo, nombreEntidad, valorLegible,
 } from "@/lib/audit-format";
 
 export const Route = createFileRoute("/_authenticated/admin/auditoria")({
   validateSearch: (search: Record<string, unknown>) => ({
     usuario: typeof search["usuario"] === "string" ? (search["usuario"] as string) : undefined,
+    sensibles:
+      search["sensibles"] === "1" || search["sensibles"] === 1 || search["sensibles"] === true
+        ? ("1" as const)
+        : undefined,
   }),
   component: AuditoriaPage,
 });
