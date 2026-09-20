@@ -247,11 +247,12 @@ function UsuariosPage() {
       <AdminPageHeader
         title="Usuarios"
         description="Gestiona perfiles, roles y estado de cuenta."
-      >
-        <Button onClick={abrirNuevo}>
-          <UserPlus className="mr-2 h-4 w-4" /> Nuevo alumno
-        </Button>
-      </AdminPageHeader>
+        action={
+          <Button onClick={abrirNuevo}>
+            <UserPlus className="mr-2 h-4 w-4" /> Nuevo alumno
+          </Button>
+        }
+      />
 
       <div className="mb-4 flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[220px]">
