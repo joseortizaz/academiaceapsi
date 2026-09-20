@@ -130,10 +130,36 @@ export function describirEvento(ev: AuditEvent, ctx: Contexto = {}): string {
 
   if (ev.categoria === "acceso") {
     if (ev.accion === "login") return `${actor} inició sesión`;
+    if (ev.accion === "cambio_password") return `${actor} cambió su contraseña provisional`;
     if (ev.accion === "registro") {
       const via = (ev.detalle?.["via"] as string) ?? "autoregistro";
       return `${actor} se registró (${via === "administrador" ? "por administrador" : "autoregistro"})`;
     }
+  }
+
+  switch (ev.accion) {
+    case "crear_alumno":
+      return `${actor} creó la cuenta del alumno ${ev.entidad_etiqueta ?? sujeto}`;
+    case "restablecer_password":
+      return `${actor} restableció la contraseña de ${ev.entidad_etiqueta ?? sujeto}`;
+    case "eliminar_cuenta": {
+      const correo = ev.detalle?.["correo"] as string | undefined;
+      return `${actor} eliminó la cuenta de ${ev.entidad_etiqueta ?? sujeto}${correo ? ` (${correo})` : ""}`;
+    }
+    case "crear_clase_vivo":
+      return `${actor} programó la clase en vivo ${etiqueta}`.trim();
+    case "reprogramar_clase_vivo":
+      return `${actor} reprogramó la clase en vivo ${etiqueta}`.trim();
+    case "cancelar_clase_vivo":
+      return `${actor} canceló la clase en vivo ${etiqueta}`.trim();
+    case "asignar_licencia_zoom":
+      return `${actor} asignó una licencia de Zoom${ev.entidad_etiqueta ? ` (${ev.entidad_etiqueta})` : ""}`;
+    case "generar_contenido_ia":
+      return `${actor} usó la generación con IA${ev.detalle?.["tipo"] ? ` (${ev.detalle["tipo"]})` : ""}`;
+    case "exportar_auditoria":
+      return `${actor} exportó el registro de auditoría (${ev.detalle?.["filas"] ?? 0} filas)`;
+    default:
+      break;
   }
 
   if (ev.entidad === "user_roles") {
