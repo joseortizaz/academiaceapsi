@@ -62,6 +62,7 @@ import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
+import { Route as AuthenticatedAdminResenasRouteImport } from './routes/_authenticated/admin.resenas'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
 import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
 import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
@@ -376,6 +377,12 @@ const AuthenticatedAdminSolicitudesRoute =
     path: '/solicitudes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminResenasRoute =
+  AuthenticatedAdminResenasRouteImport.update({
+    id: '/resenas',
+    path: '/resenas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProgramasRoute =
   AuthenticatedAdminProgramasRouteImport.update({
     id: '/programas',
@@ -558,6 +565,7 @@ export interface FileRoutesByFullPath {
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -632,6 +640,7 @@ export interface FileRoutesByTo {
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -712,6 +721,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/_authenticated/admin/modulos': typeof AuthenticatedAdminModulosRoute
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
+  '/_authenticated/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/_authenticated/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -792,6 +802,7 @@ export interface FileRouteTypes {
     | '/admin/mensajes'
     | '/admin/modulos'
     | '/admin/programas'
+    | '/admin/resenas'
     | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
@@ -866,6 +877,7 @@ export interface FileRouteTypes {
     | '/admin/mensajes'
     | '/admin/modulos'
     | '/admin/programas'
+    | '/admin/resenas'
     | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
@@ -945,6 +957,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/mensajes'
     | '/_authenticated/admin/modulos'
     | '/_authenticated/admin/programas'
+    | '/_authenticated/admin/resenas'
     | '/_authenticated/admin/solicitudes'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
@@ -1391,6 +1404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSolicitudesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/resenas': {
+      id: '/_authenticated/admin/resenas'
+      path: '/resenas'
+      fullPath: '/admin/resenas'
+      preLoaderRoute: typeof AuthenticatedAdminResenasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/programas': {
       id: '/_authenticated/admin/programas'
       path: '/programas'
@@ -1578,6 +1598,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMensajesRoute: typeof AuthenticatedAdminMensajesRoute
   AuthenticatedAdminModulosRoute: typeof AuthenticatedAdminModulosRoute
   AuthenticatedAdminProgramasRoute: typeof AuthenticatedAdminProgramasRoute
+  AuthenticatedAdminResenasRoute: typeof AuthenticatedAdminResenasRoute
   AuthenticatedAdminSolicitudesRoute: typeof AuthenticatedAdminSolicitudesRoute
   AuthenticatedAdminTestimoniosRoute: typeof AuthenticatedAdminTestimoniosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
@@ -1600,6 +1621,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMensajesRoute: AuthenticatedAdminMensajesRoute,
   AuthenticatedAdminModulosRoute: AuthenticatedAdminModulosRoute,
   AuthenticatedAdminProgramasRoute: AuthenticatedAdminProgramasRoute,
+  AuthenticatedAdminResenasRoute: AuthenticatedAdminResenasRoute,
   AuthenticatedAdminSolicitudesRoute: AuthenticatedAdminSolicitudesRoute,
   AuthenticatedAdminTestimoniosRoute: AuthenticatedAdminTestimoniosRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
