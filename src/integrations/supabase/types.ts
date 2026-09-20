@@ -2410,6 +2410,10 @@ export type Database = {
       }
     }
     Functions: {
+      audit_attach_context: {
+        Args: { _ip: string; _ua: string; _user_id: string }
+        Returns: undefined
+      }
       audit_resolve_actor: {
         Args: { _uid?: string }
         Returns: {
