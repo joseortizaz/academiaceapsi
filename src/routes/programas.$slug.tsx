@@ -558,6 +558,7 @@ function DetallePrograma() {
                                   {m.descripcion && (
                                     <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
                                   )}
+                                  {lineaDocenteLeccion(m.docente_id)}
                                 </div>
                               </li>
                             ))}
