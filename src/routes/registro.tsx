@@ -116,8 +116,8 @@ function Registro() {
                 </Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                Responsable: Academia Ceapsi RD · Ejerza sus derechos en{" "}
-                <a href="mailto:admin@ceapsird.com" className="text-primary underline underline-offset-2">admin@ceapsird.com</a>.
+                Responsable: {LEGAL_ENTITY_SHORT} (Academia Ceapsi RD) · Ejerza sus derechos en{" "}
+                <a href={`mailto:${PRIVACY_EMAIL}`} className="text-primary underline underline-offset-2">{PRIVACY_EMAIL}</a>.
               </p>
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Creando cuenta..." : "Crear cuenta"}
