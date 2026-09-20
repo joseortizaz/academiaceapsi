@@ -2414,6 +2414,7 @@ export type Database = {
         Args: { _ip: string; _ua: string; _user_id: string }
         Returns: undefined
       }
+      audit_entidad_es: { Args: { _e: string }; Returns: string }
       audit_resolve_actor: {
         Args: { _uid?: string }
         Returns: {
@@ -2489,6 +2490,17 @@ export type Database = {
       is_teacher_of_program: {
         Args: { _programa_id: string }
         Returns: boolean
+      }
+      log_activity: {
+        Args: {
+          _accion: string
+          _detalle?: Json
+          _entidad?: string
+          _entidad_id?: string
+          _etiqueta?: string
+          _programa_id?: string
+        }
+        Returns: undefined
       }
       move_to_dlq: {
         Args: {
