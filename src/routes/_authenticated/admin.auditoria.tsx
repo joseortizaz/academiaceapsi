@@ -246,6 +246,16 @@ function AuditoriaPage() {
 
   const ctx = { nombres, programas };
 
+  const { data: nombreUsuarioFiltrado } = useQuery({
+    queryKey: ["admin", "auditoria", "usuario", usuario],
+    enabled: !!usuario,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles").select("nombre,apellido").eq("id", usuario!).maybeSingle();
+      return data ? `${data.nombre ?? ""} ${data.apellido ?? ""}`.trim() : usuario!;
+    },
+  });
+
   const fmt = (iso: string) =>
     new Date(iso).toLocaleString("es-DO", { dateStyle: "short", timeStyle: "short" });
 
