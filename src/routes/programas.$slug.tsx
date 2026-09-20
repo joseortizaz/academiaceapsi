@@ -18,6 +18,7 @@ import {
   Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
+import { ProgramReviews } from "@/components/reviews/ProgramReviews";
 
 export const Route = createFileRoute("/programas/$slug")({
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
@@ -30,7 +31,15 @@ export const Route = createFileRoute("/programas/$slug")({
       .select("*")
       .eq("slug", params.slug)
       .maybeSingle();
-    return { programa: data ?? null };
+    let stats: { promedio: number | null; total: number | null } | null = null;
+    if (data?.id) {
+      const { data: s } = await (supabase.from as any)("program_rating_stats")
+        .select("promedio,total")
+        .eq("programa_id", data.id)
+        .maybeSingle();
+      stats = (s as any) ?? null;
+    }
+    return { programa: data ?? null, stats };
   },
   head: ({ params, loaderData }) => {
     const url = programaUrl(params.slug);
@@ -47,6 +56,27 @@ export const Route = createFileRoute("/programas/$slug")({
     const description = p.resumen?.trim() || plainExcerpt(p.descripcion) ||
       "Programa de formación de la Academia Ceapsi RD.";
     const image = p.imagen_url || `${SITE_URL}/favicon.ico`;
+    const total = Number(loaderData?.stats?.total ?? 0);
+    const jsonLd: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: p.titulo,
+      description,
+      provider: {
+        "@type": "Organization",
+        name: "Academia Ceapsi RD",
+        sameAs: SITE_URL,
+      },
+    };
+    if (total > 0) {
+      jsonLd.aggregateRating = {
+        "@type": "AggregateRating",
+        ratingValue: Number(loaderData?.stats?.promedio ?? 0),
+        reviewCount: total,
+        bestRating: 5,
+        worstRating: 1,
+      };
+    }
     return {
       meta: [
         { title },
@@ -60,6 +90,9 @@ export const Route = createFileRoute("/programas/$slug")({
         { name: "twitter:image", content: image },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
+      ],
     };
   },
   component: DetallePrograma,
@@ -491,6 +524,12 @@ function DetallePrograma() {
               )}
             </div>
           )}
+
+          <ProgramReviews
+            programaId={programa.id}
+            programaTitulo={programa.titulo}
+            slug={programa.slug}
+          />
         </div>
 
         <aside className="space-y-6">

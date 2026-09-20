@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ import {
   Award,
   Users2,
   FileText,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +43,7 @@ const nav = [
   { to: "/admin/evaluaciones", label: "Evaluaciones", icon: FileCheck },
   { to: "/admin/certificados", label: "Certificados", icon: Award },
   { to: "/admin/testimonios", label: "Testimonios", icon: MessageSquare },
+  { to: "/admin/resenas", label: "Valoraciones", icon: Star },
   { to: "/admin/eventos", label: "Eventos", icon: Images },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
@@ -56,6 +59,16 @@ function AdminLayout() {
   const { isLoading, hasRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { data: resenasPendientes = 0 } = useQuery({
+    queryKey: ["admin", "resenas", "pendientes"],
+    queryFn: async () => {
+      const { count } = await (supabase.from as any)("program_reviews")
+        .select("id", { count: "exact", head: true })
+        .eq("estado", "pendiente");
+      return count ?? 0;
+    },
+  });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -95,6 +108,11 @@ function AdminLayout() {
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
+                {item.to === "/admin/resenas" && resenasPendientes > 0 && (
+                  <span className="ml-auto rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
+                    {resenasPendientes}
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+import { ReviewForm } from "@/components/reviews/ProgramReviews";
 
 
 
@@ -885,6 +886,11 @@ function CursoPlayer() {
           ) : (
             <p className="text-muted-foreground">Selecciona un módulo para comenzar.</p>
           )}
+          </div>
+
+          <div className="mt-8 rounded-lg border bg-card p-5">
+            <h3 className="mb-3 font-bold">Valora este programa</h3>
+            <ReviewForm programaId={programa.id} slug={programa.slug} compact />
           </div>
         </main>
       </div>

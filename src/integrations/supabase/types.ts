@@ -1640,6 +1640,56 @@ export type Database = {
           },
         ]
       }
+      program_reviews: {
+        Row: {
+          comentario: string | null
+          created_at: string
+          estado: string
+          id: string
+          moderado_at: string | null
+          moderado_por: string | null
+          motivo_rechazo: string | null
+          programa_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string
+          estado?: string
+          id?: string
+          moderado_at?: string | null
+          moderado_por?: string | null
+          motivo_rechazo?: string | null
+          programa_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string
+          estado?: string
+          id?: string
+          moderado_at?: string | null
+          moderado_por?: string | null
+          motivo_rechazo?: string | null
+          programa_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_reviews_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programs: {
         Row: {
           categoria_id: string | null
@@ -2231,6 +2281,27 @@ export type Database = {
           },
         ]
       }
+      program_rating_stats: {
+        Row: {
+          c1: number | null
+          c2: number | null
+          c3: number | null
+          c4: number | null
+          c5: number | null
+          programa_id: string | null
+          promedio: number | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_reviews_programa_id_fkey"
+            columns: ["programa_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teachers_public: {
         Row: {
           apellido: string | null
@@ -2276,6 +2347,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_review_program: {
+        Args: { _programa_id: string; _user_id: string }
+        Returns: boolean
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -2310,6 +2385,16 @@ export type Database = {
           orden: number
           puntaje: number
           tipo: string
+        }[]
+      }
+      get_program_reviews: {
+        Args: { _limit?: number; _offset?: number; _programa_id: string }
+        Returns: {
+          autor: string
+          comentario: string
+          created_at: string
+          id: string
+          rating: number
         }[]
       }
       has_role: {
