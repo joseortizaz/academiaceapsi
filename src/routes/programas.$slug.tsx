@@ -354,6 +354,39 @@ function DetallePrograma() {
     }
   };
 
+  const tituloModulo = (modulo_id: string | null) =>
+    modulo_id ? (courseModules.find((c) => c.id === modulo_id)?.titulo ?? null) : null;
+
+  const leccionesDe = (docenteId: string) =>
+    modulos
+      .filter((m) => m.docente_id === docenteId)
+      .map((m) => ({
+        titulo: m.titulo,
+        modulo: programa.tipo === "diplomado" ? tituloModulo(m.modulo_id) : null,
+      }));
+
+  const botonDocente = (d: Teacher, extraClass = "") => (
+    <button
+      type="button"
+      onClick={() => setPerfil(d)}
+      className={`text-left font-medium text-foreground hover:text-primary hover:underline ${extraClass}`}
+    >
+      {docenteNombre(d)}
+    </button>
+  );
+
+  const lineaDocenteLeccion = (id: string | null) => {
+    const d = id ? docentePorId.get(id) : undefined;
+    if (!d) return null;
+    return (
+      <p className="mt-1 text-xs text-muted-foreground">
+        Docente: {botonDocente(d, "text-xs")}
+      </p>
+    );
+  };
+
+  const docentesVisibles = verTodosDocentes ? docentes : docentes.slice(0, 5);
+
 
   return (
     <PublicLayout>
