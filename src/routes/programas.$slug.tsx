@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
-  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, Video, Link2, MessageCircle,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { ProgramReviews } from "@/components/reviews/ProgramReviews";
@@ -784,6 +784,13 @@ function DetallePrograma() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <TeacherProfileDialog
+        teacher={perfil}
+        onClose={() => setPerfil(null)}
+        lecciones={perfil ? leccionesDe(perfil.id) : undefined}
+        mostrarVerTodos
+      />
 
     </PublicLayout>
   );
