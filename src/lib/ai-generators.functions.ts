@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { extractText, getDocumentProxy } from "unpdf";
+// unpdf se importa dinámicamente dentro del handler: su bundle (pdfjs) es enorme
+// y rompe el análisis estático del plugin de build si entra al grafo de importación.
 
 async function assertAdminOrDocente(userId: string) {
   const { data } = await supabaseAdmin
