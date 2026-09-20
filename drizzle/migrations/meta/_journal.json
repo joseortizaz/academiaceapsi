@@ -15,6 +15,13 @@
       "when": 1789395007324,
       "tag": "0001_fix_submit_assessment_ambiguous_column",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789889729961,
+      "tag": "0002_create_program_reviews",
+      "breakpoints": true
     }
   ]
 }
