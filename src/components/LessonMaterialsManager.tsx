@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { registrarActividad } from "@/lib/audit-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -196,7 +197,20 @@ export function LessonMaterialsManager({ moduloId, programaId, editable = true }
                   <span className="text-xs text-muted-foreground">{formatSize(m.tamano_bytes)}</span>
                 ) : null}
                 <Button type="button" size="sm" variant="ghost" asChild>
-                  <a href={m.url} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      registrarActividad({
+                        accion: "descargar_material",
+                        entidad: "lesson_materials",
+                        entidadId: m.id,
+                        etiqueta: m.nombre,
+                        programaId: m.programa_id,
+                      })
+                    }
+                  >
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>

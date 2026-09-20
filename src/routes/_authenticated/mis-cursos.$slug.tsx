@@ -696,7 +696,19 @@ function CursoPlayer() {
                       <Button
                         size="sm"
                         variant={openRecording === c.id ? "secondary" : "outline"}
-                        onClick={() => setOpenRecording(openRecording === c.id ? null : c.id)}
+                        onClick={() => {
+                          const abriendo = openRecording !== c.id;
+                          setOpenRecording(abriendo ? c.id : null);
+                          if (abriendo) {
+                            registrarActividad({
+                              accion: "ver_grabacion",
+                              entidad: "zoom_meetings",
+                              entidadId: c.id,
+                              etiqueta: c.titulo,
+                              programaId: programa.id,
+                            });
+                          }
+                        }}
                       >
                         {openRecording === c.id ? "Ocultar" : "Ver grabación"}
                       </Button>
