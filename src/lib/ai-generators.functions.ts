@@ -122,7 +122,8 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
 
-    // Extraer texto
+    // Extraer texto (import dinámico, solo en servidor)
+    const { extractText, getDocumentProxy } = await import("unpdf");
     const pdf = await getDocumentProxy(buf);
     const { text } = await extractText(pdf, { mergePages: true });
     const cleaned = (Array.isArray(text) ? text.join("\n") : text)
