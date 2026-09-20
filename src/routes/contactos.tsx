@@ -1,18 +1,32 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contactos")({
+  head: () => ({
+    meta: [
+      { title: "Contacto | Academia Ceapsi RD" },
+      { name: "description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
+      { property: "og:title", content: "Contacto | Academia Ceapsi RD" },
+      { property: "og:description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Contactos,
 });
 
 function Contactos() {
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+
   return (
     <PublicLayout>
       <PageHeader
@@ -55,8 +69,13 @@ function Contactos() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                if (!privacyAccepted) {
+                  toast.error("Debes aceptar el Aviso de Privacidad.");
+                  return;
+                }
                 toast.success("Mensaje enviado", { description: "Pronto te contactaremos." });
                 (e.target as HTMLFormElement).reset();
+                setPrivacyAccepted(false);
               }}
               className="mt-6 grid gap-4 sm:grid-cols-2"
             >
@@ -75,6 +94,18 @@ function Contactos() {
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="mensaje">Mensaje</Label>
                 <Textarea id="mensaje" required placeholder="Cuéntanos más..." rows={5} />
+              </div>
+              <div className="flex items-start gap-2 sm:col-span-2">
+                <Checkbox
+                  id="privacidad-contacto"
+                  checked={privacyAccepted}
+                  onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                  required
+                />
+                <Label htmlFor="privacidad-contacto" className="text-xs font-normal leading-relaxed text-muted-foreground">
+                  Acepto el{" "}<Link to="/privacidad" target="_blank" className="font-medium text-primary underline underline-offset-2">Aviso de Privacidad</Link>{" "}
+                  y el tratamiento de mis datos para responder mi solicitud.
+                </Label>
               </div>
               <div className="sm:col-span-2">
                 <Button type="submit" size="lg" className="w-full sm:w-auto">Enviar mensaje</Button>

@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
 import { Route as ProgramasRouteImport } from './routes/programas'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as DocentesRouteImport } from './routes/docentes'
@@ -122,6 +123,11 @@ const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
 const ProgramasRoute = ProgramasRouteImport.update({
   id: '/programas',
   path: '/programas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GaleriaRoute = GaleriaRouteImport.update({
@@ -537,6 +543,7 @@ export interface FileRoutesByFullPath {
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
+  '/privacidad': typeof PrivacidadRoute
   '/programas': typeof ProgramasRouteWithChildren
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
@@ -617,6 +624,7 @@ export interface FileRoutesByTo {
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
+  '/privacidad': typeof PrivacidadRoute
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -695,6 +703,7 @@ export interface FileRoutesById {
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
   '/galeria': typeof GaleriaRoute
+  '/privacidad': typeof PrivacidadRoute
   '/programas': typeof ProgramasRouteWithChildren
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
@@ -777,6 +786,7 @@ export interface FileRouteTypes {
     | '/docentes'
     | '/eventos'
     | '/galeria'
+    | '/privacidad'
     | '/programas'
     | '/recuperar-password'
     | '/registro'
@@ -857,6 +867,7 @@ export interface FileRouteTypes {
     | '/docentes'
     | '/eventos'
     | '/galeria'
+    | '/privacidad'
     | '/recuperar-password'
     | '/registro'
     | '/reset-password'
@@ -934,6 +945,7 @@ export interface FileRouteTypes {
     | '/docentes'
     | '/eventos'
     | '/galeria'
+    | '/privacidad'
     | '/programas'
     | '/recuperar-password'
     | '/registro'
@@ -1016,6 +1028,7 @@ export interface RootRouteChildren {
   DocentesRoute: typeof DocentesRoute
   EventosRoute: typeof EventosRoute
   GaleriaRoute: typeof GaleriaRoute
+  PrivacidadRoute: typeof PrivacidadRoute
   ProgramasRoute: typeof ProgramasRouteWithChildren
   RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RegistroRoute: typeof RegistroRoute
@@ -1093,6 +1106,13 @@ declare module '@tanstack/react-router' {
       path: '/programas'
       fullPath: '/programas'
       preLoaderRoute: typeof ProgramasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/galeria': {
@@ -1756,6 +1776,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocentesRoute: DocentesRoute,
   EventosRoute: EventosRoute,
   GaleriaRoute: GaleriaRoute,
+  PrivacidadRoute: PrivacidadRoute,
   ProgramasRoute: ProgramasRouteWithChildren,
   RecuperarPasswordRoute: RecuperarPasswordRoute,
   RegistroRoute: RegistroRoute,
