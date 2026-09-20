@@ -431,8 +431,9 @@ function DetallePrograma() {
               )}
             </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">Descripción del programa</h2>
+            <div className="order-3 space-y-10">
+            <div>
+              <h2 className="text-2xl font-bold">Descripción del programa</h2>
             <RichText html={programa.descripcion} className="mt-3 text-foreground/90" />
           </div>
 
