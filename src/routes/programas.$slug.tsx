@@ -703,7 +703,9 @@ function DetallePrograma() {
               </p>
             </div>
           )}
-        </aside>
+            </aside>
+          </div>
+        </div>
       </section>
 
       <Dialog open={inscOpen} onOpenChange={setInscOpen}>
