@@ -39,6 +39,10 @@ function isoDaysAgo(days: number) {
 }
 
 function AuditoriaPage() {
+  const { usuario } = Route.useSearch();
+  const navigate = useNavigate();
+  const exportarFn = useServerFn(logAuditExport);
+  const [exportando, setExportando] = useState(false);
   const [desde, setDesde] = useState(isoDaysAgo(7));
   const [hasta, setHasta] = useState("");
   const [categoria, setCategoria] = useState("todas");
