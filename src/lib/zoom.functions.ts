@@ -144,6 +144,31 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(`No se pudo guardar la reunión: ${error.message}`);
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "crear_clase_vivo",
+      entidad: "zoom_meetings",
+      entidadId: row.id,
+      entidadEtiqueta: data.titulo,
+      programaId: data.programaId,
+      detalle: {
+        inicio: data.startAt,
+        duracionMin: data.durationMin,
+        cohortId: data.cohortId ?? null,
+        licencia: hostEmail,
+      },
+    });
+    await logAudit({
+      actorId: context.userId,
+      accion: "asignar_licencia_zoom",
+      entidad: "zoom_licenses",
+      entidadEtiqueta: hostEmail,
+      programaId: data.programaId,
+      detalle: { docenteId: responsibleTeacherId, claseId: row.id },
+    });
+
     return row;
   });
 
@@ -153,7 +178,7 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: row } = await supabaseAdmin
       .from("zoom_meetings")
-      .select("zoom_meeting_id, programa_id, cohort_id, modulo_id")
+      .select("zoom_meeting_id, titulo, programa_id, cohort_id, modulo_id")
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Reunión no encontrada.");
@@ -171,6 +196,18 @@ export const deleteZoomMeeting = createServerFn({ method: "POST" })
       }
     }
     await supabaseAdmin.from("zoom_meetings").delete().eq("id", data.id);
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "cancelar_clase_vivo",
+      entidad: "zoom_meetings",
+      entidadId: data.id,
+      entidadEtiqueta: (row as any).titulo ?? null,
+      programaId: row.programa_id,
+      sensible: true,
+    });
+
     return { success: true };
   });
 

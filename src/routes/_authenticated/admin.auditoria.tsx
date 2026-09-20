@@ -1,4 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { logAuditExport } from "@/lib/audit.functions";
+import { getUsersAuthInfo } from "@/lib/admin-users.functions";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +27,9 @@ import {
 } from "@/lib/audit-format";
 
 export const Route = createFileRoute("/_authenticated/admin/auditoria")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    usuario: typeof search["usuario"] === "string" ? (search["usuario"] as string) : undefined,
+  }),
   component: AuditoriaPage,
 });
 
@@ -36,6 +43,10 @@ function isoDaysAgo(days: number) {
 }
 
 function AuditoriaPage() {
+  const { usuario } = Route.useSearch();
+  const navigate = useNavigate();
+  const exportarFn = useServerFn(logAuditExport);
+  const [exportando, setExportando] = useState(false);
   const [desde, setDesde] = useState(isoDaysAgo(7));
   const [hasta, setHasta] = useState("");
   const [categoria, setCategoria] = useState("todas");
@@ -48,36 +59,151 @@ function AuditoriaPage() {
   const [cursor, setCursor] = useState<number | null>(null);
   const [detalle, setDetalle] = useState<AuditEvent | null>(null);
 
-  const filtros = JSON.stringify({ desde, hasta, categoria, rol, entidad, soloSensibles, buscado });
+  const filtros = JSON.stringify({ desde, hasta, categoria, rol, entidad, soloSensibles, buscado, usuario });
 
   useEffect(() => {
     setPaginas([]);
     setCursor(null);
   }, [filtros]);
 
+  const aplicarFiltros = (q: any) => {
+    if (desde) q = q.gte("occurred_at", new Date(desde + "T00:00:00").toISOString());
+    if (hasta) q = q.lte("occurred_at", new Date(hasta + "T23:59:59").toISOString());
+    if (categoria !== "todas") q = q.eq("categoria", categoria);
+    if (rol !== "todos") q = q.eq("actor_rol", rol);
+    if (entidad !== "todas") q = q.eq("entidad", entidad);
+    if (soloSensibles) q = q.eq("sensible", true);
+    if (usuario) q = q.or(`actor_id.eq.${usuario},sujeto_id.eq.${usuario}`);
+    if (buscado.trim()) {
+      const t = `%${buscado.trim()}%`;
+      q = q.or(`actor_nombre.ilike.${t},actor_email.ilike.${t},entidad_etiqueta.ilike.${t}`);
+    }
+    return q;
+  };
+
   const { data: pagina, isFetching } = useQuery({
     queryKey: ["admin", "auditoria", filtros, cursor],
     queryFn: async () => {
-      let q = (supabase.from as any)("audit_log")
-        .select("*")
-        .order("id", { ascending: false })
-        .limit(PAGE);
-      if (desde) q = q.gte("occurred_at", new Date(desde + "T00:00:00").toISOString());
-      if (hasta) q = q.lte("occurred_at", new Date(hasta + "T23:59:59").toISOString());
-      if (categoria !== "todas") q = q.eq("categoria", categoria);
-      if (rol !== "todos") q = q.eq("actor_rol", rol);
-      if (entidad !== "todas") q = q.eq("entidad", entidad);
-      if (soloSensibles) q = q.eq("sensible", true);
-      if (buscado.trim()) {
-        const t = `%${buscado.trim()}%`;
-        q = q.or(`actor_nombre.ilike.${t},actor_email.ilike.${t},entidad_etiqueta.ilike.${t}`);
-      }
+      let q = aplicarFiltros(
+        (supabase.from as any)("audit_log").select("*").order("id", { ascending: false }).limit(PAGE),
+      );
       if (cursor !== null) q = q.lt("id", cursor);
       const { data, error } = await q;
       if (error) throw error;
       return (data as AuditEvent[]) ?? [];
     },
   });
+
+  // ─────────── Tarjetas de resumen ───────────
+  const { data: resumen } = useQuery({
+    queryKey: ["admin", "auditoria", "resumen"],
+    queryFn: async () => {
+      const hace7 = new Date(Date.now() - 7 * 24 * 3600_000).toISOString();
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const t = (supabase.from as any)("audit_log");
+      const [logins, sensibles, acciones, actores, auth] = await Promise.all([
+        t.select("id", { count: "exact", head: true })
+          .eq("categoria", "acceso").eq("accion", "login").gte("occurred_at", hace7),
+        t.select("id", { count: "exact", head: true })
+          .eq("sensible", true).gte("occurred_at", hace7),
+        t.select("id", { count: "exact", head: true }).gte("occurred_at", hoy.toISOString()),
+        t.select("actor_id").eq("categoria", "acceso").eq("accion", "login").gte("occurred_at", hace7),
+        getUsersAuthInfo(),
+      ]);
+      const distintos = new Set(
+        ((actores.data ?? []) as { actor_id: string | null }[]).map((r) => r.actor_id).filter(Boolean),
+      ).size;
+      const limite = Date.now() - 30 * 24 * 3600_000;
+      const inactivos = (auth as { last_sign_in_at: string | null }[]).filter(
+        (u) => !u.last_sign_in_at || new Date(u.last_sign_in_at).getTime() < limite,
+      ).length;
+      return {
+        logins: logins.count ?? 0,
+        distintos,
+        sensibles: sensibles.count ?? 0,
+        hoy: acciones.count ?? 0,
+        inactivos,
+      };
+    },
+  });
+
+  // ─────────── Exportar CSV ───────────
+  const exportarCsv = async () => {
+    setExportando(true);
+    try {
+      const filas: AuditEvent[] = [];
+      let ultimo: number | null = null;
+      for (let i = 0; i < 5; i++) {
+        let q = aplicarFiltros(
+          (supabase.from as any)("audit_log").select("*").order("id", { ascending: false }).limit(1000),
+        );
+        if (ultimo !== null) q = q.lt("id", ultimo);
+        const { data, error } = await q;
+        if (error) throw error;
+        const lote = (data as AuditEvent[]) ?? [];
+        filas.push(...lote);
+        if (lote.length < 1000) break;
+        ultimo = lote[lote.length - 1]!.id;
+        if (i === 4) toast.info("Se exportaron las primeras 5.000 filas; hay más resultados.");
+      }
+
+      const sujetos = Array.from(new Set(filas.map((f) => f.sujeto_id).filter(Boolean))) as string[];
+      const progs = Array.from(new Set(filas.map((f) => f.programa_id).filter(Boolean))) as string[];
+      const [{ data: perfilesCsv }, { data: programasCsv }] = await Promise.all([
+        sujetos.length
+          ? supabase.from("profiles").select("id,nombre,apellido").in("id", sujetos)
+          : Promise.resolve({ data: [] as any[] }),
+        progs.length
+          ? supabase.from("programs").select("id,titulo").in("id", progs)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const nombresCsv = new Map((perfilesCsv ?? []).map((p: any) => [p.id, `${p.nombre ?? ""} ${p.apellido ?? ""}`.trim()]));
+      const programasMap = new Map((programasCsv ?? []).map((p: any) => [p.id, p.titulo]));
+      const ctxCsv = { nombres: nombresCsv, programas: programasMap };
+
+      const cab = [
+        "Fecha", "Categoría", "Acción", "Actor", "Rol", "Correo", "Entidad", "Etiqueta",
+        "Programa", "Sujeto", "Sensible", "IP", "Dispositivo", "Descripción", "Cambios",
+      ];
+      const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const lineas = [cab.map(esc).join(",")];
+      for (const f of filas) {
+        lineas.push([
+          new Date(f.occurred_at).toLocaleString("es-DO"),
+          CATEGORIAS[f.categoria] ?? f.categoria,
+          f.accion,
+          f.actor_nombre ?? "Sistema",
+          ROLES[f.actor_rol] ?? f.actor_rol,
+          f.actor_email ?? "",
+          nombreEntidad(f.entidad),
+          f.entidad_etiqueta ?? "",
+          f.programa_id ? programasMap.get(f.programa_id) ?? "" : "",
+          f.sujeto_id ? nombresCsv.get(f.sujeto_id) ?? "" : "",
+          f.sensible ? "Sí" : "No",
+          f.ip ?? "",
+          f.user_agent ?? "",
+          describirEvento(f, ctxCsv),
+          f.cambios ? JSON.stringify(f.cambios) : "",
+        ].map(esc).join(","));
+      }
+
+      const blob = new Blob(["\uFEFF" + lineas.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `auditoria-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      void exportarFn({ data: { filas: filas.length, filtros: JSON.parse(filtros) } }).catch(() => {});
+      toast.success(`Se exportaron ${filas.length} eventos`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo exportar");
+    } finally {
+      setExportando(false);
+    }
+  };
 
   useEffect(() => {
     if (!pagina) return;
@@ -120,6 +246,16 @@ function AuditoriaPage() {
 
   const ctx = { nombres, programas };
 
+  const { data: nombreUsuarioFiltrado } = useQuery({
+    queryKey: ["admin", "auditoria", "usuario", usuario],
+    enabled: !!usuario,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles").select("nombre,apellido").eq("id", usuario!).maybeSingle();
+      return data ? `${data.nombre ?? ""} ${data.apellido ?? ""}`.trim() : usuario!;
+    },
+  });
+
   const fmt = (iso: string) =>
     new Date(iso).toLocaleString("es-DO", { dateStyle: "short", timeStyle: "short" });
 
@@ -129,6 +265,60 @@ function AuditoriaPage() {
         title="Auditoría"
         description="Registro de acciones realizadas en el portal. Solo lectura."
       />
+
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setCategoria("acceso"); setDesde(isoDaysAgo(7)); setHasta(""); setSoloSensibles(false); }}
+        >
+          <p className="text-xs text-muted-foreground">Accesos (7 días)</p>
+          <p className="text-2xl font-bold">{resumen?.logins ?? 0}</p>
+          <p className="text-xs text-muted-foreground">{resumen?.distintos ?? 0} usuarios distintos</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setSoloSensibles(true); setCategoria("todas"); setDesde(isoDaysAgo(7)); setHasta(""); }}
+        >
+          <p className="text-xs text-muted-foreground">Eventos sensibles (7 días)</p>
+          <p className="text-2xl font-bold">{resumen?.sensibles ?? 0}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setDesde(isoDaysAgo(0)); setHasta(""); setCategoria("todas"); setSoloSensibles(false); }}
+        >
+          <p className="text-xs text-muted-foreground">Acciones hoy</p>
+          <p className="text-2xl font-bold">{resumen?.hoy ?? 0}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => navigate({ to: "/admin/usuarios" })}
+        >
+          <p className="text-xs text-muted-foreground">Sin actividad en 30 días</p>
+          <p className="text-2xl font-bold">{resumen?.inactivos ?? 0}</p>
+          <p className="text-xs text-muted-foreground">Ver usuarios</p>
+        </button>
+      </div>
+
+      {usuario && (
+        <div className="mb-4 flex items-center gap-2">
+          <Badge variant="secondary">
+            Filtrando por: {nombreUsuarioFiltrado ?? "usuario"}
+          </Badge>
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: { usuario: undefined } })}>
+            Quitar filtro
+          </Button>
+        </div>
+      )}
+
+      <div className="mb-4 flex justify-end">
+        <Button variant="outline" size="sm" onClick={exportarCsv} disabled={exportando}>
+          {exportando ? "Exportando…" : "Exportar CSV"}
+        </Button>
+      </div>
 
       <div className="mb-4 grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-3 lg:grid-cols-4">
         <div className="grid gap-1.5">
