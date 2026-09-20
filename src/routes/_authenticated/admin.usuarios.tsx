@@ -577,6 +577,100 @@ function CredencialesDialog({
   );
 }
 
+function ActividadUsuario({ userId }: { userId: string }) {
+  const { data: eventos = [] } = useQuery({
+    queryKey: ["admin", "usuarios", "actividad", userId],
+    queryFn: async () => {
+      const { data } = await (supabase.from as any)("audit_log")
+        .select("*")
+        .or(`actor_id.eq.${userId},sujeto_id.eq.${userId}`)
+        .order("id", { ascending: false })
+        .limit(100);
+      return (data as AuditEvent[]) ?? [];
+    },
+  });
+
+  const { data: resumen } = useQuery({
+    queryKey: ["admin", "usuarios", "actividad-resumen", userId],
+    queryFn: async () => {
+      const desde = new Date(Date.now() - 30 * 24 * 3600_000).toISOString();
+      const [logins, sensibles, ultimo] = await Promise.all([
+        (supabase.from as any)("audit_log")
+          .select("id", { count: "exact", head: true })
+          .eq("actor_id", userId).eq("categoria", "acceso").eq("accion", "login")
+          .gte("occurred_at", desde),
+        (supabase.from as any)("audit_log")
+          .select("id", { count: "exact", head: true })
+          .or(`actor_id.eq.${userId},sujeto_id.eq.${userId}`)
+          .eq("sensible", true)
+          .gte("occurred_at", desde),
+        (supabase.from as any)("audit_log")
+          .select("occurred_at,ip,user_agent")
+          .eq("actor_id", userId).eq("categoria", "acceso").eq("accion", "login")
+          .order("id", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      return {
+        accesos30: logins.count ?? 0,
+        sensibles30: sensibles.count ?? 0,
+        ultimo: (ultimo.data ?? null) as { occurred_at: string; ip: string | null; user_agent: string | null } | null,
+      };
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border p-3">
+          <p className="text-xs text-muted-foreground">Último acceso</p>
+          <p className="text-sm font-medium">
+            {resumen?.ultimo
+              ? new Date(resumen.ultimo.occurred_at).toLocaleString("es-DO")
+              : "Sin registros"}
+          </p>
+          {resumen?.ultimo?.ip && (
+            <p className="text-xs text-muted-foreground">IP {resumen.ultimo.ip}</p>
+          )}
+          {resumen?.ultimo?.user_agent && (
+            <p className="break-words text-xs text-muted-foreground">{resumen.ultimo.user_agent}</p>
+          )}
+        </div>
+        <div className="rounded-lg border p-3">
+          <p className="text-xs text-muted-foreground">Accesos (30 días)</p>
+          <p className="text-2xl font-bold">{resumen?.accesos30 ?? 0}</p>
+        </div>
+        <div className="rounded-lg border p-3">
+          <p className="text-xs text-muted-foreground">Eventos sensibles (30 días)</p>
+          <p className="text-2xl font-bold">{resumen?.sensibles30 ?? 0}</p>
+        </div>
+      </div>
+
+      {eventos.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Sin actividad registrada.</p>
+      ) : (
+        <ul className="divide-y rounded-md border">
+          {eventos.map((ev) => (
+            <li key={ev.id} className="flex flex-wrap items-center gap-2 p-2 text-sm">
+              <span className="w-36 shrink-0 text-xs text-muted-foreground">
+                {new Date(ev.occurred_at).toLocaleString("es-DO", { dateStyle: "short", timeStyle: "short" })}
+              </span>
+              <span className="flex-1">{describirEvento(ev)}</span>
+              {ev.sensible && <Badge variant="destructive">Sensible</Badge>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Link
+        to="/admin/auditoria"
+        search={{ usuario: userId }}
+        className="inline-block text-sm text-primary underline"
+      >
+        Ver toda la auditoría de este usuario
+      </Link>
+    </div>
+  );
+}
+
 function UserDetailDialog({
   userId, perfil, onClose,
 }: { userId: string | null; perfil: any; onClose: () => void }) {
