@@ -390,9 +390,14 @@ function DetallePrograma() {
 
   return (
     <PublicLayout>
-      <section className="border-b bg-gradient-to-b from-primary/5 to-background">
-        <div className="container mx-auto grid gap-8 px-4 py-12 lg:grid-cols-[2fr_1fr]">
-          <div>
+      <section className="relative border-b">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-primary/5 to-background"
+        />
+        <div className="relative container mx-auto grid gap-8 px-4 py-12 lg:grid-cols-[2fr_1fr] lg:items-start">
+          <div className="contents lg:col-start-1 lg:block lg:space-y-8">
+            <div className="order-1">
             <div className="mb-4 flex flex-wrap gap-2">
               <Badge variant="outline" className="capitalize">{programa.tipo}</Badge>
               <Badge variant="secondary" className="capitalize">{programa.modalidad}</Badge>
