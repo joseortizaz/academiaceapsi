@@ -47,7 +47,7 @@ function isoDaysAgo(days: number) {
 }
 
 function AuditoriaPage() {
-  const { usuario } = Route.useSearch();
+  const { usuario, sensibles } = Route.useSearch();
   const navigate = useNavigate();
   const exportarFn = useServerFn(logAuditExport);
   const [exportando, setExportando] = useState(false);
@@ -56,7 +56,7 @@ function AuditoriaPage() {
   const [categoria, setCategoria] = useState("todas");
   const [rol, setRol] = useState("todos");
   const [entidad, setEntidad] = useState("todas");
-  const [soloSensibles, setSoloSensibles] = useState(false);
+  const [soloSensibles, setSoloSensibles] = useState(sensibles === "1");
   const [busqueda, setBusqueda] = useState("");
   const [buscado, setBuscado] = useState("");
   const [paginas, setPaginas] = useState<AuditEvent[][]>([]);
@@ -469,6 +469,12 @@ function AuditoriaPage() {
                 <Dato k="IP" v={detalle.ip} />
                 <Dato k="Dispositivo" v={detalle.user_agent} />
               </dl>
+
+              {detalle.categoria === "actividad" && ACCIONES_NAVEGADOR.has(detalle.accion) && (
+                <p className="text-xs italic text-muted-foreground">
+                  Registrado por el navegador del usuario
+                </p>
+              )}
 
               {detalle.detalle && Object.keys(detalle.detalle).length > 0 && (
                 <div>
