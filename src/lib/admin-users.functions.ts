@@ -154,6 +154,18 @@ export const createStudentAccount = createServerFn({ method: "POST" })
       if (enrErr) enrollmentError = enrErr.message;
     }
 
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "crear_alumno",
+      entidad: "usuario",
+      entidadId: newUserId,
+      entidadEtiqueta: `${data.nombre} ${data.apellido}`,
+      sujetoId: newUserId,
+      programaId: data.programaId ?? null,
+      detalle: { correo: data.email, programaId: data.programaId, enrollmentError },
+    });
+
     return { userId: newUserId, enrollmentError };
   });
 
