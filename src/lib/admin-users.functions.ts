@@ -206,6 +206,17 @@ export const resetStudentPassword = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
 
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "restablecer_password",
+      entidad: "usuario",
+      entidadId: data.userId,
+      entidadEtiqueta: existing.user.email ?? null,
+      sujetoId: data.userId,
+      sensible: true,
+    });
+
     return { success: true };
   });
 
