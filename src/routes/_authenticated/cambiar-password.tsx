@@ -14,7 +14,9 @@ import { Eye, EyeOff, GraduationCap, ShieldCheck } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/cambiar-password")({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
-      typeof search.redirect === "string" && search.redirect.startsWith("/")
+      typeof search.redirect === "string" &&
+      search.redirect.startsWith("/") &&
+      !search.redirect.startsWith("/cambiar-password")
         ? search.redirect
         : undefined,
   }),
