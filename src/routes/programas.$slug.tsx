@@ -565,9 +565,69 @@ function DetallePrograma() {
             programaTitulo={programa.titulo}
             slug={programa.slug}
           />
-        </div>
+            </div>
+          </div>
 
-        <aside className="space-y-6">
+          <div className="contents lg:col-start-2 lg:block lg:space-y-6">
+            <aside className="order-2 rounded-xl border bg-card p-6 shadow-sm">
+              <div className="overflow-hidden rounded-lg bg-muted">
+                {programa.imagen_url ? (
+                  <img src={programa.imagen_url} alt={programa.titulo} className="aspect-video w-full object-cover" />
+                ) : (
+                  <div className="flex aspect-video items-center justify-center text-primary/30">
+                    <GraduationCap className="h-16 w-16" />
+                  </div>
+                )}
+              </div>
+              <div className="mt-4">
+                {programa.precio_descuento ? (
+                  <div>
+                    <span className="text-3xl font-bold text-primary">
+                      RD$ {Number(programa.precio_descuento).toLocaleString("es-DO")}
+                    </span>
+                    <span className="ml-2 text-sm text-muted-foreground line-through">
+                      RD$ {Number(programa.precio).toLocaleString("es-DO")}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-3xl font-bold text-primary">
+                    {Number(programa.precio) > 0
+                      ? `RD$ ${Number(programa.precio).toLocaleString("es-DO")}`
+                      : "Gratis"}
+                  </span>
+                )}
+              </div>
+              {existing ? (
+                <Button asChild className="mt-4 w-full">
+                  <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
+                </Button>
+              ) : (
+                <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading}>
+                  {authLoading
+                    ? "Cargando…"
+                    : isAuthenticated
+                      ? "Inscribirme ahora"
+                      : "Acceder para inscribirme"}
+                </Button>
+              )}
+              {programa.syllabus_url && (
+                <Button asChild variant="outline" className="mt-2 w-full">
+                  <a href={programa.syllabus_url} target="_blank" rel="noopener noreferrer">
+                    Descargar syllabus
+                  </a>
+                </Button>
+              )}
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button variant="outline" size="sm" onClick={copiarEnlace}>
+                  <Link2 className="mr-1.5 h-4 w-4" /> Copiar enlace
+                </Button>
+                <Button variant="outline" size="sm" onClick={compartirWhatsApp}>
+                  <MessageCircle className="mr-1.5 h-4 w-4" /> WhatsApp
+                </Button>
+              </div>
+            </aside>
+
+            <aside className="order-4 space-y-6">
           {docentes.length > 0 && (
             <div className="rounded-lg border bg-card p-5">
               <h3 className="font-bold">{docentes.length > 1 ? "Docentes" : "Docente"}</h3>
