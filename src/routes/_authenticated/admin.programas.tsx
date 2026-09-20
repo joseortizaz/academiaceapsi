@@ -201,6 +201,36 @@ function ProgramasPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
+                    {r.slug && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={
+                            r.estado === "borrador"
+                              ? "Copiar enlace público — Este programa aún no es público (borrador)"
+                              : "Copiar enlace público"
+                          }
+                          onClick={() => copiarEnlace(r.slug, r.estado)}
+                        >
+                          <Link2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={
+                            r.estado === "borrador"
+                              ? "Ver página — Este programa aún no es público (borrador)"
+                              : "Ver página"
+                          }
+                          onClick={() =>
+                            window.open(programaUrl(r.slug), "_blank", "noopener,noreferrer")
+                          }
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                     <EditButton
                       onClick={() => {
                         setEditing({ ...(r as Programa) });
@@ -209,6 +239,7 @@ function ProgramasPage() {
                     />
                     <DeleteButton onConfirm={() => remove(r.id!)} label="el programa" />
                   </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
