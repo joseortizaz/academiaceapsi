@@ -23,6 +23,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Link2, ExternalLink } from "lucide-react";
+import { programaUrl } from "@/lib/site";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import {
@@ -127,6 +130,19 @@ function ProgramasPage() {
     queryKey: ["admin", "docentes", "lookup"],
     queryFn: async () => (await supabase.from("teachers").select("id,nombre,apellido")).data ?? [],
   });
+
+  const copiarEnlace = async (slug: string, estado: string) => {
+    try {
+      await navigator.clipboard.writeText(programaUrl(slug));
+      toast.success(
+        estado === "borrador"
+          ? "Enlace copiado — este programa aún no es público (borrador)"
+          : "Enlace copiado",
+      );
+    } catch {
+      toast.error("No se pudo copiar el enlace");
+    }
+  };
 
   const save = async (v: Programa) => {
     const payload = {
@@ -265,8 +281,17 @@ function ProgramasPage() {
               <Input
                 value={s.slug}
                 onChange={(e) => set({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
+                readOnly={
+                  !!s.id && !!s.slug && ["publicado", "en_curso", "finalizado"].includes(s.estado)
+                }
                 required
               />
+              {!!s.id && !!s.slug && ["publicado", "en_curso", "finalizado"].includes(s.estado) && (
+                <p className="text-xs text-muted-foreground">
+                  El enlace no se puede cambiar una vez publicado para no romper enlaces ya
+                  compartidos.
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Resumen</Label>
