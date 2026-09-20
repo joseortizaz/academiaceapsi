@@ -367,6 +367,15 @@ function DetallePrograma() {
                 </a>
               </Button>
             )}
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={copiarEnlace}>
+                <Link2 className="mr-1.5 h-4 w-4" /> Copiar enlace
+              </Button>
+              <Button variant="outline" size="sm" onClick={compartirWhatsApp}>
+                <MessageCircle className="mr-1.5 h-4 w-4" /> WhatsApp
+              </Button>
+            </div>
+
           </aside>
         </div>
       </section>
