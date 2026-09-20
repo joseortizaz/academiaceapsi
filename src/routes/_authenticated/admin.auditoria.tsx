@@ -312,7 +312,7 @@ function AuditoriaPage() {
           <Badge variant="secondary">
             Filtrando por: {nombreUsuarioFiltrado ?? "usuario"}
           </Badge>
-          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: { usuario: undefined } })}>
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: { usuario: undefined, sensibles: undefined } })}>
             Quitar filtro
           </Button>
         </div>
