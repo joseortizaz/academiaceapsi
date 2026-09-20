@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,6 +19,10 @@ import {
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { ProgramReviews } from "@/components/reviews/ProgramReviews";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  TeacherProfileDialog, fullName as docenteNombre, initials as docenteIniciales, type Teacher,
+} from "@/components/site/TeacherProfileDialog";
 
 export const Route = createFileRoute("/programas/$slug")({
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
