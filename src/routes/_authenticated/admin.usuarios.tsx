@@ -596,7 +596,7 @@ function ActividadUsuario({ userId }: { userId: string }) {
     queryKey: ["admin", "usuarios", "actividad-resumen", userId],
     queryFn: async () => {
       const desde = new Date(Date.now() - 30 * 24 * 3600_000).toISOString();
-      const [logins, sensibles, ultimo] = await Promise.all([
+      const [logins, sensibles, ultimo, lecciones] = await Promise.all([
         (supabase.from as any)("audit_log")
           .select("id", { count: "exact", head: true })
           .eq("actor_id", userId).eq("categoria", "acceso").eq("accion", "login")
@@ -610,10 +610,15 @@ function ActividadUsuario({ userId }: { userId: string }) {
           .select("occurred_at,ip,user_agent")
           .eq("actor_id", userId).eq("categoria", "acceso").eq("accion", "login")
           .order("id", { ascending: false }).limit(1).maybeSingle(),
+        (supabase.from as any)("audit_log")
+          .select("id", { count: "exact", head: true })
+          .eq("actor_id", userId).eq("accion", "completar_leccion")
+          .gte("occurred_at", desde),
       ]);
       return {
         accesos30: logins.count ?? 0,
         sensibles30: sensibles.count ?? 0,
+        lecciones30: lecciones.count ?? 0,
         ultimo: (ultimo.data ?? null) as { occurred_at: string; ip: string | null; user_agent: string | null } | null,
       };
     },
@@ -621,7 +626,7 @@ function ActividadUsuario({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border p-3">
           <p className="text-xs text-muted-foreground">Último acceso</p>
           <p className="text-sm font-medium">
