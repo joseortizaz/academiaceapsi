@@ -704,7 +704,15 @@ function UserDetailDialog({
           </DialogTitle>
         </DialogHeader>
         {perfil && (
-          <div className="space-y-4">
+          <Tabs defaultValue="datos">
+            <TabsList className="mb-4">
+              <TabsTrigger value="datos">Datos</TabsTrigger>
+              <TabsTrigger value="actividad">Actividad reciente</TabsTrigger>
+            </TabsList>
+            <TabsContent value="actividad">
+              {userId && <ActividadUsuario userId={userId} />}
+            </TabsContent>
+            <TabsContent value="datos" className="space-y-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div><span className="text-muted-foreground">Teléfono: </span>{perfil.telefono ?? "—"}</div>
               <div><span className="text-muted-foreground">Ciudad: </span>{perfil.ciudad ?? "—"}</div>
