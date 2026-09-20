@@ -607,27 +607,58 @@ function DetallePrograma() {
         </div>
 
         <aside className="space-y-6">
-          {docente && (
+          {docentes.length > 0 && (
             <div className="rounded-lg border bg-card p-5">
-              <h3 className="font-bold">Docente</h3>
-              <div className="mt-3 flex items-start gap-3">
-                {docente.avatar_url ? (
-                  <img src={docente.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <BookOpen />
-                  </div>
-                )}
-                <div>
-                  <p className="font-semibold">{docente.nombre} {docente.apellido}</p>
-                  {docente.titulo && <p className="text-xs text-muted-foreground">{docente.titulo}</p>}
-                  {docente.especialidad && (
-                    <p className="text-xs text-muted-foreground">{docente.especialidad}</p>
-                  )}
-                </div>
+              <h3 className="font-bold">{docentes.length > 1 ? "Docentes" : "Docente"}</h3>
+              <div className="mt-3 space-y-4">
+                {docentesVisibles.map((d) => {
+                  const esPrincipal = d.id === programa.docente_id;
+                  const n = conteoLecciones[d.id] ?? 0;
+                  return (
+                    <div key={d.id} className="flex items-start gap-3">
+                      <Avatar className="h-12 w-12">
+                        {d.avatar_url && <AvatarImage src={d.avatar_url} alt={docenteNombre(d)} />}
+                        <AvatarFallback className="bg-primary text-sm text-primary-foreground">
+                          {docenteIniciales(d)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => setPerfil(d)}
+                          className="text-left font-semibold text-foreground hover:text-primary hover:underline"
+                        >
+                          {docenteNombre(d)}
+                        </button>
+                        {d.especialidad && (
+                          <p className="text-xs text-muted-foreground">{d.especialidad}</p>
+                        )}
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          {esPrincipal && (
+                            <Badge variant="secondary" className="text-[11px]">Docente principal</Badge>
+                          )}
+                          {n > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              {n} {n === 1 ? "lección" : "lecciones"} en este programa
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              {docente.biografia && (
-                <p className="mt-3 text-sm text-muted-foreground">{docente.biografia}</p>
+              {docentes.length > 5 && !verTodosDocentes && (
+                <Button
+                  variant="link"
+                  className="mt-2 h-auto p-0 text-sm text-primary"
+                  onClick={() => setVerTodosDocentes(true)}
+                >
+                  Ver los {docentes.length} docentes
+                </Button>
+              )}
+              {docentes.length === 1 && docentes[0].biografia && (
+                <p className="mt-3 text-sm text-muted-foreground">{docentes[0].biografia}</p>
               )}
             </div>
           )}
