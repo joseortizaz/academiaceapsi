@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +60,16 @@ function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { data: resenasPendientes = 0 } = useQuery({
+    queryKey: ["admin", "resenas", "pendientes"],
+    queryFn: async () => {
+      const { count } = await (supabase.from as any)("program_reviews")
+        .select("id", { count: "exact", head: true })
+        .eq("estado", "pendiente");
+      return count ?? 0;
+    },
+  });
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/" });
@@ -97,6 +108,11 @@ function AdminLayout() {
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
+                {item.to === "/admin/resenas" && resenasPendientes > 0 && (
+                  <span className="ml-auto rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
+                    {resenasPendientes}
+                  </span>
+                )}
               </Link>
             );
           })}
