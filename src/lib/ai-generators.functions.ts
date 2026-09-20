@@ -121,15 +121,10 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     const pdfRes = await fetch(data.pdfUrl, { redirect: "error" });
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
+    if (buf.byteLength > 15 * 1024 * 1024) throw new Error("El PDF supera el tamaño máximo (15 MB).");
 
-    // Extraer texto (import dinámico, solo en servidor)
-    const { extractText, getDocumentProxy } = await import("unpdf");
-    const pdf = await getDocumentProxy(buf);
-    const { text } = await extractText(pdf, { mergePages: true });
-    const cleaned = (Array.isArray(text) ? text.join("\n") : text)
-      .replace(/\s+/g, " ").trim().slice(0, 18000);
-
-    if (cleaned.length < 50) throw new Error("El PDF no contiene texto extraíble (¿está escaneado?).");
+    // El modelo (Gemini) lee el PDF directamente: se envía como archivo adjunto en base64.
+    const pdfBase64 = Buffer.from(buf).toString("base64");
 
     const tipoInstruccion =
       tipo === "opcion_multiple" ? "Todas las preguntas deben ser de opción múltiple con 4 opciones."
