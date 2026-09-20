@@ -25,6 +25,7 @@ import {
   Users2,
   FileText,
   Star,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
