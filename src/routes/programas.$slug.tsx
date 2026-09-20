@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,10 +15,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
-  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, Video, Link2, MessageCircle,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { ProgramReviews } from "@/components/reviews/ProgramReviews";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  TeacherProfileDialog, fullName as docenteNombre, initials as docenteIniciales, type Teacher,
+} from "@/components/site/TeacherProfileDialog";
 
 export const Route = createFileRoute("/programas/$slug")({
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
@@ -150,13 +154,13 @@ function DetallePrograma() {
   };
 
 
-  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null; modulo_id: string | null };
+  type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null; modulo_id: string | null; docente_id: string | null };
   const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
     queryKey: ["public", "modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
       const { data, error } = await (supabase.from as any)("program_modules_catalog")
-        .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion,modulo_id")
+        .select("id,titulo,descripcion,orden,duracion_minutos,es_en_vivo,fecha_sesion,modulo_id,docente_id")
         .eq("programa_id", programa!.id)
         .order("orden");
       if (error) throw error;
@@ -178,17 +182,54 @@ function DetallePrograma() {
     },
   });
 
-  const { data: docente } = useQuery({
-    queryKey: ["public", "docente", programa?.docente_id],
-    enabled: !!programa?.docente_id,
+  const docenteIds = useMemo(() => {
+    const s = new Set<string>();
+    if (programa?.docente_id) s.add(programa.docente_id);
+    for (const m of modulos) if (m.docente_id) s.add(m.docente_id);
+    return Array.from(s).sort();
+  }, [programa?.docente_id, modulos]);
+
+  const { data: docentesRaw = [] } = useQuery<any[]>({
+    queryKey: ["public", "programa-docentes", docenteIds],
+    enabled: docenteIds.length > 0,
     queryFn: async () => {
-      const { data } = await (supabase.from as any)("teachers_public")
-        .select("nombre,apellido,titulo,especialidad,avatar_url,biografia")
-        .eq("id", programa!.docente_id!)
-        .maybeSingle();
-      return data;
+      const { data, error } = await (supabase.from as any)("teachers_public")
+        .select("id,nombre,apellido,titulo,especialidad,biografia,avatar_url,linkedin_url,orden")
+        .in("id", docenteIds);
+      if (error) throw error;
+      return data ?? [];
     },
   });
+
+  const conteoLecciones = useMemo(() => {
+    const c: Record<string, number> = {};
+    for (const m of modulos) if (m.docente_id) c[m.docente_id] = (c[m.docente_id] ?? 0) + 1;
+    return c;
+  }, [modulos]);
+
+  const docentes = useMemo(() => {
+    const principal = programa?.docente_id ?? null;
+    return [...docentesRaw].sort((a, b) => {
+      const pa = a.id === principal ? 0 : 1;
+      const pb = b.id === principal ? 0 : 1;
+      if (pa !== pb) return pa - pb;
+      const ca = conteoLecciones[a.id] ?? 0;
+      const cb = conteoLecciones[b.id] ?? 0;
+      if (ca !== cb) return cb - ca;
+      const oa = a.orden ?? 0;
+      const ob = b.orden ?? 0;
+      if (oa !== ob) return oa - ob;
+      return `${a.nombre} ${a.apellido}`.localeCompare(`${b.nombre} ${b.apellido}`);
+    }) as (Teacher & { orden: number | null })[];
+  }, [docentesRaw, programa?.docente_id, conteoLecciones]);
+
+  const docentePorId = useMemo(
+    () => new Map(docentes.map((d) => [d.id, d])),
+    [docentes],
+  );
+
+  const [perfil, setPerfil] = useState<Teacher | null>(null);
+  const [verTodosDocentes, setVerTodosDocentes] = useState(false);
 
   const { data: existing } = useQuery({
     queryKey: ["enrollment", programa?.id, user?.id],
@@ -312,6 +353,39 @@ function DetallePrograma() {
       setSubmitting(false);
     }
   };
+
+  const tituloModulo = (modulo_id: string | null) =>
+    modulo_id ? (courseModules.find((c) => c.id === modulo_id)?.titulo ?? null) : null;
+
+  const leccionesDe = (docenteId: string) =>
+    modulos
+      .filter((m) => m.docente_id === docenteId)
+      .map((m) => ({
+        titulo: m.titulo,
+        modulo: programa.tipo === "diplomado" ? tituloModulo(m.modulo_id) : null,
+      }));
+
+  const botonDocente = (d: Teacher, extraClass = "") => (
+    <button
+      type="button"
+      onClick={() => setPerfil(d)}
+      className={`text-left font-medium text-foreground hover:text-primary hover:underline ${extraClass}`}
+    >
+      {docenteNombre(d)}
+    </button>
+  );
+
+  const lineaDocenteLeccion = (id: string | null) => {
+    const d = id ? docentePorId.get(id) : undefined;
+    if (!d) return null;
+    return (
+      <p className="mt-1 text-xs text-muted-foreground">
+        Docente: {botonDocente(d, "text-xs")}
+      </p>
+    );
+  };
+
+  const docentesVisibles = verTodosDocentes ? docentes : docentes.slice(0, 5);
 
 
   return (
@@ -448,6 +522,11 @@ function DetallePrograma() {
                 <div className="mt-4 space-y-4">
                   {courseModules.map((cm, idx) => {
                     const leccionesMod = modulos.filter((m) => m.modulo_id === cm.id);
+                    const docentesMod = Array.from(
+                      new Set(leccionesMod.map((m) => m.docente_id).filter(Boolean) as string[]),
+                    )
+                      .map((id) => docentePorId.get(id))
+                      .filter(Boolean) as Teacher[];
                     return (
                       <div key={cm.id} className="rounded-lg border bg-card">
                         <div className="border-b bg-muted/40 px-4 py-3">
@@ -456,6 +535,17 @@ function DetallePrograma() {
                           </h3>
                           {cm.descripcion && (
                             <p className="mt-1 text-sm text-muted-foreground">{cm.descripcion}</p>
+                          )}
+                          {docentesMod.length > 0 && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Docentes del módulo:{" "}
+                              {docentesMod.map((d, i) => (
+                                <span key={d.id}>
+                                  {i > 0 && ", "}
+                                  {botonDocente(d, "text-xs")}
+                                </span>
+                              ))}
+                            </p>
                           )}
                         </div>
                         {leccionesMod.length === 0 ? (
@@ -484,6 +574,7 @@ function DetallePrograma() {
                                   {m.descripcion && (
                                     <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
                                   )}
+                                  {lineaDocenteLeccion(m.docente_id)}
                                 </div>
                               </li>
                             ))}
@@ -517,6 +608,7 @@ function DetallePrograma() {
                         {m.descripcion && (
                           <p className="mt-1 text-sm text-muted-foreground">{m.descripcion}</p>
                         )}
+                        {lineaDocenteLeccion(m.docente_id)}
                       </div>
                     </li>
                   ))}
@@ -533,27 +625,58 @@ function DetallePrograma() {
         </div>
 
         <aside className="space-y-6">
-          {docente && (
+          {docentes.length > 0 && (
             <div className="rounded-lg border bg-card p-5">
-              <h3 className="font-bold">Docente</h3>
-              <div className="mt-3 flex items-start gap-3">
-                {docente.avatar_url ? (
-                  <img src={docente.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <BookOpen />
-                  </div>
-                )}
-                <div>
-                  <p className="font-semibold">{docente.nombre} {docente.apellido}</p>
-                  {docente.titulo && <p className="text-xs text-muted-foreground">{docente.titulo}</p>}
-                  {docente.especialidad && (
-                    <p className="text-xs text-muted-foreground">{docente.especialidad}</p>
-                  )}
-                </div>
+              <h3 className="font-bold">{docentes.length > 1 ? "Docentes" : "Docente"}</h3>
+              <div className="mt-3 space-y-4">
+                {docentesVisibles.map((d) => {
+                  const esPrincipal = d.id === programa.docente_id;
+                  const n = conteoLecciones[d.id] ?? 0;
+                  return (
+                    <div key={d.id} className="flex items-start gap-3">
+                      <Avatar className="h-12 w-12">
+                        {d.avatar_url && <AvatarImage src={d.avatar_url} alt={docenteNombre(d)} />}
+                        <AvatarFallback className="bg-primary text-sm text-primary-foreground">
+                          {docenteIniciales(d)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => setPerfil(d)}
+                          className="text-left font-semibold text-foreground hover:text-primary hover:underline"
+                        >
+                          {docenteNombre(d)}
+                        </button>
+                        {d.especialidad && (
+                          <p className="text-xs text-muted-foreground">{d.especialidad}</p>
+                        )}
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          {esPrincipal && (
+                            <Badge variant="secondary" className="text-[11px]">Docente principal</Badge>
+                          )}
+                          {n > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              {n} {n === 1 ? "lección" : "lecciones"} en este programa
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              {docente.biografia && (
-                <p className="mt-3 text-sm text-muted-foreground">{docente.biografia}</p>
+              {docentes.length > 5 && !verTodosDocentes && (
+                <Button
+                  variant="link"
+                  className="mt-2 h-auto p-0 text-sm text-primary"
+                  onClick={() => setVerTodosDocentes(true)}
+                >
+                  Ver los {docentes.length} docentes
+                </Button>
+              )}
+              {docentes.length === 1 && docentes[0].biografia && (
+                <p className="mt-3 text-sm text-muted-foreground">{docentes[0].biografia}</p>
               )}
             </div>
           )}
@@ -661,6 +784,13 @@ function DetallePrograma() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <TeacherProfileDialog
+        teacher={perfil}
+        onClose={() => setPerfil(null)}
+        lecciones={perfil ? leccionesDe(perfil.id) : undefined}
+        mostrarVerTodos
+      />
 
     </PublicLayout>
   );
