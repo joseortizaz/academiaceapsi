@@ -256,6 +256,60 @@ function AuditoriaPage() {
         description="Registro de acciones realizadas en el portal. Solo lectura."
       />
 
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setCategoria("acceso"); setDesde(isoDaysAgo(7)); setHasta(""); setSoloSensibles(false); }}
+        >
+          <p className="text-xs text-muted-foreground">Accesos (7 días)</p>
+          <p className="text-2xl font-bold">{resumen?.logins ?? 0}</p>
+          <p className="text-xs text-muted-foreground">{resumen?.distintos ?? 0} usuarios distintos</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setSoloSensibles(true); setCategoria("todas"); setDesde(isoDaysAgo(7)); setHasta(""); }}
+        >
+          <p className="text-xs text-muted-foreground">Eventos sensibles (7 días)</p>
+          <p className="text-2xl font-bold">{resumen?.sensibles ?? 0}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => { setDesde(isoDaysAgo(0)); setHasta(""); setCategoria("todas"); setSoloSensibles(false); }}
+        >
+          <p className="text-xs text-muted-foreground">Acciones hoy</p>
+          <p className="text-2xl font-bold">{resumen?.hoy ?? 0}</p>
+        </button>
+        <button
+          type="button"
+          className="rounded-lg border bg-card p-4 text-left transition-colors hover:bg-accent"
+          onClick={() => navigate({ to: "/admin/usuarios" })}
+        >
+          <p className="text-xs text-muted-foreground">Sin actividad en 30 días</p>
+          <p className="text-2xl font-bold">{resumen?.inactivos ?? 0}</p>
+          <p className="text-xs text-muted-foreground">Ver usuarios</p>
+        </button>
+      </div>
+
+      {usuario && (
+        <div className="mb-4 flex items-center gap-2">
+          <Badge variant="secondary">
+            Filtrando por: {nombreUsuarioFiltrado ?? "usuario"}
+          </Badge>
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: {} })}>
+            Quitar filtro
+          </Button>
+        </div>
+      )}
+
+      <div className="mb-4 flex justify-end">
+        <Button variant="outline" size="sm" onClick={exportarCsv} disabled={exportando}>
+          {exportando ? "Exportando…" : "Exportar CSV"}
+        </Button>
+      </div>
+
       <div className="mb-4 grid gap-3 rounded-lg border bg-card p-4 md:grid-cols-3 lg:grid-cols-4">
         <div className="grid gap-1.5">
           <Label className="text-xs">Desde</Label>
