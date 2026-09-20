@@ -144,6 +144,31 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(`No se pudo guardar la reunión: ${error.message}`);
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "crear_clase_vivo",
+      entidad: "zoom_meetings",
+      entidadId: row.id,
+      entidadEtiqueta: data.titulo,
+      programaId: data.programaId,
+      detalle: {
+        inicio: data.startAt,
+        duracionMin: data.durationMin,
+        cohortId: data.cohortId ?? null,
+        licencia: hostEmail,
+      },
+    });
+    await logAudit({
+      actorId: context.userId,
+      accion: "asignar_licencia_zoom",
+      entidad: "zoom_licenses",
+      entidadEtiqueta: hostEmail,
+      programaId: data.programaId,
+      detalle: { docenteId: responsibleTeacherId, claseId: row.id },
+    });
+
     return row;
   });
 
