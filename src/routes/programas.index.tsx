@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PublicLayout } from "@/components/site/PublicLayout";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Calendar,
   Clock,
@@ -142,9 +142,7 @@ function ProgramasPage() {
                         </span>
                       )}
                     </div>
-                    <Button size="sm" asChild={false} tabIndex={-1}>
-                      <span>Más información</span>
-                    </Button>
+                    <span className={buttonVariants({ size: "sm" })}>Más información</span>
                   </div>
                 </div>
               </Link>
