@@ -86,8 +86,11 @@ function DetallePrograma() {
   });
 
 
+  const { programa: programaInicial } = Route.useLoaderData();
+
   const { data: programa, isLoading } = useQuery({
     queryKey: ["public", "programa", slug],
+    initialData: programaInicial ?? undefined,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("programs")
@@ -98,6 +101,21 @@ function DetallePrograma() {
       return data;
     },
   });
+
+  const shareUrl = programaUrl(slug);
+  const copiarEnlace = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Enlace copiado");
+    } catch {
+      toast.error("No se pudo copiar el enlace");
+    }
+  };
+  const compartirWhatsApp = () => {
+    const texto = `${programa?.titulo ?? "Programa"} — ${shareUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+  };
+
 
   type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null; modulo_id: string | null };
   const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
