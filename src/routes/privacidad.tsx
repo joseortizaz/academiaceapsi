@@ -78,13 +78,13 @@ function Privacidad() {
           </p>
 
           <LegalSection id="responsable" number="1" title="Responsable del tratamiento">
-            <p>El responsable del tratamiento es <strong>{LEGAL_ENTITY_NAME}</strong>.</p>
+            <p>El responsable del tratamiento es <strong>{LEGAL_ENTITY_NAME}</strong> (en adelante, «{LEGAL_ENTITY_SHORT}»), que opera la plataforma Academia Ceapsi RD (academiaceapsi.com).</p>
             <ul>
               <li><strong>Domicilio:</strong> {LEGAL_ADDRESS}.</li>
               <li><strong>Correo:</strong> <a href={`mailto:${PRIVACY_EMAIL}`}>{PRIVACY_EMAIL}</a>.</li>
               <li><strong>Teléfono:</strong> <a href="tel:+18097845106">{PRIVACY_PHONE}</a>.</li>
             </ul>
-            <p>Estos son nuestros medios de contacto para los fines del artículo 5.3 de la Ley 172-13.</p>
+            <p>Estos son los medios de contacto de {LEGAL_ENTITY_SHORT} para los fines del artículo 5.3 de la Ley 172-13.</p>
           </LegalSection>
 
           <LegalSection id="datos" number="2" title="Datos que recopilamos">
