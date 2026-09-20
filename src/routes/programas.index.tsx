@@ -1,29 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PublicLayout } from "@/components/site/PublicLayout";
-import { RichText } from "@/components/RichText";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Calendar,
   Clock,
-  FileText,
   GraduationCap,
-  Sparkles,
-  Target,
-  UserCheck,
   Users,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/programas/")({
   head: () => ({
