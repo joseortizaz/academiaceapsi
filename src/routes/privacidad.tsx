@@ -116,7 +116,7 @@ function Privacidad() {
               <li>Proteger el portal, prevenir fraude y mantener trazabilidad mediante auditoría.</li>
               <li>Mejorar el servicio y cumplir obligaciones legales, contables y contractuales.</li>
             </ul>
-            <p>No vendemos datos personales ni los usamos con fines distintos a los indicados sin obtener un nuevo consentimiento, conforme al artículo 5.8.</p>
+            <p>{LEGAL_ENTITY_SHORT} no vende datos personales ni los usa con fines distintos a los indicados sin obtener un nuevo consentimiento, conforme al artículo 5.8.</p>
           </LegalSection>
 
           <LegalSection id="base-legal" number="4" title="Base legal y consentimiento">
@@ -150,7 +150,7 @@ function Privacidad() {
 
           <LegalSection id="derechos" number="9" title="Sus derechos">
             <p>Puede ejercer gratuitamente sus derechos de acceso —con respuesta en 5 días hábiles—, rectificación, actualización y supresión —en 10 días hábiles y, cuando corresponda, notificación al cesionario en 5 días hábiles—, oposición y revocación del consentimiento, conforme a los artículos 8, 9 y 10. Los sucesores pueden ejercer estos derechos respecto de personas fallecidas.</p>
-            <p>Para ejercerlos, escriba a <a href={`mailto:${PRIVACY_EMAIL}?subject=Derechos%20sobre%20datos%20personales`}>{PRIVACY_EMAIL}</a> con el asunto <strong>“Derechos sobre datos personales”</strong>, identifíquese y describa claramente su solicitud. Los usuarios también pueden editar la información disponible desde su perfil en el portal.</p>
+            <p>Para ejercerlos, escriba a {LEGAL_ENTITY_SHORT} a través de <a href={`mailto:${PRIVACY_EMAIL}?subject=Derechos%20sobre%20datos%20personales`}>{PRIVACY_EMAIL}</a> con el asunto <strong>“Derechos sobre datos personales”</strong>, identifíquese y describa claramente su solicitud. Los usuarios también pueden editar la información disponible desde su perfil en el portal.</p>
             <p>Si su solicitud no es atendida, puede acudir a la acción de hábeas data ante el juez competente, conforme a los artículos 17 al 21.</p>
           </LegalSection>
 
