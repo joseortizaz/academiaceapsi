@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Users,
 } from "lucide-react";
+import { StarRating } from "@/components/reviews/StarRating";
 
 
 export const Route = createFileRoute("/programas/")({
@@ -46,6 +47,17 @@ function ProgramasPage() {
       return data ?? [];
     },
   });
+
+  const { data: stats = [] } = useQuery({
+    queryKey: ["public", "programas", "ratings"],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from as any)("program_rating_stats")
+        .select("programa_id,promedio,total");
+      if (error) throw error;
+      return (data as { programa_id: string; promedio: number | null; total: number | null }[]) ?? [];
+    },
+  });
+  const statsMap = new Map(stats.map((s) => [s.programa_id, s]));
 
   return (
     <PublicLayout>
@@ -99,6 +111,17 @@ function ProgramasPage() {
                   <h3 className="line-clamp-2 text-lg font-bold text-foreground transition group-hover:text-primary">
                     {p.titulo}
                   </h3>
+                  {(() => {
+                    const s = statsMap.get(p.id);
+                    if (!s || !s.total) return null;
+                    return (
+                      <div className="flex items-center gap-2 text-sm">
+                        <StarRating value={Number(s.promedio ?? 0)} size={15} />
+                        <span className="font-medium">{Number(s.promedio ?? 0).toFixed(1)}</span>
+                        <span className="text-muted-foreground">({s.total})</span>
+                      </div>
+                    );
+                  })()}
                   {p.resumen && (
                     <p className="line-clamp-3 text-sm text-muted-foreground">{p.resumen}</p>
                   )}
