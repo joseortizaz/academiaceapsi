@@ -522,6 +522,11 @@ function DetallePrograma() {
                 <div className="mt-4 space-y-4">
                   {courseModules.map((cm, idx) => {
                     const leccionesMod = modulos.filter((m) => m.modulo_id === cm.id);
+                    const docentesMod = Array.from(
+                      new Set(leccionesMod.map((m) => m.docente_id).filter(Boolean) as string[]),
+                    )
+                      .map((id) => docentePorId.get(id))
+                      .filter(Boolean) as Teacher[];
                     return (
                       <div key={cm.id} className="rounded-lg border bg-card">
                         <div className="border-b bg-muted/40 px-4 py-3">
@@ -530,6 +535,17 @@ function DetallePrograma() {
                           </h3>
                           {cm.descripcion && (
                             <p className="mt-1 text-sm text-muted-foreground">{cm.descripcion}</p>
+                          )}
+                          {docentesMod.length > 0 && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Docentes del módulo:{" "}
+                              {docentesMod.map((d, i) => (
+                                <span key={d.id}>
+                                  {i > 0 && ", "}
+                                  {botonDocente(d, "text-xs")}
+                                </span>
+                              ))}
+                            </p>
                           )}
                         </div>
                         {leccionesMod.length === 0 ? (
