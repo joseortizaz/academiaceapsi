@@ -22,6 +22,13 @@
       "when": 1789889729961,
       "tag": "0002_create_program_reviews",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789893739931,
+      "tag": "0003_teachers_public_read_only",
+      "breakpoints": true
     }
   ]
 }
