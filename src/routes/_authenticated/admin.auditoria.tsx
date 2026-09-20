@@ -23,6 +23,9 @@ import {
 } from "@/lib/audit-format";
 
 export const Route = createFileRoute("/_authenticated/admin/auditoria")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    usuario: typeof search["usuario"] === "string" ? (search["usuario"] as string) : undefined,
+  }),
   component: AuditoriaPage,
 });
 
