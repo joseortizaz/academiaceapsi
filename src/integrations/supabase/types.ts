@@ -246,6 +246,69 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          accion: string
+          actor_email: string | null
+          actor_id: string | null
+          actor_nombre: string | null
+          actor_rol: string
+          cambios: Json | null
+          categoria: string
+          detalle: Json | null
+          entidad: string | null
+          entidad_etiqueta: string | null
+          entidad_id: string | null
+          id: number
+          ip: string | null
+          occurred_at: string
+          programa_id: string | null
+          sensible: boolean
+          sujeto_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          accion: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_nombre?: string | null
+          actor_rol?: string
+          cambios?: Json | null
+          categoria: string
+          detalle?: Json | null
+          entidad?: string | null
+          entidad_etiqueta?: string | null
+          entidad_id?: string | null
+          id?: never
+          ip?: string | null
+          occurred_at?: string
+          programa_id?: string | null
+          sensible?: boolean
+          sujeto_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          accion?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_nombre?: string | null
+          actor_rol?: string
+          cambios?: Json | null
+          categoria?: string
+          detalle?: Json | null
+          entidad?: string | null
+          entidad_etiqueta?: string | null
+          entidad_id?: string | null
+          id?: never
+          ip?: string | null
+          occurred_at?: string
+          programa_id?: string | null
+          sensible?: boolean
+          sujeto_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       balance_activo_webhook_logs: {
         Row: {
           created_at: string
@@ -2347,6 +2410,16 @@ export type Database = {
       }
     }
     Functions: {
+      audit_resolve_actor: {
+        Args: { _uid?: string }
+        Returns: {
+          actor_email: string
+          actor_id: string
+          actor_nombre: string
+          actor_rol: string
+        }[]
+      }
+      audit_trunc: { Args: { v: Json }; Returns: Json }
       can_review_program: {
         Args: { _programa_id: string; _user_id: string }
         Returns: boolean
