@@ -25,6 +25,7 @@ import {
   Users2,
   FileText,
   Star,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,7 @@ const nav = [
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
   { to: "/admin/integraciones", label: "Integraciones", icon: Plug },
+  { to: "/admin/auditoria", label: "Auditoría", icon: ShieldCheck },
 ];
 
 function AdminLayout() {
