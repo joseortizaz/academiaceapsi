@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-// unpdf se importa dinámicamente dentro del handler: su bundle (pdfjs) es enorme
-// y rompe el análisis estático del plugin de build si entra al grafo de importación.
+// Los PDF se envían directamente al modelo de IA (Gemini los lee en base64),
+// sin librerías locales de extracción: el bundle de pdfjs rompía el build.
 
 async function assertAdminOrDocente(userId: string) {
   const { data } = await supabaseAdmin
