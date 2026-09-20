@@ -152,15 +152,25 @@ Devuelve EXACTAMENTE este JSON:
 Reglas:
 - "opciones" es un arreglo de 4 strings para opción múltiple, o null para verdadero/falso.
 - "respuesta_correcta" debe coincidir EXACTAMENTE con una opción (o "verdadero"/"falso").
-- Las preguntas deben ser claras, sin ambigüedad y basadas en el material.
-
-MATERIAL:
-"""
-${cleaned}
-"""`;
+- Las preguntas deben ser claras, sin ambigüedad y basadas en el material del PDF adjunto.`;
 
     const content = await callLovableAI(
-      [{ role: "system", content: system }, { role: "user", content: user }],
+      [
+        { role: "system", content: system },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: user },
+            {
+              type: "file",
+              file: {
+                filename: "material.pdf",
+                file_data: `data:application/pdf;base64,${pdfBase64}`,
+              },
+            },
+          ],
+        },
+      ],
       { responseFormat: "json_object" },
     );
 
