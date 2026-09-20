@@ -27,6 +27,12 @@ function Acceder() {
   const [loading, setLoading] = useState(false);
 
   const resolveDestination = async (userId: string): Promise<string> => {
+    const { data: userData } = await supabase.auth.getUser();
+    if ((userData.user?.app_metadata as any)?.must_change_password === true) {
+      return redirect && redirect.startsWith("/")
+        ? `/cambiar-password?redirect=${encodeURIComponent(redirect)}`
+        : "/cambiar-password";
+    }
     if (redirect) return redirect;
     const { data: roles } = await supabase
       .from("user_roles")
@@ -37,6 +43,7 @@ function Acceder() {
     if (roleList.includes("docente")) return "/docente";
     return "/estudiante";
   };
+
 
   const redirectAuthenticatedUser = async (userId: string) => {
     const destination = await resolveDestination(userId);

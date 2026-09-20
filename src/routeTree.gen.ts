@@ -33,6 +33,7 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
+import { Route as AuthenticatedCambiarPasswordRouteImport } from './routes/_authenticated/cambiar-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authenticated/mis-cursos.index'
 import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
@@ -204,6 +205,12 @@ const AuthenticatedCertificadosRoute =
   AuthenticatedCertificadosRouteImport.update({
     id: '/certificados',
     path: '/certificados',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCambiarPasswordRoute =
+  AuthenticatedCambiarPasswordRouteImport.update({
+    id: '/cambiar-password',
+    path: '/cambiar-password',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -524,6 +531,7 @@ export interface FileRoutesByFullPath {
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
@@ -599,6 +607,7 @@ export interface FileRoutesByTo {
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -676,6 +685,7 @@ export interface FileRoutesById {
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
@@ -755,6 +765,7 @@ export interface FileRouteTypes {
     | '/solicitud-curso'
     | '/unsubscribe'
     | '/admin'
+    | '/cambiar-password'
     | '/certificados'
     | '/docente'
     | '/estudiante'
@@ -830,6 +841,7 @@ export interface FileRouteTypes {
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/unsubscribe'
+    | '/cambiar-password'
     | '/certificados'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -906,6 +918,7 @@ export interface FileRouteTypes {
     | '/solicitud-curso'
     | '/unsubscribe'
     | '/_authenticated/admin'
+    | '/_authenticated/cambiar-password'
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
@@ -1173,6 +1186,13 @@ declare module '@tanstack/react-router' {
       path: '/certificados'
       fullPath: '/certificados'
       preLoaderRoute: typeof AuthenticatedCertificadosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cambiar-password': {
+      id: '/_authenticated/cambiar-password'
+      path: '/cambiar-password'
+      fullPath: '/cambiar-password'
+      preLoaderRoute: typeof AuthenticatedCambiarPasswordRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -1646,6 +1666,7 @@ const AuthenticatedEstudianteRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedCambiarPasswordRoute: typeof AuthenticatedCambiarPasswordRoute
   AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRouteWithChildren
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRouteWithChildren
@@ -1656,6 +1677,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedCambiarPasswordRoute: AuthenticatedCambiarPasswordRoute,
   AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRouteWithChildren,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRouteWithChildren,
