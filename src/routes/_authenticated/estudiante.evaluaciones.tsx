@@ -142,12 +142,23 @@ function Evaluaciones() {
 
   const loading = enrollmentsQ.isLoading || assessmentsQ.isLoading;
 
+  const abrirEvaluacion = (a: Assessment) => {
+    setActive(a);
+    registrarActividad({
+      accion: "abrir_evaluacion",
+      entidad: "assessments",
+      entidadId: a.id,
+      etiqueta: a.titulo,
+      programaId: (a as any).programa_id ?? null,
+    });
+  };
+
   // Abre automáticamente la evaluación indicada en la URL (?assessmentId=...)
   useEffect(() => {
     if (autoOpened || !assessmentId) return;
     const found = (assessmentsQ.data ?? []).find((a) => a.id === assessmentId);
     if (found) {
-      setActive(found);
+      abrirEvaluacion(found);
       setAutoOpened(true);
     }
   }, [assessmentId, assessmentsQ.data, autoOpened]);
