@@ -649,6 +649,10 @@ function ActividadUsuario({ userId }: { userId: string }) {
           <p className="text-xs text-muted-foreground">Eventos sensibles (30 días)</p>
           <p className="text-2xl font-bold">{resumen?.sensibles30 ?? 0}</p>
         </div>
+        <div className="rounded-lg border p-3">
+          <p className="text-xs text-muted-foreground">Lecciones completadas (30 días)</p>
+          <p className="text-2xl font-bold">{resumen?.lecciones30 ?? 0}</p>
+        </div>
       </div>
 
       {eventos.length === 0 ? (
