@@ -15,15 +15,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
-  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video,
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
 } from "lucide-react";
+import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 
 export const Route = createFileRoute("/programas/$slug")({
-  validateSearch: (search: Record<string, unknown>): { inscribir?: 1 } => ({
+  validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
+    ...search,
     inscribir: search.inscribir === 1 || search.inscribir === "1" ? 1 : undefined,
   }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("programs")
+      .select("*")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    return { programa: data ?? null };
+  },
+  head: ({ params, loaderData }) => {
+    const url = programaUrl(params.slug);
+    const p = loaderData?.programa;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Programa no encontrado | Academia Ceapsi RD" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const title = `${p.titulo} | Academia Ceapsi RD`;
+    const description = p.resumen?.trim() || plainExcerpt(p.descripcion) ||
+      "Programa de formación de la Academia Ceapsi RD.";
+    const image = p.imagen_url || `${SITE_URL}/favicon.ico`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: DetallePrograma,
 });
+
 
 
 function DetallePrograma() {
@@ -45,8 +86,11 @@ function DetallePrograma() {
   });
 
 
+  const { programa: programaInicial } = Route.useLoaderData();
+
   const { data: programa, isLoading } = useQuery({
     queryKey: ["public", "programa", slug],
+    initialData: programaInicial ?? undefined,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("programs")
@@ -57,6 +101,21 @@ function DetallePrograma() {
       return data;
     },
   });
+
+  const shareUrl = programaUrl(slug);
+  const copiarEnlace = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Enlace copiado");
+    } catch {
+      toast.error("No se pudo copiar el enlace");
+    }
+  };
+  const compartirWhatsApp = () => {
+    const texto = `${programa?.titulo ?? "Programa"} — ${shareUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+  };
+
 
   type ModuloCatalog = { id: string; titulo: string; descripcion: string | null; orden: number; duracion_minutos: number | null; es_en_vivo: boolean | null; fecha_sesion: string | null; modulo_id: string | null };
   const { data: modulos = [] } = useQuery<ModuloCatalog[]>({
@@ -308,6 +367,15 @@ function DetallePrograma() {
                 </a>
               </Button>
             )}
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={copiarEnlace}>
+                <Link2 className="mr-1.5 h-4 w-4" /> Copiar enlace
+              </Button>
+              <Button variant="outline" size="sm" onClick={compartirWhatsApp}>
+                <MessageCircle className="mr-1.5 h-4 w-4" /> WhatsApp
+              </Button>
+            </div>
+
           </aside>
         </div>
       </section>
