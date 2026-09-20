@@ -347,6 +347,20 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       }
     }
 
+    {
+      const { logAudit } = await import("@/lib/audit.server");
+      await logAudit({
+        actorId: context.userId,
+        categoria: "actividad",
+        accion: "entrar_clase_vivo",
+        entidad: "zoom_meetings",
+        entidadId: meeting.id,
+        entidadEtiqueta: meeting.titulo,
+        programaId: meeting.programa_id,
+        dedupeMinutes: 10,
+      });
+    }
+
     return {
       signature,
       sdkKey,

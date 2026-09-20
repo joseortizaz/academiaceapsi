@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Award, Eye, ExternalLink } from "lucide-react";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
+import { registrarActividad } from "@/lib/audit-client";
 import type { CertificateTemplateData } from "@/components/CertificateTemplate";
 
 export const Route = createFileRoute("/_authenticated/certificados")({
@@ -43,6 +44,13 @@ function MisCertificados() {
 
   const openPreview = (cert: (typeof certificados)[number]) => {
     const code = (cert as any).verification_code ?? cert.numero_certificado;
+    registrarActividad({
+      accion: "descargar_certificado",
+      entidad: "certificates",
+      entidadId: cert.id,
+      etiqueta: cert.numero_certificado,
+      programaId: cert.programa_id,
+    });
     setPreviewData({
       studentName:
         `${user?.nombre ?? ""} ${user?.apellido ?? ""}`.trim() || "Estudiante",

@@ -16,6 +16,7 @@ import { ClipboardCheck, CheckCircle2, Trophy, FileText, Clock, Loader2, ArrowLe
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { FileUploader } from "@/components/FileUploader";
+import { registrarActividad } from "@/lib/audit-client";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -142,12 +143,23 @@ function Evaluaciones() {
 
   const loading = enrollmentsQ.isLoading || assessmentsQ.isLoading;
 
+  const abrirEvaluacion = (a: Assessment) => {
+    setActive(a);
+    registrarActividad({
+      accion: "abrir_evaluacion",
+      entidad: "assessments",
+      entidadId: a.id,
+      etiqueta: a.titulo,
+      programaId: (a as any).programa_id ?? null,
+    });
+  };
+
   // Abre automáticamente la evaluación indicada en la URL (?assessmentId=...)
   useEffect(() => {
     if (autoOpened || !assessmentId) return;
     const found = (assessmentsQ.data ?? []).find((a) => a.id === assessmentId);
     if (found) {
-      setActive(found);
+      abrirEvaluacion(found);
       setAutoOpened(true);
     }
   }, [assessmentId, assessmentsQ.data, autoOpened]);
@@ -244,7 +256,7 @@ function Evaluaciones() {
                           ) : (
                             <Badge variant="secondary">Pendiente</Badge>
                           )}
-                          <Button size="sm" onClick={() => setActive(a)}>
+                          <Button size="sm" onClick={() => abrirEvaluacion(a)}>
                             {sub ? "Ver entrega" : "Comenzar"}
                           </Button>
                         </div>

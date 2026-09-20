@@ -23,12 +23,16 @@ import {
 import { AdminPageHeader, EmptyState } from "@/components/admin/AdminUI";
 import { ShieldAlert } from "lucide-react";
 import {
-  AuditEvent, CATEGORIAS, ENTIDADES, ROLES, describirEvento, nombreCampo, nombreEntidad, valorLegible,
+  AuditEvent, ACCIONES_NAVEGADOR, CATEGORIAS, ENTIDADES, ROLES, describirEvento, nombreCampo, nombreEntidad, valorLegible,
 } from "@/lib/audit-format";
 
 export const Route = createFileRoute("/_authenticated/admin/auditoria")({
   validateSearch: (search: Record<string, unknown>) => ({
     usuario: typeof search["usuario"] === "string" ? (search["usuario"] as string) : undefined,
+    sensibles:
+      search["sensibles"] === "1" || search["sensibles"] === 1 || search["sensibles"] === true
+        ? ("1" as const)
+        : undefined,
   }),
   component: AuditoriaPage,
 });
@@ -43,7 +47,7 @@ function isoDaysAgo(days: number) {
 }
 
 function AuditoriaPage() {
-  const { usuario } = Route.useSearch();
+  const { usuario, sensibles } = Route.useSearch();
   const navigate = useNavigate();
   const exportarFn = useServerFn(logAuditExport);
   const [exportando, setExportando] = useState(false);
@@ -52,7 +56,7 @@ function AuditoriaPage() {
   const [categoria, setCategoria] = useState("todas");
   const [rol, setRol] = useState("todos");
   const [entidad, setEntidad] = useState("todas");
-  const [soloSensibles, setSoloSensibles] = useState(false);
+  const [soloSensibles, setSoloSensibles] = useState(sensibles === "1");
   const [busqueda, setBusqueda] = useState("");
   const [buscado, setBuscado] = useState("");
   const [paginas, setPaginas] = useState<AuditEvent[][]>([]);
@@ -308,7 +312,7 @@ function AuditoriaPage() {
           <Badge variant="secondary">
             Filtrando por: {nombreUsuarioFiltrado ?? "usuario"}
           </Badge>
-          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: { usuario: undefined } })}>
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/auditoria", search: { usuario: undefined, sensibles: undefined } })}>
             Quitar filtro
           </Button>
         </div>
@@ -465,6 +469,12 @@ function AuditoriaPage() {
                 <Dato k="IP" v={detalle.ip} />
                 <Dato k="Dispositivo" v={detalle.user_agent} />
               </dl>
+
+              {detalle.categoria === "actividad" && ACCIONES_NAVEGADOR.has(detalle.accion) && (
+                <p className="text-xs italic text-muted-foreground">
+                  Registrado por el navegador del usuario
+                </p>
+              )}
 
               {detalle.detalle && Object.keys(detalle.detalle).length > 0 && (
                 <div>

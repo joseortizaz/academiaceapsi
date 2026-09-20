@@ -1,7 +1,8 @@
 import { RecordingPlayer } from "@/components/RecordingPlayer";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { registrarActividad } from "@/lib/audit-client";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -241,6 +242,18 @@ function CursoPlayer() {
 
   const activeModule =
     modulos.find((m) => m.id === activeModuleId) ?? modulos[0];
+
+  // Registro de actividad: lección abierta por el alumno
+  useEffect(() => {
+    if (!activeModule || !programa?.id) return;
+    registrarActividad({
+      accion: "ver_leccion",
+      entidad: "program_modules",
+      entidadId: activeModule.id,
+      etiqueta: activeModule.titulo,
+      programaId: programa.id,
+    });
+  }, [activeModule?.id, programa?.id]);
 
   const setProgresoLocal = (moduloId: string, completado: boolean) => {
     qc.setQueryData(["mc-progress", enrollment?.id], (old: any) => {
@@ -683,7 +696,19 @@ function CursoPlayer() {
                       <Button
                         size="sm"
                         variant={openRecording === c.id ? "secondary" : "outline"}
-                        onClick={() => setOpenRecording(openRecording === c.id ? null : c.id)}
+                        onClick={() => {
+                          const abriendo = openRecording !== c.id;
+                          setOpenRecording(abriendo ? c.id : null);
+                          if (abriendo) {
+                            registrarActividad({
+                              accion: "ver_grabacion",
+                              entidad: "zoom_meetings",
+                              entidadId: c.id,
+                              etiqueta: c.titulo,
+                              programaId: programa.id,
+                            });
+                          }
+                        }}
                       >
                         {openRecording === c.id ? "Ocultar" : "Ver grabación"}
                       </Button>

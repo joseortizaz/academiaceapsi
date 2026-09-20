@@ -13,6 +13,8 @@ export type LogAuditInput = {
   sujetoId?: string | null;
   detalle?: Record<string, unknown> | null;
   sensible?: boolean;
+  /** Si ya existe una fila del mismo actor+acción+entidad en esta ventana, no inserta. */
+  dedupeMinutes?: number;
 };
 
 /** IP y dispositivo de la petición actual (nunca lanza). */
@@ -45,6 +47,18 @@ export async function logAudit(input: LogAuditInput): Promise<void> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const actorId = input.actorId ?? null;
+
+    if (input.dedupeMinutes && actorId) {
+      const desde = new Date(Date.now() - input.dedupeMinutes * 60_000).toISOString();
+      const { data: previo } = await (supabaseAdmin.from as any)("audit_log")
+        .select("id")
+        .eq("actor_id", actorId)
+        .eq("accion", input.accion)
+        .eq("entidad_id", input.entidadId ?? "")
+        .gt("occurred_at", desde)
+        .limit(1);
+      if (previo && previo.length > 0) return;
+    }
 
     let actorNombre: string | null = null;
     let actorEmail: string | null = null;
