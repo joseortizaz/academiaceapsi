@@ -15,15 +15,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
-  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video,
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, BookOpen, Video, Link2, MessageCircle,
 } from "lucide-react";
+import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 
 export const Route = createFileRoute("/programas/$slug")({
-  validateSearch: (search: Record<string, unknown>): { inscribir?: 1 } => ({
+  validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
+    ...search,
     inscribir: search.inscribir === 1 || search.inscribir === "1" ? 1 : undefined,
   }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("programs")
+      .select("*")
+      .eq("slug", params.slug)
+      .maybeSingle();
+    return { programa: data ?? null };
+  },
+  head: ({ params, loaderData }) => {
+    const url = programaUrl(params.slug);
+    const p = loaderData?.programa;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Programa no encontrado | Academia Ceapsi RD" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    const title = `${p.titulo} | Academia Ceapsi RD`;
+    const description = p.resumen?.trim() || plainExcerpt(p.descripcion) ||
+      "Programa de formación de la Academia Ceapsi RD.";
+    const image = p.imagen_url || `${SITE_URL}/favicon.ico`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: DetallePrograma,
 });
+
 
 
 function DetallePrograma() {
