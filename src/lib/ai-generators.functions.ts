@@ -178,6 +178,15 @@ Reglas:
     if (!parsed?.preguntas || !Array.isArray(parsed.preguntas)) {
       throw new Error("Formato de respuesta inesperado");
     }
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      categoria: "actividad",
+      accion: "generar_contenido_ia",
+      entidad: "ia",
+      detalle: { tipo: "examen_desde_pdf" },
+    });
+
     return { preguntas: parsed.preguntas };
   });
 
@@ -250,6 +259,16 @@ Devuelve EXACTAMENTE este JSON:
     );
 
     const parsed = safeJsonParse(content);
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      categoria: "actividad",
+      accion: "generar_contenido_ia",
+      entidad: "ia",
+      detalle: { tipo: "leccion_desde_web" },
+    });
+
     return {
       ...parsed,
       _firecrawl_disponible: !!fcKey,
