@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { extractText, getDocumentProxy } from "unpdf";
+// unpdf se importa dinámicamente dentro del handler: su bundle (pdfjs) es enorme
+// y rompe el análisis estático del plugin de build si entra al grafo de importación.
 
 async function assertAdminOrDocente(userId: string) {
   const { data } = await supabaseAdmin
@@ -121,7 +122,8 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
 
-    // Extraer texto
+    // Extraer texto (import dinámico, solo en servidor)
+    const { extractText, getDocumentProxy } = await import("unpdf");
     const pdf = await getDocumentProxy(buf);
     const { text } = await extractText(pdf, { mergePages: true });
     const cleaned = (Array.isArray(text) ? text.join("\n") : text)
