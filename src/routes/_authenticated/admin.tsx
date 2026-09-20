@@ -28,6 +28,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
@@ -87,9 +88,12 @@ function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-muted/30">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:flex">
-        <div className="border-b p-4">
-          <h2 className="text-lg font-bold">Administración</h2>
-          <p className="text-xs text-muted-foreground">Academia Ceapsi RD</p>
+        <div className="flex items-start justify-between gap-2 border-b p-4">
+          <div>
+            <h2 className="text-lg font-bold">Administración</h2>
+            <p className="text-xs text-muted-foreground">Academia Ceapsi RD</p>
+          </div>
+          <NotificationsBell />
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
           {nav.map((item) => {

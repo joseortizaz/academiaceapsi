@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bell, CheckCheck, Trash2 } from "lucide-react";
+import { Bell, CheckCheck, Trash2, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -121,7 +121,12 @@ export function NotificationsBell() {
           {notifs.map((n) => {
             const body = (
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm", !n.leida && "font-semibold")}>{n.titulo}</p>
+                <p className={cn("flex items-start gap-1.5 text-sm", !n.leida && "font-semibold")}>
+                  {n.tipo === "audit_alert" && (
+                    <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                  )}
+                  <span className="min-w-0">{n.titulo}</span>
+                </p>
                 {n.mensaje && <p className="line-clamp-2 text-xs text-muted-foreground">{n.mensaje}</p>}
                 <p className="mt-1 text-[10px] text-muted-foreground">
                   {new Date(n.created_at).toLocaleString()}
