@@ -46,6 +46,8 @@ export const ENTIDADES: Record<string, string> = {
   lesson_comments: "comentario",
   community_posts: "publicación de la comunidad",
   usuario: "cuenta",
+  audit_log: "registro de auditoría",
+  ia: "generación con IA",
 };
 
 export const CAMPOS: Record<string, string> = {
