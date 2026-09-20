@@ -88,7 +88,7 @@ function Privacidad() {
           </LegalSection>
 
           <LegalSection id="datos" number="2" title="Datos que recopilamos">
-            <p>Según la forma en que utilice el portal, podemos recopilar:</p>
+            <p>Según la forma en que utilice el portal, {LEGAL_ENTITY_SHORT} puede recopilar:</p>
             <ul>
               <li><strong>Registro y cuenta:</strong> nombre, apellido, correo, teléfono, contraseña cifrada e inicio de sesión con Google, si se utiliza.</li>
               <li><strong>Perfil:</strong> foto, país, ciudad, biografía, especialidad y LinkedIn; en el caso de docentes, información profesional adicional.</li>
@@ -125,9 +125,9 @@ function Privacidad() {
           </LegalSection>
 
           <LegalSection id="compartimos" number="5" title="Con quién compartimos y encargados del tratamiento">
-            <p>Podemos utilizar proveedores que tratan datos por nuestra cuenta: infraestructura y base de datos (Lovable Cloud / Supabase), videoconferencias (Zoom), contabilidad y facturación (Balance Activo), inicio de sesión con Google, servicios de mensajería y correo, y el servicio de inteligencia artificial utilizado por docentes y administradores para generar contenido educativo. <strong>No se envían datos de estudiantes al servicio de inteligencia artificial.</strong></p>
+            <p>{LEGAL_ENTITY_SHORT} puede utilizar proveedores que tratan datos por su cuenta: infraestructura y base de datos (Lovable Cloud / Supabase), videoconferencias (Zoom), contabilidad y facturación (Balance Activo), inicio de sesión con Google, servicios de mensajería y correo, y el servicio de inteligencia artificial utilizado por docentes y administradores para generar contenido educativo. <strong>No se envían datos de estudiantes al servicio de inteligencia artificial.</strong></p>
             <p>Son públicos el nombre y perfil profesional de los docentes, así como las reseñas aprobadas, que muestran el nombre visible del estudiante. También podemos comunicar datos a las autoridades cuando la ley lo exija.</p>
-            <p>Los proveedores solo tratan los datos por cuenta nuestra y bajo deber de confidencialidad.</p>
+            <p>Los proveedores solo tratan los datos por cuenta de {LEGAL_ENTITY_SHORT} y bajo deber de confidencialidad.</p>
           </LegalSection>
 
           <LegalSection id="transferencias" number="6" title="Transferencias internacionales">
@@ -155,7 +155,7 @@ function Privacidad() {
           </LegalSection>
 
           <LegalSection id="menores" number="10" title="Menores de edad">
-            <p>Nuestros servicios están dirigidos a personas mayores de 18 años. Si detectamos datos de un menor sin autorización de su representante legal, los eliminaremos, conforme al artículo 79.</p>
+            <p>Los servicios de {LEGAL_ENTITY_SHORT} están dirigidos a personas mayores de 18 años. Si detectamos datos de un menor sin autorización de su representante legal, los eliminaremos, conforme al artículo 79.</p>
           </LegalSection>
 
           <LegalSection id="cookies" number="11" title="Cookies y tecnologías similares">
