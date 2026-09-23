@@ -326,6 +326,7 @@ function EstudianteDashboard() {
                         {new Date(s.fecha_sesion!).toLocaleString("es-DO", {
                           weekday: "short", day: "2-digit", month: "short",
                           hour: "2-digit", minute: "2-digit",
+                          timeZone: "America/Santo_Domingo",
                         })}
                       </p>
                     </div>
@@ -523,6 +524,7 @@ function NextLiveClassWidget({
         {new Date(cls.start_at).toLocaleString("es-DO", {
           weekday: "short", day: "2-digit", month: "short",
           hour: "2-digit", minute: "2-digit",
+          timeZone: "America/Santo_Domingo",
         })}
       </p>
       {isLive ? (

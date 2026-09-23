@@ -274,6 +274,7 @@ function ClassTable({
             <TableCell className="whitespace-nowrap text-sm">
               {new Date(c.start_at).toLocaleString("es-DO", {
                 day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+                timeZone: "America/Santo_Domingo",
               })}
             </TableCell>
             <TableCell><StatusBadge status={c.status} /></TableCell>
@@ -345,7 +346,7 @@ function CreateClassDialog({
 
   const mut = useMutation({
     mutationFn: async () => {
-      const startAt = new Date(`${fecha}T${hora}`).toISOString();
+      const startAt = new Date(`${fecha}T${hora}:00-04:00`).toISOString();
       return createFn({
         data: {
           programaId, titulo,
