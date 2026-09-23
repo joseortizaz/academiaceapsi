@@ -15,6 +15,18 @@ import {
 } from "./zoom-licenses.server";
 
 
+/** Convierte un instante UTC a un string de hora local "ingenua" (sin Z/offset)
+ * en horario de Rep. Dominicana (UTC-4 fijo, sin horario de verano), para
+ * mandarlo a la API de Zoom junto con timezone: "America/Santo_Domingo".
+ * Zoom interpreta start_time como ya-local-a-esa-zona, así que si le mandamos
+ * un string con "Z" (UTC) aplica el offset DOS veces. */
+function toSantoDomingoNaiveLocal(isoUtc: string): string {
+  const utcDate = new Date(isoUtc);
+  const localMs = utcDate.getTime() - 4 * 60 * 60 * 1000; // UTC-4 fijo
+  return new Date(localMs).toISOString().slice(0, 19);
+}
+
+
 async function assertAdminOrDocente(userId: string) {
   const roles = await getUserRoles(userId);
   if (!roles.includes("admin") && !roles.includes("docente")) {
@@ -106,7 +118,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       body: JSON.stringify({
         topic: data.titulo,
         type: 2, // scheduled
-        start_time: data.startAt,
+        start_time: toSantoDomingoNaiveLocal(data.startAt),
         duration: data.durationMin,
         timezone: "America/Santo_Domingo",
         settings: {
