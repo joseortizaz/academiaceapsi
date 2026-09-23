@@ -108,7 +108,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
             video: {
               isResizable: true,
               viewSizes: {
-                default: { width: 1000, height: 600 },
+                default: { width: 1440, height: 810 },
                 ribbon: { width: 300, height: 700 },
               },
               // Evita la vista de galería por defecto: su algoritmo de cuadrícula
@@ -212,7 +212,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div className="relative min-h-[600px] w-full overflow-hidden rounded-lg border bg-black">
+      <div className="relative min-h-[810px] w-full overflow-hidden rounded-lg border bg-black">
         <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
