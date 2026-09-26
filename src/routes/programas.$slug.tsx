@@ -400,8 +400,8 @@ function DetallePrograma() {
           <div className="contents lg:col-start-1 lg:block lg:space-y-8">
             <div className="order-1">
             <div className="mb-4 flex flex-wrap gap-2">
-              <Badge variant="outline" className="capitalize">{programa.tipo}</Badge>
-              <Badge variant="secondary" className="capitalize">{programa.modalidad}</Badge>
+              <Badge variant="outline">{tipoLabel(programa.tipo)}</Badge>
+              <Badge variant="secondary">{modalidadLabel(programa.modalidad)}</Badge>
               {programa.certificado_incluido && <Badge>Certificado incluido</Badge>}
             </div>
             <h1 className="text-3xl font-bold md:text-4xl">{programa.titulo}</h1>
