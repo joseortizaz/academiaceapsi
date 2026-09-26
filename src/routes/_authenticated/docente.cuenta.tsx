@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Save, KeyRound } from "lucide-react";
@@ -131,12 +132,12 @@ function CuentaDocente() {
           <CardContent className="space-y-4">
             <div>
               <Label>Nueva contraseña</Label>
-              <Input type="password" value={pw.nueva}
+              <PasswordInput value={pw.nueva}
                 onChange={(e) => setPw({ ...pw, nueva: e.target.value })} />
             </div>
             <div>
               <Label>Repetir</Label>
-              <Input type="password" value={pw.repetir}
+              <PasswordInput value={pw.repetir}
                 onChange={(e) => setPw({ ...pw, repetir: e.target.value })} />
             </div>
             <Button variant="outline" className="w-full" onClick={handleChangePassword}>

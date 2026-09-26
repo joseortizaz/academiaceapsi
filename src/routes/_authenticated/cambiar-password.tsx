@@ -6,10 +6,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { changeProvisionalPassword } from "@/lib/admin-users.functions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, EyeOff, GraduationCap, ShieldCheck } from "lucide-react";
+import { GraduationCap, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cambiar-password")({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
@@ -39,7 +39,6 @@ function CambiarPassword() {
 
   const [pass1, setPass1] = useState("");
   const [pass2, setPass2] = useState("");
-  const [ver, setVer] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
@@ -122,32 +121,20 @@ function CambiarPassword() {
           <form onSubmit={enviar} className="mt-8 space-y-5">
             <div className="space-y-2">
               <Label htmlFor="pass1" className="text-base">Contraseña nueva</Label>
-              <div className="relative">
-                <Input
-                  id="pass1"
-                  type={ver ? "text" : "password"}
-                  value={pass1}
-                  onChange={(e) => setPass1(e.target.value)}
-                  className="h-12 pr-12 text-lg"
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setVer((v) => !v)}
-                  aria-label={ver ? "Ocultar contraseña" : "Mostrar contraseña"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                >
-                  {ver ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
+              <PasswordInput
+                id="pass1"
+                value={pass1}
+                onChange={(e) => setPass1(e.target.value)}
+                className="h-12 text-lg"
+                autoComplete="new-password"
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="pass2" className="text-base">Repite la contraseña</Label>
-              <Input
+              <PasswordInput
                 id="pass2"
-                type={ver ? "text" : "password"}
                 value={pass2}
                 onChange={(e) => setPass2(e.target.value)}
                 className="h-12 text-lg"
