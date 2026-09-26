@@ -34,8 +34,7 @@ export function Footer() {
             Contacto
           </p>
           <ul className="space-y-3 text-sm text-primary-foreground/80">
-            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /><span>Presidente Hipólito Irigoyen No. 5, Zona Universitaria, Distrito Nacional, Rep. Dom.</span></li>
-            <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><a href="tel:+18097845106" className="hover:text-accent">809-784-5106</a></li>
+            <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-accent" /><span>Distrito Nacional, Rep. Dom.</span></li>
             <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-accent" /><a href="https://wa.me/18098695705" target="_blank" rel="noopener noreferrer" className="hover:text-accent">WhatsApp: 809-869-5705</a></li>
             <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-accent" /><a href="mailto:admin@ceapsird.com" className="hover:text-accent">admin@ceapsird.com</a></li>
           </ul>
