@@ -110,7 +110,6 @@ function UsuariosPage() {
 
   const abrirNuevo = () => {
     setForm({ nombre: "", apellido: "", email: "", telefono: "", password: generarPassword(), programaId: "" });
-    setVerPass(false);
     setNuevoOpen(true);
   };
 

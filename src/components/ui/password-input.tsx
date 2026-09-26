@@ -17,7 +17,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, React.ComponentProps<ty
       setVisible((current) => !current);
       requestAnimationFrame(() => {
         input?.focus({ preventScroll: true });
-        if (start != null && end != null) input?.setSelectionRange(start, end, direction);
+        if (start != null && end != null) input?.setSelectionRange(start, end, direction ?? undefined);
       });
     };
 
