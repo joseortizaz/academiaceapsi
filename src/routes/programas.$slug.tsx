@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
-  Clock, Calendar, Users, GraduationCap, CheckCircle2, Video, Link2, MessageCircle,
+  Clock, Calendar, Users, GraduationCap, CheckCircle2, Video, Link2, MessageCircle, FileText, Target, Award, BookOpen,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -434,37 +434,68 @@ function DetallePrograma() {
             </div>
           </div>
             <div className="order-3 space-y-10">
-            <div>
-              <h2 className="text-2xl font-bold">Descripción del programa</h2>
-            <RichText html={programa.descripcion} className="mt-3 text-foreground/90" />
-          </div>
+            <Accordion type="multiple" defaultValue={["descripcion"]} className="space-y-3 [&_[role=region][data-state=closed]]:hidden">
+              {programa.descripcion && (
+                <AccordionItem value="descripcion" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+                  <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><FileText className="h-5 w-5" /></span>
+                    <span className="min-w-0 flex-1 text-lg font-bold">Descripción del programa</span>
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
+                    <RichText html={programa.descripcion} className="text-foreground/90" />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
-          {(programa as any).objetivos && (
-            <div>
-              <h2 className="text-2xl font-bold">Objetivos</h2>
-              <RichText html={(programa as any).objetivos} className="mt-3 text-foreground/90" />
-            </div>
-          )}
+              {(programa as any).objetivos && (
+                <AccordionItem value="objetivos" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+                  <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Target className="h-5 w-5" /></span>
+                    <span className="min-w-0 flex-1 text-lg font-bold">Objetivos</span>
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
+                    <RichText html={(programa as any).objetivos} className="text-foreground/90" />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
-          {(programa as any).publico_meta && (
-            <div>
-              <h2 className="text-2xl font-bold">Público meta</h2>
-              <RichText html={(programa as any).publico_meta} className="mt-3 text-foreground/90" />
-            </div>
-          )}
+              {(programa as any).publico_meta && (
+                <AccordionItem value="publico-meta" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+                  <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Users className="h-5 w-5" /></span>
+                    <span className="min-w-0 flex-1 text-lg font-bold">Público meta</span>
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
+                    <RichText html={(programa as any).publico_meta} className="text-foreground/90" />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
-          {(programa as any).resultados_esperados && (
-            <div>
-              <h2 className="text-2xl font-bold">Resultados esperados</h2>
-              <RichText html={(programa as any).resultados_esperados} className="mt-3 text-foreground/90" />
-            </div>
-          )}
+              {(programa as any).resultados_esperados && (
+                <AccordionItem value="resultados" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+                  <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><Award className="h-5 w-5" /></span>
+                    <span className="min-w-0 flex-1 text-lg font-bold">Resultados esperados</span>
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
+                    <RichText html={(programa as any).resultados_esperados} className="text-foreground/90" />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
           {modulos.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold">Contenido del programa</h2>
+            <AccordionItem value="contenido" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+              <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><BookOpen className="h-5 w-5" /></span>
+                <span className="min-w-0 flex-1 text-lg font-bold">Contenido del programa</span>
+                <span className="text-xs font-normal text-muted-foreground sm:text-sm">
+                  {programa.tipo === "diplomado" && courseModules.length > 0 && `${courseModules.length} ${courseModules.length === 1 ? "módulo" : "módulos"} · `}
+                  {modulos.length} {modulos.length === 1 ? "lección" : "lecciones"}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
               {programa.tipo === "diplomado" && courseModules.length > 0 ? (
-                <Accordion type="multiple" className="mt-4 space-y-4">
+                <Accordion type="multiple" className="space-y-4">
                   {courseModules.map((cm, idx) => {
                     const leccionesMod = modulos.filter((m) => m.modulo_id === cm.id);
                     const docentesMod = Array.from(
@@ -517,7 +548,7 @@ function DetallePrograma() {
                             ))}
                           </div>
                         )}
-                        <AccordionContent className="pb-0">
+                        <AccordionContent forceMount className="pb-0 data-[state=closed]:hidden">
                           {leccionesMod.length === 0 ? (
                             <p className="px-4 py-3 text-sm text-muted-foreground">Próximamente</p>
                           ) : (
@@ -553,7 +584,7 @@ function DetallePrograma() {
                   })}
                 </Accordion>
               ) : (
-                <ol className="mt-4 divide-y rounded-lg border bg-card">
+                <ol className="divide-y rounded-lg border bg-card">
                   {modulos.map((m, i) => (
                     <li key={m.id} className="flex items-start gap-3 p-4">
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
@@ -579,8 +610,10 @@ function DetallePrograma() {
                   ))}
                 </ol>
               )}
-            </div>
+              </AccordionContent>
+            </AccordionItem>
           )}
+            </Accordion>
 
           <ProgramReviews
             programaId={programa.id}
