@@ -230,8 +230,8 @@ function ProgramasPage() {
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="capitalize">{p.tipo}</Badge>
-                    <Badge variant="secondary" className="capitalize">{p.modalidad}</Badge>
+                    <Badge variant="outline">{tipoLabel(p.tipo)}</Badge>
+                    <Badge variant="secondary">{modalidadLabel(p.modalidad)}</Badge>
                     {p.destacado && <Badge>Destacado</Badge>}
                   </div>
                   <h3 className="line-clamp-2 text-lg font-bold text-foreground transition group-hover:text-primary">
