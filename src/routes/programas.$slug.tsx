@@ -1,3 +1,4 @@
+import { tipoLabel, modalidadLabel } from "@/lib/program-labels";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
