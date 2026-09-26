@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
@@ -72,11 +72,11 @@ function ResetPassword() {
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="nueva">Nueva contraseña</Label>
-                <Input id="nueva" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <PasswordInput id="nueva" required value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="repetir">Repetir contraseña</Label>
-                <Input id="repetir" type="password" required value={repeat} onChange={(e) => setRepeat(e.target.value)} />
+                <PasswordInput id="repetir" required value={repeat} onChange={(e) => setRepeat(e.target.value)} />
               </div>
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Guardando..." : "Actualizar contraseña"}

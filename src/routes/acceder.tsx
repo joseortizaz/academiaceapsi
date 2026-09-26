@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
@@ -163,7 +164,7 @@ function Acceder() {
                     ¿Olvidaste tu contraseña?
                   </Link>
                 </div>
-                <Input id="password" type="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <PasswordInput id="password" required placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Accediendo..." : "Acceder"}

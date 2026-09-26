@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { AdminPageHeader, EmptyState, DeleteButton } from "@/components/admin/AdminUI";
 import { Label } from "@/components/ui/label";
-import { Copy, Eye, EyeOff, KeyRound, MessageCircle, Search, UserPlus } from "lucide-react";
+import { Copy, Eye, KeyRound, MessageCircle, Search, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createStudentAccount,
@@ -76,7 +77,6 @@ function UsuariosPage() {
 
   const [nuevoOpen, setNuevoOpen] = useState(false);
   const [creando, setCreando] = useState(false);
-  const [verPass, setVerPass] = useState(false);
   const [form, setForm] = useState({
     nombre: "", apellido: "", email: "", telefono: "", password: "", programaId: "",
   });
@@ -429,21 +429,11 @@ function UsuariosPage() {
             <div className="space-y-2">
               <Label>Contraseña provisional *</Label>
               <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    type={verPass ? "text" : "password"}
+                <div className="min-w-0 flex-1">
+                  <PasswordInput
                     value={form.password}
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="pr-10"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setVerPass((v) => !v)}
-                    aria-label={verPass ? "Ocultar" : "Mostrar"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  >
-                    {verPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
                 </div>
                 <Button type="button" variant="outline" onClick={() => setForm({ ...form, password: generarPassword() })}>
                   Generar
