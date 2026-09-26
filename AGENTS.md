@@ -1,0 +1,1 @@
+Use the shared `PasswordInput` for editable password fields; it keeps visibility controls, focus, and cursor behavior consistent across forms.
