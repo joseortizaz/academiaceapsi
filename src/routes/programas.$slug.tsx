@@ -434,7 +434,7 @@ function DetallePrograma() {
             </div>
           </div>
             <div className="order-3 space-y-10">
-            <Accordion type="multiple" defaultValue={["descripcion"]} className="space-y-3">
+            <Accordion type="multiple" defaultValue={["descripcion"]} className="space-y-3 [&_[role=region][data-state=closed]]:hidden">
               {programa.descripcion && (
                 <AccordionItem value="descripcion" className="rounded-xl border border-b bg-card px-5 shadow-sm">
                   <AccordionTrigger className="gap-3 py-4 hover:no-underline">
