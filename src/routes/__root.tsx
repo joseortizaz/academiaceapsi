@@ -86,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Plataforma educativa dominicana de diplomados y cursos en psicología, educación y ciencias del comportamiento. En vivo por Zoom o a tu ritmo." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/HdfYYSHElHOCcbrFG3SQJEuhBtr1/social-images/social-1782790146327-Captura_de_pantalla_2026-06-29_232803.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/HdfYYSHElHOCcbrFG3SQJEuhBtr1/social-images/social-1782790146327-Captura_de_pantalla_2026-06-29_232803.webp" },
+      { name: "google-site-verification", content: "eWTpMH_g0VxmncceS_aKi3ozlMHdyejCCqMwCxxV3U8" },
     ],
     links: [
       {
