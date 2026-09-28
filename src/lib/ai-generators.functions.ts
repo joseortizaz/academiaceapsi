@@ -117,9 +117,17 @@ export const generateQuizFromPdf = createServerFn({ method: "POST" })
     const idioma = data.idioma ?? "español";
     const nivel = data.nivel ?? "intermedio";
 
-    // Descargar PDF
-    const pdfRes = await fetch(data.pdfUrl, { redirect: "error" });
-    if (!pdfRes.ok) throw new Error("No se pudo descargar el PDF");
+    // Descargar PDF (redirect: "error" no existe en el runtime edge; se usa "manual")
+    const pdfRes = await fetch(data.pdfUrl, { redirect: "manual" });
+    if (pdfRes.status >= 300 && pdfRes.status < 400) {
+      throw new Error("La URL del PDF redirige a otro destino; no se permite por seguridad.");
+    }
+    if (!pdfRes.ok) throw new Error(`No se pudo descargar el PDF (HTTP ${pdfRes.status}).`);
+    const contentType = (pdfRes.headers.get("content-type") ?? "").toLowerCase();
+    const isPdfUrl = new URL(data.pdfUrl).pathname.toLowerCase().endsWith(".pdf");
+    if (!isPdfUrl && !contentType.includes("application/pdf")) {
+      throw new Error("La generación con IA solo acepta archivos PDF.");
+    }
     const buf = new Uint8Array(await pdfRes.arrayBuffer());
     if (buf.byteLength > 15 * 1024 * 1024) throw new Error("El PDF supera el tamaño máximo (15 MB).");
 
