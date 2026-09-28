@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
 import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
@@ -103,6 +104,11 @@ const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
 const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
   id: '/sobre-nosotros',
   path: '/sobre-nosotros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -548,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -628,6 +635,7 @@ export interface FileRoutesByTo {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -708,6 +716,7 @@ export interface FileRoutesById {
   '/recuperar-password': typeof RecuperarPasswordRoute
   '/registro': typeof RegistroRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre-nosotros': typeof SobreNosotrosRoute
   '/solicitud-curso': typeof SolicitudCursoRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -791,6 +800,7 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/registro'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/unsubscribe'
@@ -871,6 +881,7 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/registro'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/unsubscribe'
@@ -950,6 +961,7 @@ export interface FileRouteTypes {
     | '/recuperar-password'
     | '/registro'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/sobre-nosotros'
     | '/solicitud-curso'
     | '/unsubscribe'
@@ -1033,6 +1045,7 @@ export interface RootRouteChildren {
   RecuperarPasswordRoute: typeof RecuperarPasswordRoute
   RegistroRoute: typeof RegistroRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreNosotrosRoute: typeof SobreNosotrosRoute
   SolicitudCursoRoute: typeof SolicitudCursoRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -1078,6 +1091,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre-nosotros'
       fullPath: '/sobre-nosotros'
       preLoaderRoute: typeof SobreNosotrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1781,6 +1801,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecuperarPasswordRoute: RecuperarPasswordRoute,
   RegistroRoute: RegistroRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreNosotrosRoute: SobreNosotrosRoute,
   SolicitudCursoRoute: SolicitudCursoRoute,
   UnsubscribeRoute: UnsubscribeRoute,

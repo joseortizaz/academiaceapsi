@@ -29,7 +29,7 @@ function SobreNosotros() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/15 text-accent">
                 <b.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-5 text-xl font-bold text-foreground">{b.t}</h3>
+              <h2 className="mt-5 text-xl font-bold text-foreground">{b.t}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
             </CardContent>
           </Card>
