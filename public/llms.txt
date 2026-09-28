@@ -1,0 +1,21 @@
+# Academia Ceapsi RD
+
+> Plataforma educativa dominicana de diplomados, cursos y talleres en psicología, educación y ciencias del comportamiento, en vivo por Zoom o a tu ritmo.
+
+Academia Ceapsi RD es operada por Centro de Aprendizaje y Cambio Ceapsi, SRL, en Distrito Nacional, República Dominicana.
+
+## Pages
+
+- [Inicio](https://academiaceapsi.com/): Presentación de la academia y programas destacados.
+- [Programas](https://academiaceapsi.com/programas): Catálogo de diplomados, cursos y talleres.
+- [Docentes](https://academiaceapsi.com/docentes): Perfiles de los docentes.
+- [Sobre nosotros](https://academiaceapsi.com/sobre-nosotros): Misión, visión, valores e historia.
+- [Blog](https://academiaceapsi.com/blog): Artículos de psicología y educación.
+- [Eventos](https://academiaceapsi.com/eventos): Graduaciones y actividades.
+- [Contacto](https://academiaceapsi.com/contactos): Cómo comunicarse con la academia.
+- [Solicitar curso](https://academiaceapsi.com/solicitud-curso): Formulario de solicitud de inscripción.
+
+## Optional
+
+- [Galería](https://academiaceapsi.com/galeria): Fotos de actividades.
+- [Aviso de privacidad](https://academiaceapsi.com/privacidad): Tratamiento de datos personales (Ley 172-13).

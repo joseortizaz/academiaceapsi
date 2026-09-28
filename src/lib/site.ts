@@ -41,3 +41,36 @@ export function pageHead(path: string, title: string, description: string, extra
     scripts: extra?.scripts ?? [],
   };
 }
+
+export const ORGANIZATION_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Academia Ceapsi RD",
+      legalName: LEGAL_ENTITY_NAME,
+      url: SITE_URL,
+      email: PRIVACY_EMAIL,
+      address: { "@type": "PostalAddress", addressLocality: "Distrito Nacional", addressCountry: "DO" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "Academia Ceapsi RD",
+      url: SITE_URL,
+      inLanguage: "es",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
+
+export const LOCAL_BUSINESS_LD = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Academia Ceapsi RD",
+  url: `${SITE_URL}/contactos`,
+  email: PRIVACY_EMAIL,
+  address: { "@type": "PostalAddress", addressLocality: "Distrito Nacional", addressCountry: "DO" },
+  parentOrganization: { "@id": `${SITE_URL}/#organization` },
+};
