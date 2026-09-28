@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,14 +10,7 @@ import { Calendar, Image as ImageIcon, Video as VideoIcon, X, ChevronLeft, Chevr
 
 export const Route = createFileRoute("/eventos")({
   staticData: { sitemap: true },
-  head: () => ({
-    meta: [
-      { title: "Eventos — Academia Ceapsi RD" },
-      { name: "description", content: "Galería de eventos, graduaciones, conferencias y actividades de Academia Ceapsi RD." },
-      { property: "og:title", content: "Eventos — Academia Ceapsi RD" },
-      { property: "og:description", content: "Galería de eventos, graduaciones y conferencias de Academia Ceapsi RD." },
-    ],
-  }),
+  head: () => pageHead("/eventos", "Eventos | Academia Ceapsi RD", "Graduaciones, conferencias y actividades de Academia Ceapsi RD en República Dominicana."),
   component: EventosPage,
 });
 

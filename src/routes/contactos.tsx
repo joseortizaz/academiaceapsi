@@ -1,3 +1,4 @@
+import { pageHead, LOCAL_BUSINESS_LD } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
@@ -12,16 +13,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/contactos")({
   staticData: { sitemap: true },
-  head: () => ({
-    meta: [
-      { title: "Contacto | Academia Ceapsi RD" },
-      { name: "description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
-      { property: "og:title", content: "Contacto | Academia Ceapsi RD" },
-      { property: "og:description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => pageHead("/contactos", "Contacto | Academia Ceapsi RD", "Contacta a Academia Ceapsi RD por WhatsApp o correo para recibir información sobre diplomados y cursos de psicología.", { scripts: [{ type: "application/ld+json", children: JSON.stringify(LOCAL_BUSINESS_LD) }] }),
   component: Contactos,
 });
 

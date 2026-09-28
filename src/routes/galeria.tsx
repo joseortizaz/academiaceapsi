@@ -1,8 +1,10 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
 
 export const Route = createFileRoute("/galeria")({
   staticData: { sitemap: true },
+  head: () => pageHead("/galeria", "Galería | Academia Ceapsi RD", "Fotos de graduaciones, clases y actividades de Academia Ceapsi RD en República Dominicana."),
   component: Galeria,
 });
 

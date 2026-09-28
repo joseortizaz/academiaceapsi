@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,24 +10,7 @@ import { Calendar, ArrowRight, Loader2 } from "lucide-react";
 export const Route = createFileRoute("/blog/")({
   staticData: { sitemap: true },
   component: Blog,
-  head: () => ({
-    meta: [
-      { title: "Blog | Academia CEAPSI" },
-      {
-        name: "description",
-        content:
-          "Artículos de interés psicológico y educativo escritos por los docentes de Academia CEAPSI.",
-      },
-      { property: "og:title", content: "Blog | Academia CEAPSI" },
-      {
-        property: "og:description",
-        content:
-          "Artículos de interés psicológico y educativo escritos por los docentes de Academia CEAPSI.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => pageHead("/blog", "Blog | Academia Ceapsi RD", "Artículos de interés psicológico y educativo escritos por los docentes de Academia Ceapsi RD."),
 });
 
 export function formatFecha(value?: string | null) {

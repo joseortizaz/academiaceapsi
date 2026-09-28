@@ -21,3 +21,23 @@ export function plainExcerpt(html: string | null | undefined, max = 160) {
     .trim();
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
+
+/** Metadatos por página: título, descripción, Open Graph, canonical y og:url propios. */
+export function pageHead(path: string, title: string, description: string, extra?: { type?: string; scripts?: { type: string; children: string }[] }) {
+  const url = `${SITE_URL}${path}`;
+  return {
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: extra?.type ?? "website" },
+      { property: "og:url", content: url },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ],
+    links: [{ rel: "canonical", href: url }],
+    scripts: extra?.scripts ?? [],
+  };
+}

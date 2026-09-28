@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import Autoplay from "embla-carousel-autoplay";
@@ -15,6 +16,7 @@ import heroImg from "@/assets/hero-ceapsi.jpg";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
+  head: () => pageHead("/", "Academia Ceapsi RD — Diplomados y cursos de psicología", "Diplomados y cursos en psicología, educación y ciencias del comportamiento en República Dominicana. Clases en vivo por Zoom o a tu ritmo."),
   component: Home,
 });
 

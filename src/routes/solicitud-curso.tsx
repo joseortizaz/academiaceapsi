@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -21,21 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/solicitud-curso")({
   staticData: { sitemap: true },
-  head: () => ({
-    meta: [
-      { title: "Solicitar Curso o Diplomado — Ceapsi" },
-      {
-        name: "description",
-        content:
-          "Completa la solicitud para nuestros cursos y diplomados. Un asesor se pondrá en contacto contigo a la brevedad.",
-      },
-      { property: "og:title", content: "Solicitar Curso o Diplomado — Ceapsi" },
-      {
-        property: "og:description",
-        content: "Un asesor se pondrá en contacto contigo.",
-      },
-    ],
-  }),
+  head: () => pageHead("/solicitud-curso", "Solicitar curso o diplomado | Academia Ceapsi RD", "Completa la solicitud para nuestros cursos y diplomados. Un asesor de Academia Ceapsi RD te contactará a la brevedad."),
   component: SolicitudCurso,
 });
 
