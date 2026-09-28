@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Target, Eye, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/sobre-nosotros")({
+  staticData: { sitemap: true },
   component: SobreNosotros,
 });
 

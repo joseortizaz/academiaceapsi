@@ -26,6 +26,7 @@ const cleanParam = (v: unknown) =>
   typeof v === "string" && v.trim() ? v.trim() : undefined;
 
 export const Route = createFileRoute("/programas/")({
+  staticData: { sitemap: true },
   validateSearch: (search: Record<string, unknown>): ProgramasSearch => ({
     tipo: cleanParam(search.tipo),
     modalidad: cleanParam(search.modalidad),

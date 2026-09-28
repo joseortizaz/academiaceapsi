@@ -23,6 +23,7 @@ import {
 import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/grupos")({
+  staticData: { sitemap: false },
   component: GruposPage,
 });
 

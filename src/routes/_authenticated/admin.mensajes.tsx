@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { AdminPageHeader, EmptyState } from "@/components/admin/AdminUI";
 
 export const Route = createFileRoute("/_authenticated/admin/mensajes")({
+  staticData: { sitemap: false },
   component: MensajesPage,
 });
 

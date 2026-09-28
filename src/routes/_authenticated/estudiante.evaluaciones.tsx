@@ -19,6 +19,7 @@ import { FileUploader } from "@/components/FileUploader";
 import { registrarActividad } from "@/lib/audit-client";
 
 export const Route = createFileRoute("/_authenticated/estudiante/evaluaciones")({
+  staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>) => ({
     assessmentId:
       typeof search.assessmentId === "string" ? search.assessmentId : undefined,

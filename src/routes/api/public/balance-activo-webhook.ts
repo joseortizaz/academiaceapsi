@@ -8,6 +8,7 @@ type BaEvent = {
 };
 
 export const Route = createFileRoute("/api/public/balance-activo-webhook")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

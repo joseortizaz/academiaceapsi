@@ -11,6 +11,7 @@ import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube } from "lucide
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contactos")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Contacto | Academia Ceapsi RD" },

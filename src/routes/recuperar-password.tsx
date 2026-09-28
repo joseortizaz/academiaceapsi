@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/recuperar-password")({
+  staticData: { sitemap: false },
   component: RecuperarPassword,
 });
 

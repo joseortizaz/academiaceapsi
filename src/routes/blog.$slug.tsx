@@ -16,6 +16,7 @@ function toHtml(content: string | null | undefined) {
 }
 
 export const Route = createFileRoute("/blog/$slug")({
+  staticData: { sitemap: true },
   component: BlogPost,
   head: () => ({
     meta: [

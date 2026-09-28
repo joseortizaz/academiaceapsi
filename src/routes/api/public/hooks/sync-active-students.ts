@@ -9,6 +9,7 @@ import { syncManyCustomers } from "@/lib/balance-activo.server";
  * para /api/public/hooks/*). Ninguna PII se retorna; solo escribe.
  */
 export const Route = createFileRoute("/api/public/hooks/sync-active-students")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

@@ -20,6 +20,7 @@ import { CheckCircle2, GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/solicitud-curso")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Solicitar Curso o Diplomado — Ceapsi" },

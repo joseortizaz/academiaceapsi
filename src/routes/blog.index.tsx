@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/blog/")({
+  staticData: { sitemap: true },
   component: Blog,
   head: () => ({
     meta: [

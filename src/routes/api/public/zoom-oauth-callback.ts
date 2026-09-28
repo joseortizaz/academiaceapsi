@@ -15,6 +15,7 @@ function htmlPage(title: string, body: string, ok: boolean): Response {
 }
 
 export const Route = createFileRoute("/api/public/zoom-oauth-callback")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       GET: async ({ request }) => {

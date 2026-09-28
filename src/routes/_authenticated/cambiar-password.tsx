@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/cambiar-password")({
+  staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
       typeof search.redirect === "string" &&

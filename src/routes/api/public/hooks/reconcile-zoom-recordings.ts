@@ -32,6 +32,7 @@ type RecordingsResponse = {
 };
 
 export const Route = createFileRoute("/api/public/hooks/reconcile-zoom-recordings")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

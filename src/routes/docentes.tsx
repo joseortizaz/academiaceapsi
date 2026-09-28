@@ -12,6 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/docentes")({
+  staticData: { sitemap: true },
   component: Docentes,
 });
 

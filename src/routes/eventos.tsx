@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Image as ImageIcon, Video as VideoIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/eventos")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Eventos — Academia Ceapsi RD" },

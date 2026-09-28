@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/admin/certificados")({
+  staticData: { sitemap: false },
   component: AdminCertificados,
 });
 

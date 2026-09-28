@@ -9,6 +9,7 @@ import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog"
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 
 export const Route = createFileRoute("/verify/$code")({
+  staticData: { sitemap: false },
   component: VerifyCertificate,
   head: () => ({
     meta: [

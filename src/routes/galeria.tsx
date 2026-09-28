@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
 
 export const Route = createFileRoute("/galeria")({
+  staticData: { sitemap: true },
   component: Galeria,
 });
 

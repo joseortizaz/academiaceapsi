@@ -18,6 +18,7 @@ type RecordingFile = {
 };
 
 export const Route = createFileRoute("/api/public/recording/$meetingId")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       GET: async ({ request, params }) => {

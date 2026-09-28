@@ -27,6 +27,7 @@ type ZoomEvent = {
 };
 
 export const Route = createFileRoute("/api/public/zoom-webhook")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

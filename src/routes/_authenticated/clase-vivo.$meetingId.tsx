@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { ZoomEmbed } from "@/components/ZoomEmbed";
 
 export const Route = createFileRoute("/_authenticated/clase-vivo/$meetingId")({
+  staticData: { sitemap: false },
   component: ClaseEnVivo,
 });
 

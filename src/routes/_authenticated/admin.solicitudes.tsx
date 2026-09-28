@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Loader2, Pencil, Trash2, Plus, ExternalLink, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/solicitudes")({
+  staticData: { sitemap: false },
   component: AdminSolicitudes,
 });
 

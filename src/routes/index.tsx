@@ -14,6 +14,7 @@ import { GraduationCap, Award, Video, Users, Clock, CheckCircle2, Star, ArrowRig
 import heroImg from "@/assets/hero-ceapsi.jpg";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   component: Home,
 });
 
