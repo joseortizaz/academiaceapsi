@@ -8,6 +8,7 @@ import {
 import heroImg from "@/assets/guide-teacher-hero.jpg";
 
 export const Route = createFileRoute("/_authenticated/docente/instructivo")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Instructivo del docente | CEAPSI" },

@@ -43,6 +43,7 @@ function generateToken(): string {
 }
 
 export const Route = createFileRoute('/api/public/course-request')({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

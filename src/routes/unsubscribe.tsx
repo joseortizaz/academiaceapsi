@@ -14,6 +14,7 @@ type State =
   | { status: 'error'; message: string }
 
 export const Route = createFileRoute('/unsubscribe')({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: 'Cancelar suscripción — Academia Ceapsi RD' },

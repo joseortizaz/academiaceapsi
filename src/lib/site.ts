@@ -21,3 +21,56 @@ export function plainExcerpt(html: string | null | undefined, max = 160) {
     .trim();
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
+
+/** Metadatos por página: título, descripción, Open Graph, canonical y og:url propios. */
+export function pageHead(path: string, title: string, description: string, extra?: { type?: string; scripts?: { type: string; children: string }[] }) {
+  const url = `${SITE_URL}${path}`;
+  return {
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: extra?.type ?? "website" },
+      { property: "og:url", content: url },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ],
+    links: [{ rel: "canonical", href: url }],
+    scripts: extra?.scripts ?? [],
+  };
+}
+
+export const ORGANIZATION_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Academia Ceapsi RD",
+      legalName: LEGAL_ENTITY_NAME,
+      url: SITE_URL,
+      email: PRIVACY_EMAIL,
+      address: { "@type": "PostalAddress", addressLocality: "Distrito Nacional", addressCountry: "DO" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "Academia Ceapsi RD",
+      url: SITE_URL,
+      inLanguage: "es",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
+
+export const LOCAL_BUSINESS_LD = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Academia Ceapsi RD",
+  url: `${SITE_URL}/contactos`,
+  email: PRIVACY_EMAIL,
+  address: { "@type": "PostalAddress", addressLocality: "Distrito Nacional", addressCountry: "DO" },
+  parentOrganization: { "@id": `${SITE_URL}/#organization` },
+};

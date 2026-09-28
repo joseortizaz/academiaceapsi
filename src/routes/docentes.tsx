@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,6 +13,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/docentes")({
+  staticData: { sitemap: true },
+  head: () => pageHead("/docentes", "Docentes | Academia Ceapsi RD", "Conoce a los docentes de Academia Ceapsi RD: profesionales en psicología, educación y ciencias del comportamiento."),
   component: Docentes,
 });
 

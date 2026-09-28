@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,25 +27,12 @@ const cleanParam = (v: unknown) =>
   typeof v === "string" && v.trim() ? v.trim() : undefined;
 
 export const Route = createFileRoute("/programas/")({
+  staticData: { sitemap: true },
   validateSearch: (search: Record<string, unknown>): ProgramasSearch => ({
     tipo: cleanParam(search.tipo),
     modalidad: cleanParam(search.modalidad),
   }),
-  head: () => ({
-    meta: [
-      { title: "Programas | Academia Ceapsi RD" },
-      {
-        name: "description",
-        content:
-          "Diplomados y cursos sincrónicos y asincrónicos de la Academia Ceapsi RD en República Dominicana.",
-      },
-      { property: "og:title", content: "Catálogo de Programas — Academia Ceapsi RD" },
-      {
-        property: "og:description",
-        content: "Explora nuestros diplomados, cursos y talleres especializados.",
-      },
-    ],
-  }),
+  head: () => pageHead("/programas", "Programas | Academia Ceapsi RD", "Diplomados, cursos y talleres de psicología en vivo o a tu ritmo, ofrecidos por Academia Ceapsi RD en República Dominicana."),
   component: ProgramasPage,
 });
 

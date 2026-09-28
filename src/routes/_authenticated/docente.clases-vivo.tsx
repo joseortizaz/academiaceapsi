@@ -30,6 +30,7 @@ import {
 } from "@/lib/zoom.functions";
 
 export const Route = createFileRoute("/_authenticated/docente/clases-vivo")({
+  staticData: { sitemap: false },
   component: DocenteClasesVivo,
 });
 

@@ -9,6 +9,7 @@ function redactEmail(email: string | null | undefined): string {
 }
 
 export const Route = createFileRoute("/email/unsubscribe")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       GET: async ({ request }) => {

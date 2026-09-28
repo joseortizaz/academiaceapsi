@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { listMyInvoices, syncMyInvoices } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/estudiante/facturacion")({
+  staticData: { sitemap: false },
   component: EstudianteFacturacion,
 });
 

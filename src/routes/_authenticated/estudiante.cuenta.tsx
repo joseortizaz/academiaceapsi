@@ -20,6 +20,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listMyInvoices, syncMyInvoices } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/estudiante/cuenta")({
+  staticData: { sitemap: false },
   component: MiCuenta,
 });
 

@@ -17,6 +17,7 @@ import { AdminPageHeader, DeleteButton, EmptyState } from "@/components/admin/Ad
 import { StarRating } from "@/components/reviews/StarRating";
 
 export const Route = createFileRoute("/_authenticated/admin/resenas")({
+  staticData: { sitemap: false },
   component: ResenasPage,
 });
 

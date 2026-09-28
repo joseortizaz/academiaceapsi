@@ -23,6 +23,7 @@ import {
 } from "@/components/admin/AdminUI";
 
 export const Route = createFileRoute("/_authenticated/admin/blog")({
+  staticData: { sitemap: false },
   component: BlogPage,
 });
 

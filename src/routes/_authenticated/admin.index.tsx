@@ -10,6 +10,7 @@ import {
 } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  staticData: { sitemap: false },
   component: AdminIndex,
 });
 

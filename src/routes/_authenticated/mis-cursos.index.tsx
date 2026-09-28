@@ -9,6 +9,7 @@ import { GraduationCap, BookOpen } from "lucide-react";
 import { StudentShell } from "@/components/student/StudentShell";
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/")({
+  staticData: { sitemap: false },
   component: MisCursos,
 });
 

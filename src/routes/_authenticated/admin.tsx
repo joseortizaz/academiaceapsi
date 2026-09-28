@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  staticData: { sitemap: false },
   component: AdminLayout,
 });
 

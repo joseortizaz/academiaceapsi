@@ -1,9 +1,12 @@
+import { pageHead } from "@/lib/site";
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Target, Eye, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/sobre-nosotros")({
+  staticData: { sitemap: true },
+  head: () => pageHead("/sobre-nosotros", "Sobre nosotros | Academia Ceapsi RD", "Conoce la misión, visión, valores e historia de Academia Ceapsi RD, formación continua en psicología en República Dominicana."),
   component: SobreNosotros,
 });
 
@@ -26,7 +29,7 @@ function SobreNosotros() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/15 text-accent">
                 <b.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-5 text-xl font-bold text-foreground">{b.t}</h3>
+              <h2 className="mt-5 text-xl font-bold text-foreground">{b.t}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
             </CardContent>
           </Card>

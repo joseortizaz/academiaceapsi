@@ -14,6 +14,7 @@ import { Save, KeyRound } from "lucide-react";
 import { AvatarUploader } from "@/components/AvatarUploader";
 
 export const Route = createFileRoute("/_authenticated/docente/cuenta")({
+  staticData: { sitemap: false },
   component: CuentaDocente,
 });
 

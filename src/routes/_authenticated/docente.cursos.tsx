@@ -29,6 +29,7 @@ import { listZoomMeetings } from "@/lib/zoom.functions";
 
 
 export const Route = createFileRoute("/_authenticated/docente/cursos")({
+  staticData: { sitemap: false },
   component: DocenteCursos,
 });
 

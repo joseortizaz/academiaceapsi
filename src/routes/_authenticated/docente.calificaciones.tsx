@@ -19,6 +19,7 @@ import { Search, CheckCircle2, FileText, ExternalLink, Loader2 } from "lucide-re
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/docente/calificaciones")({
+  staticData: { sitemap: false },
   component: DocenteCalificaciones,
 });
 

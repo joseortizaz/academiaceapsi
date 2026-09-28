@@ -26,6 +26,7 @@ const sections = [
 ] as const;
 
 export const Route = createFileRoute("/privacidad")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Aviso de Privacidad | Academia Ceapsi RD" },

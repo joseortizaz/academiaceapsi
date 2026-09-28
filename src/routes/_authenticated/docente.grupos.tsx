@@ -15,6 +15,7 @@ import {
 import { Users, Calendar, MapPin, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/docente/grupos")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Mis grupos docentes — Academia Ceapsi" },

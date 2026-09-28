@@ -27,6 +27,7 @@ import {
 } from "@/components/site/TeacherProfileDialog";
 
 export const Route = createFileRoute("/programas/$slug")({
+  staticData: { sitemap: true },
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
     ...search,
     inscribir: search.inscribir === 1 || search.inscribir === "1" ? 1 : undefined,

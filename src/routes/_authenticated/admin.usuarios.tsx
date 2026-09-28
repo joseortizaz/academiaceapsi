@@ -58,6 +58,7 @@ function mensajeCredenciales(email: string, password: string): string {
 
 
 export const Route = createFileRoute("/_authenticated/admin/usuarios")({
+  staticData: { sitemap: false },
   component: UsuariosPage,
 });
 

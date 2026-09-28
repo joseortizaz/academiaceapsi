@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getZoomConnectionStatus } from "@/lib/zoom.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/integraciones")({
+  staticData: { sitemap: false },
   component: AdminIntegraciones,
 });
 

@@ -11,6 +11,7 @@ import { registrarActividad } from "@/lib/audit-client";
 import type { CertificateTemplateData } from "@/components/CertificateTemplate";
 
 export const Route = createFileRoute("/_authenticated/certificados")({
+  staticData: { sitemap: false },
   component: MisCertificados,
 });
 

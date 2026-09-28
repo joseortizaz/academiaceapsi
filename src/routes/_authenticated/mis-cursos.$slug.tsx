@@ -22,6 +22,7 @@ import { ReviewForm } from "@/components/reviews/ProgramReviews";
 
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
+  staticData: { sitemap: false },
   component: CursoPlayer,
 });
 

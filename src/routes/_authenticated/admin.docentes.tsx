@@ -15,6 +15,7 @@ import {
 } from "@/components/admin/AdminUI";
 
 export const Route = createFileRoute("/_authenticated/admin/docentes")({
+  staticData: { sitemap: false },
   component: DocentesPage,
 });
 

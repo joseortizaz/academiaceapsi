@@ -20,6 +20,7 @@ import { Image as ImageIcon, Video as VideoIcon, Trash2, Plus, Upload, Loader2 }
 import { useRef } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/eventos")({
+  staticData: { sitemap: false },
   component: EventosAdmin,
 });
 

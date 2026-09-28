@@ -15,6 +15,7 @@ function registrarContextoDeAcceso(user: { id: string; last_sign_in_at?: string 
 }
 
 export const Route = createFileRoute("/_authenticated")({
+  staticData: { sitemap: "exclude-subtree" },
   ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();

@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 
 export const Route = createFileRoute("/registro")({
+  staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
       typeof search.redirect === "string" && search.redirect.startsWith("/")

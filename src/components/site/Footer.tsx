@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-4">
         <div>
           <div className="rounded-lg bg-white p-3 inline-block">
-            <img src={logoCeapsi} alt="CEAPSI" className="h-16 w-auto" />
+            <img src={logoCeapsi} alt="Logo de Academia Ceapsi RD" className="h-16 w-auto" />
           </div>
           <p className="mt-4 text-sm text-primary-foreground/75">
             Formación profesional en psicología y ciencias del comportamiento para

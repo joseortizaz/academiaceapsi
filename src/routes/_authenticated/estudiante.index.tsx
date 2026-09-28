@@ -37,6 +37,7 @@ function isLiveZoom(c: ZoomMeetingLite) {
 }
 
 export const Route = createFileRoute("/_authenticated/estudiante/")({
+  staticData: { sitemap: false },
   component: EstudianteDashboard,
 });
 

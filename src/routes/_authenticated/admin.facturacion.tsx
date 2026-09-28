@@ -23,6 +23,7 @@ import {
 } from "@/lib/balance-activo.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/facturacion")({
+  staticData: { sitemap: false },
   component: AdminFacturacion,
 });
 

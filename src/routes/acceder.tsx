@@ -11,6 +11,7 @@ import { lovable } from "@/integrations/lovable";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/acceder")({
+  staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
     redirect:
       typeof search.redirect === "string" && search.redirect.startsWith("/")

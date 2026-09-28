@@ -1,3 +1,4 @@
+import { pageHead, plainExcerpt, SITE_URL } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -16,23 +17,45 @@ function toHtml(content: string | null | undefined) {
 }
 
 export const Route = createFileRoute("/blog/$slug")({
+  staticData: { sitemap: true },
   component: BlogPost,
-  head: () => ({
-    meta: [
-      { title: "Artículo | Blog Academia CEAPSI" },
-      {
-        name: "description",
-        content: "Artículo del blog de Academia CEAPSI sobre psicología y educación.",
-      },
-      { property: "og:title", content: "Artículo | Blog Academia CEAPSI" },
-      {
-        property: "og:description",
-        content: "Artículo del blog de Academia CEAPSI sobre psicología y educación.",
-      },
-      { property: "og:type", content: "article" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("blog_posts")
+      .select("titulo,resumen,imagen_url,fecha_publicacion,updated_at")
+      .eq("slug", params.slug)
+      .eq("estado", "publicado")
+      .maybeSingle();
+    return { post: data };
+  },
+  head: ({ params, loaderData }) => {
+    const post = loaderData?.post;
+    const title = post ? `${post.titulo} | Blog Academia Ceapsi RD` : "Artículo | Blog Academia Ceapsi RD";
+    const description = post?.resumen
+      ? plainExcerpt(post.resumen, 160)
+      : "Artículo del blog de Academia Ceapsi RD sobre psicología y educación.";
+    const head = pageHead(`/blog/${params.slug}`, title, description, {
+      type: "article",
+      scripts: post
+        ? [{
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              headline: post.titulo,
+              description,
+              ...(post.imagen_url ? { image: post.imagen_url } : {}),
+              ...(post.fecha_publicacion ? { datePublished: post.fecha_publicacion } : {}),
+              ...(post.updated_at ? { dateModified: post.updated_at } : {}),
+              author: { "@type": "Organization", name: "Academia Ceapsi RD" },
+              publisher: { "@id": `${SITE_URL}/#organization` },
+              mainEntityOfPage: `${SITE_URL}/blog/${params.slug}`,
+            }),
+          }]
+        : [],
+    });
+    return head;
+  },
 });
 
 function BlogPost() {

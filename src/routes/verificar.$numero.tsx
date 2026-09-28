@@ -6,6 +6,7 @@ import { Award, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/verificar/$numero")({
+  staticData: { sitemap: false },
   component: VerificarCertificado,
   head: () => ({
     meta: [

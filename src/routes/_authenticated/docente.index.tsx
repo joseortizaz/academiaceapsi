@@ -13,6 +13,7 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/docente/")({
+  staticData: { sitemap: false },
   component: DocenteResumen,
 });
 

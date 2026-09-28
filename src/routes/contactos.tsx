@@ -1,3 +1,4 @@
+import { pageHead, LOCAL_BUSINESS_LD } from "@/lib/site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PublicLayout, PageHeader } from "@/components/site/PublicLayout";
@@ -11,16 +12,8 @@ import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube } from "lucide
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contactos")({
-  head: () => ({
-    meta: [
-      { title: "Contacto | Academia Ceapsi RD" },
-      { name: "description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
-      { property: "og:title", content: "Contacto | Academia Ceapsi RD" },
-      { property: "og:description", content: "Contacta a Academia Ceapsi RD para recibir información sobre nuestros programas educativos." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  staticData: { sitemap: true },
+  head: () => pageHead("/contactos", "Contacto | Academia Ceapsi RD", "Contacta a Academia Ceapsi RD por WhatsApp o correo para recibir información sobre diplomados y cursos de psicología.", { scripts: [{ type: "application/ld+json", children: JSON.stringify(LOCAL_BUSINESS_LD) }] }),
   component: Contactos,
 });
 
@@ -56,9 +49,9 @@ function Contactos() {
             </Card>
           ))}
           <div className="flex gap-2 pt-2">
-            <a href="#" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Facebook className="h-4 w-4" /></a>
-            <a href="#" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Instagram className="h-4 w-4" /></a>
-            <a href="#" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Youtube className="h-4 w-4" /></a>
+            <a href="#" aria-label="Facebook" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Facebook className="h-4 w-4" /></a>
+            <a href="#" aria-label="Instagram" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Instagram className="h-4 w-4" /></a>
+            <a href="#" aria-label="YouTube" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Youtube className="h-4 w-4" /></a>
           </div>
         </div>
 

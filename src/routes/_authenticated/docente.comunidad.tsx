@@ -16,6 +16,7 @@ import { Send, Pencil, Trash2, Plus, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/docente/comunidad")({
+  staticData: { sitemap: false },
   component: DocenteComunidad,
 });
 

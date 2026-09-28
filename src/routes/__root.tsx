@@ -10,6 +10,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
+import { ORGANIZATION_LD } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -69,6 +70,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -91,6 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ORGANIZATION_LD) }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
