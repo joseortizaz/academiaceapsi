@@ -40,6 +40,7 @@ import {
   LibraryCategoriesManager,
   useLibraryCategories,
 } from "@/components/admin/LibraryCategoriesManager";
+import { LibraryStats } from "@/components/admin/LibraryStats";
 import {
   LIBRARY_COVERS_BUCKET,
   LIBRARY_ESTADOS,
@@ -332,6 +333,7 @@ function BibliotecaAdminPage() {
         <TabsList>
           <TabsTrigger value="documentos">Documentos ({docs.length})</TabsTrigger>
           <TabsTrigger value="categorias">Categorías ({categorias.length})</TabsTrigger>
+          <TabsTrigger value="estadisticas">Estadísticas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="documentos" className="space-y-4">
@@ -498,6 +500,10 @@ function BibliotecaAdminPage() {
 
         <TabsContent value="categorias">
           <LibraryCategoriesManager conteo={conteoPorCategoria} />
+        </TabsContent>
+
+        <TabsContent value="estadisticas">
+          <LibraryStats docs={docs} />
         </TabsContent>
       </Tabs>
 

@@ -6,6 +6,8 @@ import { ExternalLink, FileText, Loader2, Upload } from "lucide-react";
 import { LIBRARY_FILES_BUCKET, LIBRARY_PDF_MAX_MB, formatFileSize } from "@/lib/library";
 
 export type UploadedPdf = {
+  /** Archivo local recién subido (sirve para generar la portada sin descargarlo). */
+  file: File;
   path: string;
   size: number;
   paginas: number | null;
@@ -73,7 +75,7 @@ export function LibraryPdfUploader({ path, size, onUploaded }: Props) {
       });
       if (error) throw error;
       const paginas = await contarPaginas(file);
-      onUploaded({ path: newPath, size: file.size, paginas });
+      onUploaded({ file, path: newPath, size: file.size, paginas });
       toast.success("PDF cargado");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo subir el PDF");
