@@ -26,6 +26,7 @@ import {
   FileText,
   Star,
   ShieldCheck,
+  Library,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -49,6 +50,7 @@ const nav = [
   { to: "/admin/resenas", label: "Valoraciones", icon: Star },
   { to: "/admin/eventos", label: "Eventos", icon: Images },
   { to: "/admin/blog", label: "Blog", icon: Newspaper },
+  { to: "/admin/biblioteca", label: "Biblioteca", icon: Library },
   { to: "/admin/anuncios", label: "Anuncios", icon: Megaphone },
   { to: "/admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
   { to: "/admin/solicitudes", label: "Solicitudes", icon: ClipboardList },
