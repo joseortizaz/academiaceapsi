@@ -79,6 +79,7 @@ import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
 import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
+import { Route as AuthenticatedAdminBibliotecaRouteImport } from './routes/_authenticated/admin.biblioteca'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin.auditoria'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -478,6 +479,12 @@ const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminBibliotecaRoute =
+  AuthenticatedAdminBibliotecaRouteImport.update({
+    id: '/biblioteca',
+    path: '/biblioteca',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAuditoriaRoute =
   AuthenticatedAdminAuditoriaRouteImport.update({
     id: '/auditoria',
@@ -573,6 +580,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/biblioteca': typeof AuthenticatedAdminBibliotecaRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
@@ -651,6 +659,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/biblioteca': typeof AuthenticatedAdminBibliotecaRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
@@ -735,6 +744,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/_authenticated/admin/biblioteca': typeof AuthenticatedAdminBibliotecaRoute
   '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/_authenticated/admin/certificados': typeof AuthenticatedAdminCertificadosRoute
@@ -819,6 +829,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/admin/anuncios'
     | '/admin/auditoria'
+    | '/admin/biblioteca'
     | '/admin/blog'
     | '/admin/categorias'
     | '/admin/certificados'
@@ -897,6 +908,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/admin/anuncios'
     | '/admin/auditoria'
+    | '/admin/biblioteca'
     | '/admin/blog'
     | '/admin/categorias'
     | '/admin/certificados'
@@ -980,6 +992,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/auditoria'
+    | '/_authenticated/admin/biblioteca'
     | '/_authenticated/admin/blog'
     | '/_authenticated/admin/categorias'
     | '/_authenticated/admin/certificados'
@@ -1562,6 +1575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/biblioteca': {
+      id: '/_authenticated/admin/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/admin/biblioteca'
+      preLoaderRoute: typeof AuthenticatedAdminBibliotecaRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/auditoria': {
       id: '/_authenticated/admin/auditoria'
       path: '/auditoria'
@@ -1645,6 +1665,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
+  AuthenticatedAdminBibliotecaRoute: typeof AuthenticatedAdminBibliotecaRoute
   AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminCertificadosRoute: typeof AuthenticatedAdminCertificadosRoute
@@ -1669,6 +1690,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
+  AuthenticatedAdminBibliotecaRoute: AuthenticatedAdminBibliotecaRoute,
   AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
   AuthenticatedAdminCertificadosRoute: AuthenticatedAdminCertificadosRoute,
