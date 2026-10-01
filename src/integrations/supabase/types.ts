@@ -1264,6 +1264,113 @@ export type Database = {
           },
         ]
       }
+      library_categories: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          orden: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          orden?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          orden?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      library_documents: {
+        Row: {
+          anio: number | null
+          autores: string | null
+          categoria_id: string | null
+          created_at: string
+          created_by: string | null
+          descargas: number
+          descripcion: string | null
+          destacado: boolean
+          estado: string
+          etiquetas: string[]
+          file_path: string | null
+          id: string
+          idioma: string
+          licencia: string | null
+          paginas: number | null
+          portada_url: string | null
+          published_at: string | null
+          slug: string
+          tamano_bytes: number | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          anio?: number | null
+          autores?: string | null
+          categoria_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descargas?: number
+          descripcion?: string | null
+          destacado?: boolean
+          estado?: string
+          etiquetas?: string[]
+          file_path?: string | null
+          id?: string
+          idioma?: string
+          licencia?: string | null
+          paginas?: number | null
+          portada_url?: string | null
+          published_at?: string | null
+          slug: string
+          tamano_bytes?: number | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          anio?: number | null
+          autores?: string | null
+          categoria_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descargas?: number
+          descripcion?: string | null
+          destacado?: boolean
+          estado?: string
+          etiquetas?: string[]
+          file_path?: string | null
+          id?: string
+          idioma?: string
+          licencia?: string | null
+          paginas?: number | null
+          portada_url?: string | null
+          published_at?: string | null
+          slug?: string
+          tamano_bytes?: number | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_documents_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "library_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_progress: {
         Row: {
           completado: boolean | null
@@ -2231,6 +2338,38 @@ export type Database = {
           },
         ]
       }
+      library_catalog: {
+        Row: {
+          anio: number | null
+          autores: string | null
+          categoria_id: string | null
+          categoria_nombre: string | null
+          categoria_slug: string | null
+          descargas: number | null
+          descripcion: string | null
+          destacado: boolean | null
+          etiquetas: string[] | null
+          id: string | null
+          idioma: string | null
+          licencia: string | null
+          paginas: number | null
+          portada_url: string | null
+          published_at: string | null
+          slug: string | null
+          tamano_bytes: number | null
+          titulo: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_documents_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "library_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_public: {
         Row: {
           apellido: string | null
@@ -2491,6 +2630,7 @@ export type Database = {
         Args: { _programa_id: string }
         Returns: boolean
       }
+      library_increment_downloads: { Args: { _id: string }; Returns: undefined }
       log_activity: {
         Args: {
           _accion: string

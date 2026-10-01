@@ -64,6 +64,13 @@
       "when": 1790452467841,
       "tag": "0008_quitar_descripcion_vista_publica_catalogo",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790878210314,
+      "tag": "0009_biblioteca_virtual",
+      "breakpoints": true
     }
   ]
 }
