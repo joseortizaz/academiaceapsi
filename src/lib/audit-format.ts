@@ -39,6 +39,8 @@ export const ENTIDADES: Record<string, string> = {
   blog_posts: "artículo del blog",
   events: "evento",
   hero_slides: "diapositiva de portada",
+  library_documents: "documento de la biblioteca",
+  library_categories: "categoría de la biblioteca",
   coupons: "cupón",
   zoom_licenses: "licencia de Zoom",
   program_access_links: "enlace de acceso",
@@ -122,6 +124,7 @@ export const ACCIONES_NAVEGADOR = new Set([
   "ver_grabacion",
   "descargar_certificado",
   "abrir_evaluacion",
+  "ver_libro",
 ]);
 
 export type Contexto = {
@@ -183,6 +186,10 @@ export function describirEvento(ev: AuditEvent, ctx: Contexto = {}): string {
       return `${actor} descargó el certificado ${etiqueta}${enPrograma(ev, ctx)}`.trim();
     case "abrir_evaluacion":
       return `${actor} abrió la evaluación ${etiqueta}${enPrograma(ev, ctx)}`.trim();
+    case "ver_libro":
+      return `${actor} leyó en línea el documento ${etiqueta} de la biblioteca`.trim();
+    case "descargar_libro":
+      return `${actor} descargó el documento ${etiqueta} de la biblioteca`.trim();
     case "entrar_clase_vivo":
       return `${actor} entró a la clase en vivo ${etiqueta}${enPrograma(ev, ctx)}`.trim();
     case "exportar_auditoria":
