@@ -22,16 +22,19 @@ import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as DocentesRouteImport } from './routes/docentes'
 import { Route as ContactosRouteImport } from './routes/contactos'
+import { Route as BibliotecaRouteImport } from './routes/biblioteca'
 import { Route as AccederRouteImport } from './routes/acceder'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BibliotecaIndexRouteImport } from './routes/biblioteca.index'
 import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
 import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as BibliotecaSlugRouteImport } from './routes/biblioteca.$slug'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
@@ -157,6 +160,11 @@ const ContactosRoute = ContactosRouteImport.update({
   path: '/contactos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BibliotecaRoute = BibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccederRoute = AccederRouteImport.update({
   id: '/acceder',
   path: '/acceder',
@@ -180,6 +188,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BibliotecaIndexRoute = BibliotecaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BibliotecaRoute,
 } as any)
 const VerifyCodeRoute = VerifyCodeRouteImport.update({
   id: '/verify/$code',
@@ -205,6 +218,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BibliotecaSlugRoute = BibliotecaSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BibliotecaRoute,
 } as any)
 const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   id: '/estudiante',
@@ -552,6 +570,7 @@ const ApiPublicHooksReconcileZoomRecordingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acceder': typeof AccederRoute
+  '/biblioteca': typeof BibliotecaRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -570,11 +589,13 @@ export interface FileRoutesByFullPath {
   '/certificados': typeof AuthenticatedCertificadosRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/biblioteca/': typeof BibliotecaIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/programas/': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -649,11 +670,13 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
+  '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/biblioteca': typeof BibliotecaIndexRoute
   '/blog': typeof BlogIndexRoute
   '/programas': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -716,6 +739,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/acceder': typeof AccederRoute
+  '/biblioteca': typeof BibliotecaRouteWithChildren
   '/contactos': typeof ContactosRoute
   '/docentes': typeof DocentesRoute
   '/eventos': typeof EventosRoute
@@ -734,11 +758,13 @@ export interface FileRoutesById {
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/programas/$slug': typeof ProgramasSlugRoute
   '/verificar/$numero': typeof VerificarNumeroRoute
   '/verify/$code': typeof VerifyCodeRoute
+  '/biblioteca/': typeof BibliotecaIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/programas/': typeof ProgramasIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -801,6 +827,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/acceder'
+    | '/biblioteca'
     | '/contactos'
     | '/docentes'
     | '/eventos'
@@ -819,11 +846,13 @@ export interface FileRouteTypes {
     | '/certificados'
     | '/docente'
     | '/estudiante'
+    | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/biblioteca/'
     | '/blog/'
     | '/programas/'
     | '/.lovable/oauth/consent'
@@ -898,11 +927,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/cambiar-password'
     | '/certificados'
+    | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/biblioteca'
     | '/blog'
     | '/programas'
     | '/.lovable/oauth/consent'
@@ -964,6 +995,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/acceder'
+    | '/biblioteca'
     | '/contactos'
     | '/docentes'
     | '/eventos'
@@ -982,11 +1014,13 @@ export interface FileRouteTypes {
     | '/_authenticated/certificados'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
+    | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/programas/$slug'
     | '/verificar/$numero'
     | '/verify/$code'
+    | '/biblioteca/'
     | '/blog/'
     | '/programas/'
     | '/.lovable/oauth/consent'
@@ -1049,6 +1083,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccederRoute: typeof AccederRoute
+  BibliotecaRoute: typeof BibliotecaRouteWithChildren
   ContactosRoute: typeof ContactosRoute
   DocentesRoute: typeof DocentesRoute
   EventosRoute: typeof EventosRoute
@@ -1176,6 +1211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/biblioteca': {
+      id: '/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/biblioteca'
+      preLoaderRoute: typeof BibliotecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/acceder': {
       id: '/acceder'
       path: '/acceder'
@@ -1211,6 +1253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/biblioteca/': {
+      id: '/biblioteca/'
+      path: '/'
+      fullPath: '/biblioteca/'
+      preLoaderRoute: typeof BibliotecaIndexRouteImport
+      parentRoute: typeof BibliotecaRoute
+    }
     '/verify/$code': {
       id: '/verify/$code'
       path: '/verify/$code'
@@ -1245,6 +1294,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/biblioteca/$slug': {
+      id: '/biblioteca/$slug'
+      path: '/$slug'
+      fullPath: '/biblioteca/$slug'
+      preLoaderRoute: typeof BibliotecaSlugRouteImport
+      parentRoute: typeof BibliotecaRoute
     }
     '/_authenticated/estudiante': {
       id: '/_authenticated/estudiante'
@@ -1796,6 +1852,20 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface BibliotecaRouteChildren {
+  BibliotecaSlugRoute: typeof BibliotecaSlugRoute
+  BibliotecaIndexRoute: typeof BibliotecaIndexRoute
+}
+
+const BibliotecaRouteChildren: BibliotecaRouteChildren = {
+  BibliotecaSlugRoute: BibliotecaSlugRoute,
+  BibliotecaIndexRoute: BibliotecaIndexRoute,
+}
+
+const BibliotecaRouteWithChildren = BibliotecaRoute._addFileChildren(
+  BibliotecaRouteChildren,
+)
+
 interface ProgramasRouteChildren {
   ProgramasSlugRoute: typeof ProgramasSlugRoute
   ProgramasIndexRoute: typeof ProgramasIndexRoute
@@ -1814,6 +1884,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccederRoute: AccederRoute,
+  BibliotecaRoute: BibliotecaRouteWithChildren,
   ContactosRoute: ContactosRoute,
   DocentesRoute: DocentesRoute,
   EventosRoute: EventosRoute,

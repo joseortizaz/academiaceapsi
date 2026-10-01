@@ -9,6 +9,7 @@ export const PRIVACY_PHONE = "809-784-5106";
 export const PRIVACY_LAST_UPDATED = "20 de septiembre de 2026";
 
 export const programaUrl = (slug: string) => `${SITE_URL}/programas/${slug}`;
+export const bibliotecaUrl = (slug: string) => `${SITE_URL}/biblioteca/${slug}`;
 
 /** Quita etiquetas HTML y recorta el texto para usarlo como descripción. */
 export function plainExcerpt(html: string | null | undefined, max = 160) {

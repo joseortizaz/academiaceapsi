@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, EyeOff, FileText, Search, Star } from "lucide-react";
+import { ExternalLink, Eye, EyeOff, FileText, Link2, Search, Star } from "lucide-react";
 import {
   AdminPageHeader,
   CreateButton,
@@ -49,6 +49,7 @@ import {
   storagePathFromPublicUrl,
   type LibraryEstado,
 } from "@/lib/library";
+import { bibliotecaUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/_authenticated/admin/biblioteca")({
   staticData: { sitemap: false },
@@ -297,6 +298,15 @@ function BibliotecaAdminPage() {
     qc.invalidateQueries({ queryKey: DOCS_KEY });
   };
 
+  const copiarEnlace = async (slug: string) => {
+    try {
+      await navigator.clipboard.writeText(bibliotecaUrl(slug));
+      toast.success("Enlace copiado");
+    } catch {
+      toast.error("No se pudo copiar el enlace");
+    }
+  };
+
   const remove = async (d: DocRow) => {
     const { error } = await supabase.from("library_documents").delete().eq("id", d.id);
     if (error) return toast.error(error.message);
@@ -432,6 +442,27 @@ function BibliotecaAdminPage() {
                         })}
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-right">
+                        {d.estado === "publicado" && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              title="Copiar enlace público"
+                              onClick={() => copiarEnlace(d.slug)}
+                            >
+                              <Link2 className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="ghost" title="Ver página pública" asChild>
+                              <a
+                                href={`/biblioteca/${d.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          </>
+                        )}
                         {d.estado === "publicado" ? (
                           <Button
                             size="sm"
