@@ -124,7 +124,6 @@ export const ACCIONES_NAVEGADOR = new Set([
   "ver_grabacion",
   "descargar_certificado",
   "abrir_evaluacion",
-  "ver_libro",
 ]);
 
 export type Contexto = {

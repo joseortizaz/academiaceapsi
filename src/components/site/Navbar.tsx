@@ -13,6 +13,7 @@ const links = [
   { to: "/docentes", label: "Docentes" },
   { to: "/eventos", label: "Eventos" },
   { to: "/blog", label: "Blog" },
+  { to: "/biblioteca", label: "Biblioteca" },
   { to: "/contactos", label: "Contactos" },
 ];
 
@@ -41,7 +42,7 @@ export function Navbar() {
           <img src={logoCeapsi} alt="CEAPSI - Centro de Aprendizaje y Cambio" className="h-12 w-auto" />
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
           {links.map((l) => (
             <Link
               key={l.to}

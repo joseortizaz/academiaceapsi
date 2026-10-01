@@ -80,6 +80,28 @@ export const Route = createFileRoute("/sitemap.xml")({
           }
         }
 
+        const libraryRoute = "/biblioteca/$slug";
+        if (isSitemapRouteIncluded(router.routesById[libraryRoute])) {
+          for (let offset = 0; ; ) {
+            const { data, error } = await supabase
+              .from("library_catalog")
+              .select("id,slug,updated_at")
+              .order("id")
+              .range(offset, offset + pageSize - 1);
+            if (error) throw error;
+            if (!data || data.length === 0) break;
+            for (const row of data) {
+              if (!row.slug) continue;
+              const location = router.buildLocation({
+                to: "/biblioteca/$slug", params: { slug: row.slug }, search: () => ({}), hash: "",
+              } as never);
+              const path = sitemapPathForLocation(router, location, libraryRoute);
+              if (path) entries.push({ path, lastmod: row.updated_at ? row.updated_at.slice(0, 10) : undefined });
+            }
+            offset += data.length;
+          }
+        }
+
         return new Response(sitemapXML(BASE_URL, entries), {
           headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=3600" },
         });
