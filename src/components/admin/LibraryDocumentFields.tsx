@@ -1,3 +1,8 @@
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { ImageIcon, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +19,7 @@ import { LibraryPdfUploader, type UploadedPdf } from "@/components/admin/Library
 import {
   LIBRARY_COVERS_BUCKET,
   LIBRARY_DESCRIPCION_MAX,
+  LIBRARY_FILES_BUCKET,
   LIBRARY_ESTADOS,
   LIBRARY_IDIOMAS,
   LIBRARY_LICENCIAS_SUGERIDAS,
@@ -80,6 +86,50 @@ export function LibraryDocumentFields({
   onCoverUploaded,
 }: Props) {
   const slugFijo = !!s.published_at;
+  const [generando, setGenerando] = useState(false);
+  // PDF subido en esta sesión del formulario: evita volver a descargarlo para la portada.
+  const pdfLocal = useRef<{ path: string; file: File } | null>(null);
+
+  const generarPortada = async (origen?: Blob, automatica = false) => {
+    setGenerando(true);
+    try {
+      let pdf = origen;
+      if (!pdf && s.file_path) {
+        if (pdfLocal.current?.path === s.file_path) {
+          pdf = pdfLocal.current.file;
+        } else {
+          const { data, error } = await supabase.storage
+            .from(LIBRARY_FILES_BUCKET)
+            .download(s.file_path);
+          if (error || !data) throw error ?? new Error("No se pudo leer el PDF");
+          pdf = data;
+        }
+      }
+      if (!pdf) return;
+
+      const { renderPdfCover } = await import("@/lib/pdf-cover");
+      const imagen = await renderPdfCover(pdf);
+      const path = `portadas/auto-${crypto.randomUUID()}.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from(LIBRARY_COVERS_BUCKET)
+        .upload(path, imagen, { contentType: "image/jpeg", cacheControl: "3600", upsert: false });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from(LIBRARY_COVERS_BUCKET).getPublicUrl(path);
+      onCoverUploaded(data.publicUrl);
+      set({ portada_url: data.publicUrl });
+      toast.success(automatica ? "Portada creada a partir de la primera página" : "Portada creada");
+    } catch (e) {
+      toast.error(
+        automatica
+          ? "No se pudo crear la portada automática; puedes subir una imagen."
+          : e instanceof Error
+            ? e.message
+            : "No se pudo crear la portada",
+      );
+    } finally {
+      setGenerando(false);
+    }
+  };
 
   return (
     <>
@@ -90,11 +140,14 @@ export function LibraryDocumentFields({
           size={s.tamano_bytes}
           onUploaded={(pdf: UploadedPdf) => {
             onPdfUploaded(pdf.path);
+            pdfLocal.current = { path: pdf.path, file: pdf.file };
             set({
               file_path: pdf.path,
               tamano_bytes: pdf.size,
               ...(pdf.paginas ? { paginas: String(pdf.paginas) } : {}),
             });
+            // Sin portada: se crea a partir de la primera página.
+            if (!s.portada_url) void generarPortada(pdf.file, true);
           }}
         />
       </div>
@@ -173,6 +226,27 @@ export function LibraryDocumentFields({
               set({ portada_url: url });
             }}
           />
+          {s.file_path && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="justify-start"
+              disabled={generando}
+              onClick={() => generarPortada()}
+            >
+              {generando ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ImageIcon className="mr-2 h-4 w-4" />
+              )}
+              {generando
+                ? "Creando portada…"
+                : s.portada_url
+                  ? "Reemplazar por la página 1 del PDF"
+                  : "Crear portada desde el PDF"}
+            </Button>
+          )}
         </div>
 
         <div className="grid content-start gap-4">
