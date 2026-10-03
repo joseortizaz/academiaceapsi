@@ -71,6 +71,13 @@
       "when": 1790878210314,
       "tag": "0009_biblioteca_virtual",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790985121430,
+      "tag": "0010_biblioteca_lector",
+      "breakpoints": true
     }
   ]
 }

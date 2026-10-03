@@ -1,16 +1,11 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, ExternalLink, Loader2, Lock, BookOpenText } from "lucide-react";
+import { BookOpenText, Download, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { getLibraryDownloadUrl } from "@/lib/library.functions";
 import { formatFileSize } from "@/lib/library";
@@ -19,28 +14,41 @@ type Props = {
   doc: { id: string; slug: string; titulo: string; tamano_bytes: number | null };
 };
 
+/** Página donde el usuario dejó la lectura de un documento (solo la suya, por RLS). */
+export function useReadingProgress(documentId: string | undefined, userId: string | undefined) {
+  return useQuery({
+    queryKey: ["biblioteca", "progreso", documentId, userId],
+    enabled: !!documentId && !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("library_reading_progress")
+        .select("pagina, total_paginas, escala, updated_at")
+        .eq("document_id", documentId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 /**
- * Botones de acceso al PDF. Sin sesión invita a registrarse o iniciar sesión y
- * vuelve a esta misma ficha; con sesión pide al servidor un enlace temporal.
+ * Acceso al PDF. Sin sesión invita a registrarse o iniciar sesión y vuelve a esta
+ * ficha; con sesión ofrece el lector (o continuar donde quedó) y la descarga.
  */
 export function LibraryAccess({ doc }: Props) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const pedirUrl = useServerFn(getLibraryDownloadUrl);
-  const [cargando, setCargando] = useState<"descargar" | "leer" | null>(null);
-  const [visor, setVisor] = useState<string | null>(null);
+  const [descargando, setDescargando] = useState(false);
+  const { data: progreso } = useReadingProgress(doc.id, user?.id);
   const volverA = `/biblioteca/${doc.slug}`;
 
-  const solicitar = async (modo: "descargar" | "leer") => {
-    setCargando(modo);
+  const descargar = async () => {
+    setDescargando(true);
     try {
-      const { url } = await pedirUrl({ data: { documentId: doc.id, modo } });
-      if (modo === "descargar") {
-        // El enlace lleva Content-Disposition: attachment, así que no sale de la página.
-        window.location.assign(url);
-        toast.success("Descarga iniciada");
-      } else {
-        setVisor(url);
-      }
+      const { url } = await pedirUrl({ data: { documentId: doc.id, modo: "descargar" } });
+      // El enlace lleva Content-Disposition: attachment, así que no sale de la página.
+      window.location.assign(url);
+      toast.success("Descarga iniciada");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
       toast.error(
@@ -49,7 +57,7 @@ export function LibraryAccess({ doc }: Props) {
           : msg || "No se pudo obtener el documento",
       );
     } finally {
-      setCargando(null);
+      setDescargando(false);
     }
   };
 
@@ -69,9 +77,12 @@ export function LibraryAccess({ doc }: Props) {
           <Lock className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div className="space-y-3">
             <div>
-              <p className="font-semibold">Descarga gratuita para usuarios registrados</p>
+              <p className="font-semibold">
+                Lectura y descarga gratuitas para usuarios registrados
+              </p>
               <p className="text-sm text-muted-foreground">
-                Crea tu cuenta gratis o inicia sesión para leer y descargar este documento.
+                Crea tu cuenta gratis o inicia sesión para leer este documento en línea, tomar notas
+                privadas o descargarlo.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -92,57 +103,32 @@ export function LibraryAccess({ doc }: Props) {
     );
   }
 
+  const continuar = progreso && progreso.pagina > 1;
+
   return (
-    <>
+    <div className="space-y-2">
       <div className="flex flex-wrap gap-3">
-        <Button size="lg" onClick={() => solicitar("descargar")} disabled={!!cargando}>
-          {cargando === "descargar" ? (
+        <Button size="lg" asChild>
+          <Link to="/biblioteca/$slug/leer" params={{ slug: doc.slug }}>
+            <BookOpenText className="mr-2 h-4 w-4" />
+            {continuar ? "Continuar leyendo" : "Leer en línea"}
+          </Link>
+        </Button>
+        <Button size="lg" variant="outline" onClick={descargar} disabled={descargando}>
+          {descargando ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Download className="mr-2 h-4 w-4" />
           )}
           Descargar PDF{doc.tamano_bytes ? ` (${formatFileSize(doc.tamano_bytes)})` : ""}
         </Button>
-        <Button size="lg" variant="outline" onClick={() => solicitar("leer")} disabled={!!cargando}>
-          {cargando === "leer" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <BookOpenText className="mr-2 h-4 w-4" />
-          )}
-          Leer en línea
-        </Button>
       </div>
-
-      <Dialog open={!!visor} onOpenChange={(o) => !o && setVisor(null)}>
-        <DialogContent className="flex h-[92vh] max-w-5xl flex-col gap-3 p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="pr-8 text-base sm:text-lg">{doc.titulo}</DialogTitle>
-            <DialogDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span>
-                Si el documento no se muestra en tu dispositivo, ábrelo en una pestaña nueva.
-              </span>
-              {visor && (
-                <a
-                  href={visor}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Abrir en pestaña nueva
-                </a>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          {visor && (
-            <iframe
-              src={visor}
-              title={doc.titulo}
-              className="min-h-0 w-full flex-1 rounded-md border bg-muted"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
+      {continuar && (
+        <p className="text-sm text-muted-foreground">
+          Te quedaste en la página {progreso.pagina}
+          {progreso.total_paginas ? ` de ${progreso.total_paginas}` : ""}.
+        </p>
+      )}
+    </div>
   );
 }

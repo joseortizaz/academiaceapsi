@@ -487,7 +487,7 @@ function BibliotecaAdminPage() {
                         <EditButton onClick={() => abrir(toForm(d))} />
                         <DeleteButton
                           onConfirm={() => remove(d)}
-                          label={`"${d.titulo}" junto con su PDF y su portada`}
+                          label={`"${d.titulo}" con su PDF, su portada y las notas y el progreso de lectura de los usuarios,`}
                         />
                       </TableCell>
                     </TableRow>

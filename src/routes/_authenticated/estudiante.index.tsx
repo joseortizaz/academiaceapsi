@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { ContinueReading } from "@/components/library/ContinueReading";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -442,6 +443,8 @@ function EstudianteDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ContinueReading userId={user?.id} />
 
       {/* Anuncios */}
       {(data?.announcements ?? []).length > 0 && (

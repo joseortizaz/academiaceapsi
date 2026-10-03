@@ -45,6 +45,7 @@ import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as BibliotecaSlugLeerRouteImport } from './routes/biblioteca.$slug_.leer'
 import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
 import { Route as ApiPublicZoomOauthCallbackRouteImport } from './routes/api/public/zoom-oauth-callback'
 import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
@@ -278,6 +279,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BibliotecaSlugLeerRoute = BibliotecaSlugLeerRouteImport.update({
+  id: '/$slug_/leer',
+  path: '/$slug/leer',
+  getParentRoute: () => BibliotecaRoute,
 } as any)
 const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
   id: '/api/public/zoom-webhook',
@@ -639,6 +645,7 @@ export interface FileRoutesByFullPath {
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/biblioteca/$slug/leer': typeof BibliotecaSlugLeerRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/docente/': typeof AuthenticatedDocenteIndexRoute
@@ -720,6 +727,7 @@ export interface FileRoutesByTo {
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/biblioteca/$slug/leer': typeof BibliotecaSlugLeerRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/docente': typeof AuthenticatedDocenteIndexRoute
@@ -808,6 +816,7 @@ export interface FileRoutesById {
   '/api/public/course-request': typeof ApiPublicCourseRequestRoute
   '/api/public/zoom-oauth-callback': typeof ApiPublicZoomOauthCallbackRoute
   '/api/public/zoom-webhook': typeof ApiPublicZoomWebhookRoute
+  '/biblioteca/$slug_/leer': typeof BibliotecaSlugLeerRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
@@ -896,6 +905,7 @@ export interface FileRouteTypes {
     | '/api/public/course-request'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
+    | '/biblioteca/$slug/leer'
     | '/lovable/email/suppression'
     | '/admin/'
     | '/docente/'
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | '/api/public/course-request'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
+    | '/biblioteca/$slug/leer'
     | '/lovable/email/suppression'
     | '/admin'
     | '/docente'
@@ -1064,6 +1075,7 @@ export interface FileRouteTypes {
     | '/api/public/course-request'
     | '/api/public/zoom-oauth-callback'
     | '/api/public/zoom-webhook'
+    | '/biblioteca/$slug_/leer'
     | '/lovable/email/suppression'
     | '/_authenticated/admin/'
     | '/_authenticated/docente/'
@@ -1371,6 +1383,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/biblioteca/$slug_/leer': {
+      id: '/biblioteca/$slug_/leer'
+      path: '/$slug/leer'
+      fullPath: '/biblioteca/$slug/leer'
+      preLoaderRoute: typeof BibliotecaSlugLeerRouteImport
+      parentRoute: typeof BibliotecaRoute
     }
     '/api/public/zoom-webhook': {
       id: '/api/public/zoom-webhook'
@@ -1855,11 +1874,13 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 interface BibliotecaRouteChildren {
   BibliotecaSlugRoute: typeof BibliotecaSlugRoute
   BibliotecaIndexRoute: typeof BibliotecaIndexRoute
+  BibliotecaSlugLeerRoute: typeof BibliotecaSlugLeerRoute
 }
 
 const BibliotecaRouteChildren: BibliotecaRouteChildren = {
   BibliotecaSlugRoute: BibliotecaSlugRoute,
   BibliotecaIndexRoute: BibliotecaIndexRoute,
+  BibliotecaSlugLeerRoute: BibliotecaSlugLeerRoute,
 }
 
 const BibliotecaRouteWithChildren = BibliotecaRoute._addFileChildren(

@@ -6,7 +6,7 @@ export const LEGAL_ADDRESS =
   "Presidente Hipólito Irigoyen No. 5, Zona Universitaria, Distrito Nacional, República Dominicana";
 export const PRIVACY_EMAIL = "admin@ceapsird.com";
 export const PRIVACY_PHONE = "809-784-5106";
-export const PRIVACY_LAST_UPDATED = "1 de octubre de 2026";
+export const PRIVACY_LAST_UPDATED = "2 de octubre de 2026";
 
 export const programaUrl = (slug: string) => `${SITE_URL}/programas/${slug}`;
 export const bibliotecaUrl = (slug: string) => `${SITE_URL}/biblioteca/${slug}`;

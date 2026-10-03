@@ -98,7 +98,7 @@ function Privacidad() {
               <li><strong>Formulario de contacto:</strong> datos de contacto, asunto y contenido del mensaje.</li>
               <li><strong>Pagos:</strong> comprobante de pago cargado.</li>
               <li><strong>Actividad académica:</strong> avance, evaluaciones y entregas, calificaciones y certificados.</li>
-              <li><strong>Biblioteca Virtual:</strong> documentos que lee en línea o descarga, con fecha y hora. Para leer o descargar es necesario tener una cuenta.</li>
+              <li><strong>Biblioteca Virtual:</strong> documentos que lee en línea o descarga, con fecha y hora; la página en la que dejó cada lectura; y los resaltados y notas que cree en el lector. Para leer o descargar es necesario tener una cuenta.</li>
               <li><strong>Contenido publicado:</strong> reseñas y comentarios.</li>
               <li><strong>Clases virtuales:</strong> grabaciones y participación en sesiones de Zoom cuando la sesión se graba.</li>
               <li><strong>Auditoría y seguridad:</strong> fecha y hora, dirección IP, tipo de dispositivo y navegador, inicios de sesión y acciones realizadas en el portal.</li>
@@ -115,7 +115,7 @@ function Privacidad() {
               <li>Enviar comunicaciones operativas y académicas por correo electrónico o WhatsApp.</li>
               <li>Responder solicitudes y mensajes.</li>
               <li>Publicar reseñas moderadas y perfiles de docentes.</li>
-              <li>Dar acceso a los documentos de la Biblioteca Virtual y conocer qué materiales resultan más útiles. El contador de descargas de cada documento es una cifra global que no identifica a nadie.</li>
+              <li>Dar acceso a los documentos de la Biblioteca Virtual y conocer qué materiales resultan más útiles. El contador de descargas de cada documento es una cifra global que no identifica a nadie. Sus resaltados y notas son privados: en el portal solo usted puede verlos; ni otros usuarios ni los administradores tienen acceso a ellos.</li>
               <li>Proteger el portal, prevenir fraude y mantener trazabilidad mediante auditoría.</li>
               <li>Mejorar el servicio y cumplir obligaciones legales, contables y contractuales.</li>
             </ul>
@@ -142,6 +142,7 @@ function Privacidad() {
             <ul>
               <li>Los registros de auditoría de cambios y acciones administrativas se conservan durante 24 meses.</li>
               <li>Los registros de acceso, de actividad de aprendizaje y de uso de la Biblioteca Virtual se conservan durante 12 meses.</li>
+              <li>Sus resaltados, notas y la página en que dejó cada lectura se conservan mientras su cuenta esté activa. Puede borrarlos usted mismo desde el lector y se eliminan al eliminar la cuenta.</li>
             </ul>
             <p>Después se eliminan o anonimizan. La supresión no procede cuando existe una obligación legal o contractual de conservación; en ese caso, los datos se bloquean, conforme a los artículos 8 y 15.</p>
           </LegalSection>
