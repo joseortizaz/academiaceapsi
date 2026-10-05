@@ -17,7 +17,8 @@ import { LibraryCard, CATALOG_COLUMNS, type CatalogDoc } from "@/components/libr
 import { pageHead } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-const POR_PAGINA = 24;
+// 5 filas completas de 5 libros en pantallas grandes.
+const POR_PAGINA = 25;
 const ORDENES = {
   recientes: "Más recientes",
   descargados: "Más descargados",
@@ -166,7 +167,7 @@ function BibliotecaPage() {
   }, [docs, q, categoria, orden]);
 
   const hayFiltro = !!q || !!categoria;
-  const destacados = !hayFiltro && pagina === 1 ? docs.filter((d) => d.destacado).slice(0, 4) : [];
+  const destacados = !hayFiltro && pagina === 1 ? docs.filter((d) => d.destacado).slice(0, 5) : [];
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaActual = Math.min(pagina, totalPaginas);
   const visibles = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA);
@@ -214,7 +215,7 @@ function BibliotecaPage() {
             {destacados.length > 0 && (
               <div className="mb-12">
                 <h2 className="mb-5 text-xl font-bold">Destacados</h2>
-                <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5">
                   {destacados.map((d) => (
                     <LibraryCard key={d.id} doc={d} />
                   ))}
@@ -278,7 +279,7 @@ function BibliotecaPage() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5">
                 {visibles.map((d) => (
                   <LibraryCard key={d.id} doc={d} />
                 ))}

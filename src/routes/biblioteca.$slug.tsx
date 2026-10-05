@@ -136,7 +136,7 @@ function DocumentoPage() {
         .eq("categoria_id", doc!.categoria_id!)
         .neq("id", doc!.id)
         .order("descargas", { ascending: false })
-        .limit(4);
+        .limit(5);
       if (error) throw error;
       return (data ?? []) as CatalogDoc[];
     },
@@ -269,7 +269,7 @@ function DocumentoPage() {
         {relacionados.length > 0 && (
           <section className="mt-16">
             <h2 className="mb-5 text-xl font-bold">Más en {doc.categoria_nombre}</h2>
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 md:grid-cols-4 lg:grid-cols-5">
               {relacionados.map((d) => (
                 <LibraryCard key={d.id} doc={d} />
               ))}
