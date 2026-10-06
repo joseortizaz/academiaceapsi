@@ -261,6 +261,7 @@ function BalanceActivoInvoices() {
   const listFn = useServerFn(listMyInvoices);
   const syncFn = useServerFn(syncMyInvoices);
   const qc = useQueryClient();
+  const [syncing, setSyncing] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["ba-invoices"],
@@ -269,11 +270,11 @@ function BalanceActivoInvoices() {
 
   const invoices = data?.invoices ?? [];
   const payments = data?.payments ?? [];
-  const saldoPendiente = invoices
-    .filter((i: any) => i.estado !== "pagada")
-    .reduce((sum: number, i: any) => sum + Number(i.saldo ?? i.total ?? 0), 0);
+  const linked = data?.linked ?? true;
+  const saldoPendiente = invoices.reduce((sum: number, i: any) => sum + invoiceBalance(i), 0);
 
   const onSync = async () => {
+    setSyncing(true);
     try {
       const r = await syncFn();
       if (!r.linked) {
@@ -284,6 +285,8 @@ function BalanceActivoInvoices() {
       }
     } catch (e: any) {
       toast.error(e.message);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -294,14 +297,16 @@ function BalanceActivoInvoices() {
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" /> Facturas y cobros
           </CardTitle>
-          {saldoPendiente > 0 && (
+          {saldoPendiente > 0 ? (
             <p className="mt-1 text-sm text-amber-700">
               Saldo pendiente: <span className="font-semibold">RD$ {saldoPendiente.toLocaleString("es-DO")}</span>
             </p>
-          )}
+          ) : invoices.length > 0 ? (
+            <p className="mt-1 text-sm text-emerald-700">Estás al día con tus pagos.</p>
+          ) : null}
         </div>
-        <Button size="sm" variant="outline" onClick={onSync} disabled={isLoading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} /> Sincronizar
+        <Button size="sm" variant="outline" onClick={onSync} disabled={isLoading || syncing}>
+          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading || syncing ? "animate-spin" : ""}`} /> Sincronizar
         </Button>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -309,7 +314,9 @@ function BalanceActivoInvoices() {
           <p className="mb-2 text-sm font-medium">Facturas</p>
           {invoices.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
-              Aún no hay facturas emitidas.
+              {linked
+                ? "Aún no hay facturas emitidas."
+                : "Tu cuenta todavía no está vinculada con el sistema de facturación. Escribe a administración para que puedas ver tu estado de cuenta aquí."}
             </p>
           ) : (
             <Table>
@@ -319,6 +326,7 @@ function BalanceActivoInvoices() {
                   <TableHead>NCF / #</TableHead>
                   <TableHead>Concepto</TableHead>
                   <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-right">Saldo</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">PDF</TableHead>
                 </TableRow>
@@ -334,18 +342,11 @@ function BalanceActivoInvoices() {
                     <TableCell className="text-right font-semibold">
                       {i.moneda ?? "RD$"} {Number(i.total ?? 0).toLocaleString("es-DO")}
                     </TableCell>
+                    <TableCell className="text-right">
+                      {i.moneda ?? "RD$"} {invoiceBalance(i).toLocaleString("es-DO")}
+                    </TableCell>
                     <TableCell>
-                      <Badge
-                        className={
-                          i.estado === "pagada"
-                            ? "bg-emerald-500/15 text-emerald-700"
-                            : i.estado === "vencida"
-                              ? "bg-red-500/15 text-red-700"
-                              : "bg-amber-500/15 text-amber-700"
-                        }
-                      >
-                        {i.estado}
-                      </Badge>
+                      <InvoiceStatusBadge invoice={i} />
                     </TableCell>
                     <TableCell className="text-right">
                       {i.pdf_url ? (
@@ -397,4 +398,30 @@ function BalanceActivoInvoices() {
       </CardContent>
     </Card>
   );
+}
+
+/** Saldo pendiente de una factura: `saldo` si está; si no, total menos lo pagado según BA. */
+function invoiceBalance(i: any): number {
+  if (i.estado === "pagada" || i.estado === "anulada") return 0;
+  if (i.saldo !== null && i.saldo !== undefined) return Math.max(Number(i.saldo) || 0, 0);
+  const total = Number(i.total ?? 0);
+  const pagado = Number(i.raw?.monto_pagado ?? 0);
+  return Math.max(total - pagado, 0);
+}
+
+function InvoiceStatusBadge({ invoice: i }: { invoice: any }) {
+  const saldo = invoiceBalance(i);
+  const parcial = i.estado !== "pagada" && i.estado !== "vencida" && saldo > 0 && saldo < Number(i.total ?? 0);
+  const label = i.estado === "pagada" ? "Pagada" : i.estado === "vencida" ? "Vencida" : i.estado === "anulada" ? "Anulada" : parcial ? "Pago parcial" : "Pendiente";
+  const cls =
+    i.estado === "pagada"
+      ? "bg-emerald-500/15 text-emerald-700"
+      : i.estado === "vencida"
+        ? "bg-red-500/15 text-red-700"
+        : i.estado === "anulada"
+          ? "bg-muted text-muted-foreground"
+          : parcial
+            ? "bg-sky-500/15 text-sky-700"
+            : "bg-amber-500/15 text-amber-700";
+  return <Badge className={cls}>{label}</Badge>;
 }
