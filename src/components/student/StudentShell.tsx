@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { MoraBanner } from "@/components/student/MoraBanner";
 import { ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,7 +121,10 @@ export function StudentShell({ children }: { children: ReactNode }) {
           <div className="hidden flex-1 md:block" />
           <NotificationsBell />
         </div>
-        <main className="p-4 md:p-8">{children}</main>
+        <main className="p-4 md:p-8">
+          <MoraBanner />
+          {children}
+        </main>
       </div>
 
     </div>

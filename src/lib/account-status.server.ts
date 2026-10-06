@@ -30,3 +30,19 @@ export async function isAccountActive(userId: string): Promise<boolean> {
 export async function assertAccountActive(userId: string): Promise<void> {
   if (!(await isAccountActive(userId))) throw new Error(SUSPENDED_ACCOUNT_MESSAGE);
 }
+
+export const RESTRICTED_CONTENT_MESSAGE =
+  "Su acceso a los contenidos ha sido restringido por incumplimiento en el pago. Comuníquese con la dirección para regularizar su situación.";
+
+/**
+ * Acceso al contenido de los programas: cuenta activa y sin restricción por mora
+ * (función SQL content_access_allowed, migración 0012). Para lo que se sirve con
+ * el cliente admin: grabaciones y clases en vivo.
+ */
+export async function assertContentAccess(userId: string): Promise<void> {
+  await assertAccountActive(userId);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await (supabaseAdmin as any).rpc("content_access_allowed", { _user_id: userId });
+  if (error) return; // función aún no aplicada: se mantiene el control de cuenta activa
+  if (data === false) throw new Error(RESTRICTED_CONTENT_MESSAGE);
+}

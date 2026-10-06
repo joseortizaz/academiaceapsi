@@ -70,10 +70,16 @@ export const Route = createFileRoute("/api/public/balance-activo-webhook")({
               .maybeSingle();
             const userId = (profile as any)?.id ?? null;
 
-            const { error: invErr } = await supabaseAdmin
-              .from("external_invoices")
-              .upsert(mapInvoiceRow(payload, userId), { onConflict: "external_id" });
-            if (invErr) throw new Error(invErr.message);
+            if (userId) {
+              // El evento no trae el plan de cuotas: se vuelve a leer el estado de
+              // cuenta completo del alumno desde la API (y se recalcula su mora).
+              await syncCustomerData(userId, customerId);
+            } else {
+              const { error: invErr } = await supabaseAdmin
+                .from("external_invoices")
+                .upsert(mapInvoiceRow(payload, userId), { onConflict: "external_id" });
+              if (invErr) throw new Error(invErr.message);
+            }
           } else if (evt === "cobro.created" || evt === "cobro.updated") {
             const invoiceExtId = payload.factura_id;
             const { data: inv } = await supabaseAdmin
