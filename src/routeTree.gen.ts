@@ -9,163 +9,102 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
-import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
-import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegistroRouteImport } from './routes/registro'
-import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
-import { Route as ProgramasRouteImport } from './routes/programas'
-import { Route as PrivacidadRouteImport } from './routes/privacidad'
-import { Route as GaleriaRouteImport } from './routes/galeria'
-import { Route as EventosRouteImport } from './routes/eventos'
-import { Route as DocentesRouteImport } from './routes/docentes'
-import { Route as ContactosRouteImport } from './routes/contactos'
-import { Route as BibliotecaRouteImport } from './routes/biblioteca'
-import { Route as AccederRouteImport } from './routes/acceder'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as BibliotecaIndexRouteImport } from './routes/biblioteca.index'
-import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
-import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
-import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as BibliotecaSlugRouteImport } from './routes/biblioteca.$slug'
-import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
-import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
-import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
-import { Route as AuthenticatedCambiarPasswordRouteImport } from './routes/_authenticated/cambiar-password'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AccederRouteImport } from './routes/acceder'
+import { Route as BibliotecaRouteImport } from './routes/biblioteca'
+import { Route as ContactosRouteImport } from './routes/contactos'
+import { Route as DocentesRouteImport } from './routes/docentes'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as GaleriaRouteImport } from './routes/galeria'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
+import { Route as ProgramasRouteImport } from './routes/programas'
+import { Route as RecuperarPasswordRouteImport } from './routes/recuperar-password'
+import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SobreNosotrosRouteImport } from './routes/sobre-nosotros'
+import { Route as SolicitudCursoRouteImport } from './routes/solicitud-curso'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authenticated/mis-cursos.index'
-import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
-import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as BibliotecaSlugLeerRouteImport } from './routes/biblioteca.$slug_.leer'
-import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
-import { Route as ApiPublicZoomOauthCallbackRouteImport } from './routes/api/public/zoom-oauth-callback'
-import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
-import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
-import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
-import { Route as AuthenticatedEstudianteInstructivoRouteImport } from './routes/_authenticated/estudiante.instructivo'
-import { Route as AuthenticatedEstudianteFacturacionRouteImport } from './routes/_authenticated/estudiante.facturacion'
-import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
-import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
-import { Route as AuthenticatedDocenteLeccionesRouteImport } from './routes/_authenticated/docente.lecciones'
-import { Route as AuthenticatedDocenteInstructivoRouteImport } from './routes/_authenticated/docente.instructivo'
-import { Route as AuthenticatedDocenteGruposRouteImport } from './routes/_authenticated/docente.grupos'
-import { Route as AuthenticatedDocenteEvaluacionesRouteImport } from './routes/_authenticated/docente.evaluaciones'
-import { Route as AuthenticatedDocenteCursosRouteImport } from './routes/_authenticated/docente.cursos'
-import { Route as AuthenticatedDocenteCuentaRouteImport } from './routes/_authenticated/docente.cuenta'
-import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
-import { Route as AuthenticatedDocenteClasesVivoRouteImport } from './routes/_authenticated/docente.clases-vivo'
-import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
-import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_authenticated/clase-vivo.$meetingId'
-import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
-import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
-import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
-import { Route as AuthenticatedAdminResenasRouteImport } from './routes/_authenticated/admin.resenas'
-import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
-import { Route as AuthenticatedAdminMoraRouteImport } from './routes/_authenticated/admin.mora'
-import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
-import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
-import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_authenticated/admin.integraciones'
-import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
-import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
-import { Route as AuthenticatedAdminGruposRouteImport } from './routes/_authenticated/admin.grupos'
-import { Route as AuthenticatedAdminFacturacionRouteImport } from './routes/_authenticated/admin.facturacion'
-import { Route as AuthenticatedAdminEventosRouteImport } from './routes/_authenticated/admin.eventos'
-import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
-import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
-import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
-import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
-import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
-import { Route as AuthenticatedAdminBibliotecaRouteImport } from './routes/_authenticated/admin.biblioteca'
-import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin.auditoria'
-import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as AuthenticatedCambiarPasswordRouteImport } from './routes/_authenticated/cambiar-password'
+import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
+import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
+import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
+import { Route as BibliotecaIndexRouteImport } from './routes/biblioteca.index'
+import { Route as BibliotecaSlugRouteImport } from './routes/biblioteca.$slug'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as ProgramasIndexRouteImport } from './routes/programas.index'
+import { Route as ProgramasSlugRouteImport } from './routes/programas.$slug'
+import { Route as VerificarNumeroRouteImport } from './routes/verificar.$numero'
+import { Route as VerifyCodeRouteImport } from './routes/verify.$code'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
-import { Route as ApiPublicRecordingMeetingIdRouteImport } from './routes/api/public/recording.$meetingId'
-import { Route as ApiPublicHooksSyncActiveStudentsRouteImport } from './routes/api/public/hooks/sync-active-students'
-import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './routes/api/public/hooks/reconcile-zoom-recordings'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin.auditoria'
+import { Route as AuthenticatedAdminBibliotecaRouteImport } from './routes/_authenticated/admin.biblioteca'
+import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin.blog'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin.categorias'
+import { Route as AuthenticatedAdminCertificadosRouteImport } from './routes/_authenticated/admin.certificados'
+import { Route as AuthenticatedAdminDocentesRouteImport } from './routes/_authenticated/admin.docentes'
+import { Route as AuthenticatedAdminEvaluacionesRouteImport } from './routes/_authenticated/admin.evaluaciones'
+import { Route as AuthenticatedAdminEventosRouteImport } from './routes/_authenticated/admin.eventos'
+import { Route as AuthenticatedAdminFacturacionRouteImport } from './routes/_authenticated/admin.facturacion'
+import { Route as AuthenticatedAdminGruposRouteImport } from './routes/_authenticated/admin.grupos'
+import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
+import { Route as AuthenticatedAdminInscripcionesRouteImport } from './routes/_authenticated/admin.inscripciones'
+import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_authenticated/admin.integraciones'
+import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
+import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
+import { Route as AuthenticatedAdminMoraRouteImport } from './routes/_authenticated/admin.mora'
+import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
+import { Route as AuthenticatedAdminResenasRouteImport } from './routes/_authenticated/admin.resenas'
+import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
+import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as AuthenticatedClaseVivoMeetingIdRouteImport } from './routes/_authenticated/clase-vivo.$meetingId'
+import { Route as AuthenticatedDocenteIndexRouteImport } from './routes/_authenticated/docente.index'
+import { Route as AuthenticatedDocenteCalificacionesRouteImport } from './routes/_authenticated/docente.calificaciones'
+import { Route as AuthenticatedDocenteClasesVivoRouteImport } from './routes/_authenticated/docente.clases-vivo'
+import { Route as AuthenticatedDocenteComunidadRouteImport } from './routes/_authenticated/docente.comunidad'
+import { Route as AuthenticatedDocenteCuentaRouteImport } from './routes/_authenticated/docente.cuenta'
+import { Route as AuthenticatedDocenteCursosRouteImport } from './routes/_authenticated/docente.cursos'
+import { Route as AuthenticatedDocenteEvaluacionesRouteImport } from './routes/_authenticated/docente.evaluaciones'
+import { Route as AuthenticatedDocenteGruposRouteImport } from './routes/_authenticated/docente.grupos'
+import { Route as AuthenticatedDocenteInstructivoRouteImport } from './routes/_authenticated/docente.instructivo'
+import { Route as AuthenticatedDocenteLeccionesRouteImport } from './routes/_authenticated/docente.lecciones'
+import { Route as AuthenticatedEstudianteIndexRouteImport } from './routes/_authenticated/estudiante.index'
+import { Route as AuthenticatedEstudianteCuentaRouteImport } from './routes/_authenticated/estudiante.cuenta'
+import { Route as AuthenticatedEstudianteEvaluacionesRouteImport } from './routes/_authenticated/estudiante.evaluaciones'
+import { Route as AuthenticatedEstudianteFacturacionRouteImport } from './routes/_authenticated/estudiante.facturacion'
+import { Route as AuthenticatedEstudianteInstructivoRouteImport } from './routes/_authenticated/estudiante.instructivo'
+import { Route as AuthenticatedMisCursosIndexRouteImport } from './routes/_authenticated/mis-cursos.index'
+import { Route as AuthenticatedMisCursosSlugRouteImport } from './routes/_authenticated/mis-cursos.$slug'
+import { Route as ApiPublicBalanceActivoWebhookRouteImport } from './routes/api/public/balance-activo-webhook'
+import { Route as ApiPublicCourseRequestRouteImport } from './routes/api/public/course-request'
+import { Route as ApiPublicZoomOauthCallbackRouteImport } from './routes/api/public/zoom-oauth-callback'
+import { Route as ApiPublicZoomWebhookRouteImport } from './routes/api/public/zoom-webhook'
+import { Route as BibliotecaSlugLeerRouteImport } from './routes/biblioteca.$slug_.leer'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicHooksEvaluarMoraRouteImport } from './routes/api/public/hooks/evaluar-mora'
+import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './routes/api/public/hooks/reconcile-zoom-recordings'
+import { Route as ApiPublicHooksSyncActiveStudentsRouteImport } from './routes/api/public/hooks/sync-active-students'
+import { Route as ApiPublicRecordingMeetingIdRouteImport } from './routes/api/public/recording.$meetingId'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
-  id: '/solicitud-curso',
-  path: '/solicitud-curso',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
-  id: '/sobre-nosotros',
-  path: '/sobre-nosotros',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistroRoute = RegistroRouteImport.update({
-  id: '/registro',
-  path: '/registro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
-  id: '/recuperar-password',
-  path: '/recuperar-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgramasRoute = ProgramasRouteImport.update({
-  id: '/programas',
-  path: '/programas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacidadRoute = PrivacidadRouteImport.update({
-  id: '/privacidad',
-  path: '/privacidad',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GaleriaRoute = GaleriaRouteImport.update({
-  id: '/galeria',
-  path: '/galeria',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventosRoute = EventosRouteImport.update({
-  id: '/eventos',
-  path: '/eventos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocentesRoute = DocentesRouteImport.update({
-  id: '/docentes',
-  path: '/docentes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactosRoute = ContactosRouteImport.update({
-  id: '/contactos',
-  path: '/contactos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BibliotecaRoute = BibliotecaRouteImport.update({
-  id: '/biblioteca',
-  path: '/biblioteca',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccederRoute = AccederRouteImport.update({
@@ -173,48 +112,116 @@ const AccederRoute = AccederRouteImport.update({
   path: '/acceder',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const BibliotecaRoute = BibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactosRoute = ContactosRouteImport.update({
+  id: '/contactos',
+  path: '/contactos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProgramasRoute,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
+const DocentesRoute = DocentesRouteImport.update({
+  id: '/docentes',
+  path: '/docentes',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GaleriaRoute = GaleriaRouteImport.update({
+  id: '/galeria',
+  path: '/galeria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasRoute = ProgramasRouteImport.update({
+  id: '/programas',
+  path: '/programas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecuperarPasswordRoute = RecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistroRoute = RegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreNosotrosRoute = SobreNosotrosRouteImport.update({
+  id: '/sobre-nosotros',
+  path: '/sobre-nosotros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudCursoRoute = SolicitudCursoRouteImport.update({
+  id: '/solicitud-curso',
+  path: '/solicitud-curso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCambiarPasswordRoute =
+  AuthenticatedCambiarPasswordRouteImport.update({
+    id: '/cambiar-password',
+    path: '/cambiar-password',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCertificadosRoute =
+  AuthenticatedCertificadosRouteImport.update({
+    id: '/certificados',
+    path: '/certificados',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDocenteRoute = AuthenticatedDocenteRouteImport.update({
+  id: '/docente',
+  path: '/docente',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
+  id: '/estudiante',
+  path: '/estudiante',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const BibliotecaIndexRoute = BibliotecaIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => BibliotecaRoute,
 } as any)
-const VerifyCodeRoute = VerifyCodeRouteImport.update({
-  id: '/verify/$code',
-  path: '/verify/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
-  id: '/verificar/$numero',
-  path: '/verificar/$numero',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
+const BibliotecaSlugRoute = BibliotecaSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
-  getParentRoute: () => ProgramasRoute,
+  getParentRoute: () => BibliotecaRoute,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -222,298 +229,45 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BibliotecaSlugRoute = BibliotecaSlugRouteImport.update({
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramasIndexRoute = ProgramasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProgramasRoute,
+} as any)
+const ProgramasSlugRoute = ProgramasSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
-  getParentRoute: () => BibliotecaRoute,
+  getParentRoute: () => ProgramasRoute,
 } as any)
-const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
-  id: '/estudiante',
-  path: '/estudiante',
-  getParentRoute: () => AuthenticatedRoute,
+const VerificarNumeroRoute = VerificarNumeroRouteImport.update({
+  id: '/verificar/$numero',
+  path: '/verificar/$numero',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDocenteRoute = AuthenticatedDocenteRouteImport.update({
-  id: '/docente',
-  path: '/docente',
-  getParentRoute: () => AuthenticatedRoute,
+const VerifyCodeRoute = VerifyCodeRouteImport.update({
+  id: '/verify/$code',
+  path: '/verify/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedCertificadosRoute =
-  AuthenticatedCertificadosRouteImport.update({
-    id: '/certificados',
-    path: '/certificados',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedCambiarPasswordRoute =
-  AuthenticatedCambiarPasswordRouteImport.update({
-    id: '/cambiar-password',
-    path: '/cambiar-password',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRoute,
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedMisCursosIndexRoute =
-  AuthenticatedMisCursosIndexRouteImport.update({
-    id: '/mis-cursos/',
-    path: '/mis-cursos/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedEstudianteIndexRoute =
-  AuthenticatedEstudianteIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedEstudianteRoute,
-  } as any)
-const AuthenticatedDocenteIndexRoute =
-  AuthenticatedDocenteIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BibliotecaSlugLeerRoute = BibliotecaSlugLeerRouteImport.update({
-  id: '/$slug_/leer',
-  path: '/$slug/leer',
-  getParentRoute: () => BibliotecaRoute,
-} as any)
-const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
-  id: '/api/public/zoom-webhook',
-  path: '/api/public/zoom-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicZoomOauthCallbackRoute =
-  ApiPublicZoomOauthCallbackRouteImport.update({
-    id: '/api/public/zoom-oauth-callback',
-    path: '/api/public/zoom-oauth-callback',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicCourseRequestRoute = ApiPublicCourseRequestRouteImport.update({
-  id: '/api/public/course-request',
-  path: '/api/public/course-request',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicBalanceActivoWebhookRoute =
-  ApiPublicBalanceActivoWebhookRouteImport.update({
-    id: '/api/public/balance-activo-webhook',
-    path: '/api/public/balance-activo-webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedMisCursosSlugRoute =
-  AuthenticatedMisCursosSlugRouteImport.update({
-    id: '/mis-cursos/$slug',
-    path: '/mis-cursos/$slug',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedEstudianteInstructivoRoute =
-  AuthenticatedEstudianteInstructivoRouteImport.update({
-    id: '/instructivo',
-    path: '/instructivo',
-    getParentRoute: () => AuthenticatedEstudianteRoute,
-  } as any)
-const AuthenticatedEstudianteFacturacionRoute =
-  AuthenticatedEstudianteFacturacionRouteImport.update({
-    id: '/facturacion',
-    path: '/facturacion',
-    getParentRoute: () => AuthenticatedEstudianteRoute,
-  } as any)
-const AuthenticatedEstudianteEvaluacionesRoute =
-  AuthenticatedEstudianteEvaluacionesRouteImport.update({
-    id: '/evaluaciones',
-    path: '/evaluaciones',
-    getParentRoute: () => AuthenticatedEstudianteRoute,
-  } as any)
-const AuthenticatedEstudianteCuentaRoute =
-  AuthenticatedEstudianteCuentaRouteImport.update({
-    id: '/cuenta',
-    path: '/cuenta',
-    getParentRoute: () => AuthenticatedEstudianteRoute,
-  } as any)
-const AuthenticatedDocenteLeccionesRoute =
-  AuthenticatedDocenteLeccionesRouteImport.update({
-    id: '/lecciones',
-    path: '/lecciones',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteInstructivoRoute =
-  AuthenticatedDocenteInstructivoRouteImport.update({
-    id: '/instructivo',
-    path: '/instructivo',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteGruposRoute =
-  AuthenticatedDocenteGruposRouteImport.update({
-    id: '/grupos',
-    path: '/grupos',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteEvaluacionesRoute =
-  AuthenticatedDocenteEvaluacionesRouteImport.update({
-    id: '/evaluaciones',
-    path: '/evaluaciones',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteCursosRoute =
-  AuthenticatedDocenteCursosRouteImport.update({
-    id: '/cursos',
-    path: '/cursos',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteCuentaRoute =
-  AuthenticatedDocenteCuentaRouteImport.update({
-    id: '/cuenta',
-    path: '/cuenta',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteComunidadRoute =
-  AuthenticatedDocenteComunidadRouteImport.update({
-    id: '/comunidad',
-    path: '/comunidad',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteClasesVivoRoute =
-  AuthenticatedDocenteClasesVivoRouteImport.update({
-    id: '/clases-vivo',
-    path: '/clases-vivo',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedDocenteCalificacionesRoute =
-  AuthenticatedDocenteCalificacionesRouteImport.update({
-    id: '/calificaciones',
-    path: '/calificaciones',
-    getParentRoute: () => AuthenticatedDocenteRoute,
-  } as any)
-const AuthenticatedClaseVivoMeetingIdRoute =
-  AuthenticatedClaseVivoMeetingIdRouteImport.update({
-    id: '/clase-vivo/$meetingId',
-    path: '/clase-vivo/$meetingId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAdminUsuariosRoute =
-  AuthenticatedAdminUsuariosRouteImport.update({
-    id: '/usuarios',
-    path: '/usuarios',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminTestimoniosRoute =
-  AuthenticatedAdminTestimoniosRouteImport.update({
-    id: '/testimonios',
-    path: '/testimonios',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminSolicitudesRoute =
-  AuthenticatedAdminSolicitudesRouteImport.update({
-    id: '/solicitudes',
-    path: '/solicitudes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminResenasRoute =
-  AuthenticatedAdminResenasRouteImport.update({
-    id: '/resenas',
-    path: '/resenas',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminProgramasRoute =
-  AuthenticatedAdminProgramasRouteImport.update({
-    id: '/programas',
-    path: '/programas',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminMoraRoute = AuthenticatedAdminMoraRouteImport.update({
-  id: '/mora',
-  path: '/mora',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminModulosRoute =
-  AuthenticatedAdminModulosRouteImport.update({
-    id: '/modulos',
-    path: '/modulos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminMensajesRoute =
-  AuthenticatedAdminMensajesRouteImport.update({
-    id: '/mensajes',
-    path: '/mensajes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminIntegracionesRoute =
-  AuthenticatedAdminIntegracionesRouteImport.update({
-    id: '/integraciones',
-    path: '/integraciones',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminInscripcionesRoute =
-  AuthenticatedAdminInscripcionesRouteImport.update({
-    id: '/inscripciones',
-    path: '/inscripciones',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminHeroRoute = AuthenticatedAdminHeroRouteImport.update({
-  id: '/hero',
-  path: '/hero',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminGruposRoute =
-  AuthenticatedAdminGruposRouteImport.update({
-    id: '/grupos',
-    path: '/grupos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminFacturacionRoute =
-  AuthenticatedAdminFacturacionRouteImport.update({
-    id: '/facturacion',
-    path: '/facturacion',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminEventosRoute =
-  AuthenticatedAdminEventosRouteImport.update({
-    id: '/eventos',
-    path: '/eventos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminEvaluacionesRoute =
-  AuthenticatedAdminEvaluacionesRouteImport.update({
-    id: '/evaluaciones',
-    path: '/evaluaciones',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminDocentesRoute =
-  AuthenticatedAdminDocentesRouteImport.update({
-    id: '/docentes',
-    path: '/docentes',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminCertificadosRoute =
-  AuthenticatedAdminCertificadosRouteImport.update({
-    id: '/certificados',
-    path: '/certificados',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminCategoriasRoute =
-  AuthenticatedAdminCategoriasRouteImport.update({
-    id: '/categorias',
-    path: '/categorias',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminBibliotecaRoute =
-  AuthenticatedAdminBibliotecaRouteImport.update({
-    id: '/biblioteca',
-    path: '/biblioteca',
+const AuthenticatedAdminAnunciosRoute =
+  AuthenticatedAdminAnunciosRouteImport.update({
+    id: '/anuncios',
+    path: '/anuncios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminAuditoriaRoute =
@@ -522,55 +276,267 @@ const AuthenticatedAdminAuditoriaRoute =
     path: '/auditoria',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminAnunciosRoute =
-  AuthenticatedAdminAnunciosRouteImport.update({
-    id: '/anuncios',
-    path: '/anuncios',
+const AuthenticatedAdminBibliotecaRoute =
+  AuthenticatedAdminBibliotecaRouteImport.update({
+    id: '/biblioteca',
+    path: '/biblioteca',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
+const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminCategoriasRoute =
+  AuthenticatedAdminCategoriasRouteImport.update({
+    id: '/categorias',
+    path: '/categorias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCertificadosRoute =
+  AuthenticatedAdminCertificadosRouteImport.update({
+    id: '/certificados',
+    path: '/certificados',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDocentesRoute =
+  AuthenticatedAdminDocentesRouteImport.update({
+    id: '/docentes',
+    path: '/docentes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEvaluacionesRoute =
+  AuthenticatedAdminEvaluacionesRouteImport.update({
+    id: '/evaluaciones',
+    path: '/evaluaciones',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEventosRoute =
+  AuthenticatedAdminEventosRouteImport.update({
+    id: '/eventos',
+    path: '/eventos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminFacturacionRoute =
+  AuthenticatedAdminFacturacionRouteImport.update({
+    id: '/facturacion',
+    path: '/facturacion',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminGruposRoute =
+  AuthenticatedAdminGruposRouteImport.update({
+    id: '/grupos',
+    path: '/grupos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminHeroRoute = AuthenticatedAdminHeroRouteImport.update({
+  id: '/hero',
+  path: '/hero',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminInscripcionesRoute =
+  AuthenticatedAdminInscripcionesRouteImport.update({
+    id: '/inscripciones',
+    path: '/inscripciones',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminIntegracionesRoute =
+  AuthenticatedAdminIntegracionesRouteImport.update({
+    id: '/integraciones',
+    path: '/integraciones',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminMensajesRoute =
+  AuthenticatedAdminMensajesRouteImport.update({
+    id: '/mensajes',
+    path: '/mensajes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminModulosRoute =
+  AuthenticatedAdminModulosRouteImport.update({
+    id: '/modulos',
+    path: '/modulos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminMoraRoute = AuthenticatedAdminMoraRouteImport.update({
+  id: '/mora',
+  path: '/mora',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminProgramasRoute =
+  AuthenticatedAdminProgramasRouteImport.update({
+    id: '/programas',
+    path: '/programas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminResenasRoute =
+  AuthenticatedAdminResenasRouteImport.update({
+    id: '/resenas',
+    path: '/resenas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSolicitudesRoute =
+  AuthenticatedAdminSolicitudesRouteImport.update({
+    id: '/solicitudes',
+    path: '/solicitudes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminTestimoniosRoute =
+  AuthenticatedAdminTestimoniosRouteImport.update({
+    id: '/testimonios',
+    path: '/testimonios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedClaseVivoMeetingIdRoute =
+  AuthenticatedClaseVivoMeetingIdRouteImport.update({
+    id: '/clase-vivo/$meetingId',
+    path: '/clase-vivo/$meetingId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDocenteIndexRoute =
+  AuthenticatedDocenteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteCalificacionesRoute =
+  AuthenticatedDocenteCalificacionesRouteImport.update({
+    id: '/calificaciones',
+    path: '/calificaciones',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteClasesVivoRoute =
+  AuthenticatedDocenteClasesVivoRouteImport.update({
+    id: '/clases-vivo',
+    path: '/clases-vivo',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteComunidadRoute =
+  AuthenticatedDocenteComunidadRouteImport.update({
+    id: '/comunidad',
+    path: '/comunidad',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteCuentaRoute =
+  AuthenticatedDocenteCuentaRouteImport.update({
+    id: '/cuenta',
+    path: '/cuenta',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteCursosRoute =
+  AuthenticatedDocenteCursosRouteImport.update({
+    id: '/cursos',
+    path: '/cursos',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteEvaluacionesRoute =
+  AuthenticatedDocenteEvaluacionesRouteImport.update({
+    id: '/evaluaciones',
+    path: '/evaluaciones',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteGruposRoute =
+  AuthenticatedDocenteGruposRouteImport.update({
+    id: '/grupos',
+    path: '/grupos',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteInstructivoRoute =
+  AuthenticatedDocenteInstructivoRouteImport.update({
+    id: '/instructivo',
+    path: '/instructivo',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedDocenteLeccionesRoute =
+  AuthenticatedDocenteLeccionesRouteImport.update({
+    id: '/lecciones',
+    path: '/lecciones',
+    getParentRoute: () => AuthenticatedDocenteRoute,
+  } as any)
+const AuthenticatedEstudianteIndexRoute =
+  AuthenticatedEstudianteIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedEstudianteCuentaRoute =
+  AuthenticatedEstudianteCuentaRouteImport.update({
+    id: '/cuenta',
+    path: '/cuenta',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedEstudianteEvaluacionesRoute =
+  AuthenticatedEstudianteEvaluacionesRouteImport.update({
+    id: '/evaluaciones',
+    path: '/evaluaciones',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedEstudianteFacturacionRoute =
+  AuthenticatedEstudianteFacturacionRouteImport.update({
+    id: '/facturacion',
+    path: '/facturacion',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedEstudianteInstructivoRoute =
+  AuthenticatedEstudianteInstructivoRouteImport.update({
+    id: '/instructivo',
+    path: '/instructivo',
+    getParentRoute: () => AuthenticatedEstudianteRoute,
+  } as any)
+const AuthenticatedMisCursosIndexRoute =
+  AuthenticatedMisCursosIndexRouteImport.update({
+    id: '/mis-cursos/',
+    path: '/mis-cursos/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMisCursosSlugRoute =
+  AuthenticatedMisCursosSlugRouteImport.update({
+    id: '/mis-cursos/$slug',
+    path: '/mis-cursos/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const ApiPublicBalanceActivoWebhookRoute =
+  ApiPublicBalanceActivoWebhookRouteImport.update({
+    id: '/api/public/balance-activo-webhook',
+    path: '/api/public/balance-activo-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCourseRequestRoute = ApiPublicCourseRequestRouteImport.update({
+  id: '/api/public/course-request',
+  path: '/api/public/course-request',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
+const ApiPublicZoomOauthCallbackRoute =
+  ApiPublicZoomOauthCallbackRouteImport.update({
+    id: '/api/public/zoom-oauth-callback',
+    path: '/api/public/zoom-oauth-callback',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
+const ApiPublicZoomWebhookRoute = ApiPublicZoomWebhookRouteImport.update({
+  id: '/api/public/zoom-webhook',
+  path: '/api/public/zoom-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
+const BibliotecaSlugLeerRoute = BibliotecaSlugLeerRouteImport.update({
+  id: '/$slug_/leer',
+  path: '/$slug/leer',
+  getParentRoute: () => BibliotecaRoute,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicRecordingMeetingIdRoute =
-  ApiPublicRecordingMeetingIdRouteImport.update({
-    id: '/api/public/recording/$meetingId',
-    path: '/api/public/recording/$meetingId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSyncActiveStudentsRoute =
-  ApiPublicHooksSyncActiveStudentsRouteImport.update({
-    id: '/api/public/hooks/sync-active-students',
-    path: '/api/public/hooks/sync-active-students',
+const ApiPublicHooksEvaluarMoraRoute =
+  ApiPublicHooksEvaluarMoraRouteImport.update({
+    id: '/api/public/hooks/evaluar-mora',
+    path: '/api/public/hooks/evaluar-mora',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksReconcileZoomRecordingsRoute =
@@ -579,10 +545,44 @@ const ApiPublicHooksReconcileZoomRecordingsRoute =
     path: '/api/public/hooks/reconcile-zoom-recordings',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksEvaluarMoraRoute =
-  ApiPublicHooksEvaluarMoraRouteImport.update({
-    id: '/api/public/hooks/evaluar-mora',
-    path: '/api/public/hooks/evaluar-mora',
+const ApiPublicHooksSyncActiveStudentsRoute =
+  ApiPublicHooksSyncActiveStudentsRouteImport.update({
+    id: '/api/public/hooks/sync-active-students',
+    path: '/api/public/hooks/sync-active-students',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicRecordingMeetingIdRoute =
+  ApiPublicRecordingMeetingIdRouteImport.update({
+    id: '/api/public/recording/$meetingId',
+    path: '/api/public/recording/$meetingId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -1158,109 +1158,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/solicitud-curso': {
-      id: '/solicitud-curso'
-      path: '/solicitud-curso'
-      fullPath: '/solicitud-curso'
-      preLoaderRoute: typeof SolicitudCursoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sobre-nosotros': {
-      id: '/sobre-nosotros'
-      path: '/sobre-nosotros'
-      fullPath: '/sobre-nosotros'
-      preLoaderRoute: typeof SobreNosotrosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registro': {
-      id: '/registro'
-      path: '/registro'
-      fullPath: '/registro'
-      preLoaderRoute: typeof RegistroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recuperar-password': {
-      id: '/recuperar-password'
-      path: '/recuperar-password'
-      fullPath: '/recuperar-password'
-      preLoaderRoute: typeof RecuperarPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/programas': {
-      id: '/programas'
-      path: '/programas'
-      fullPath: '/programas'
-      preLoaderRoute: typeof ProgramasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacidad': {
-      id: '/privacidad'
-      path: '/privacidad'
-      fullPath: '/privacidad'
-      preLoaderRoute: typeof PrivacidadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/galeria': {
-      id: '/galeria'
-      path: '/galeria'
-      fullPath: '/galeria'
-      preLoaderRoute: typeof GaleriaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eventos': {
-      id: '/eventos'
-      path: '/eventos'
-      fullPath: '/eventos'
-      preLoaderRoute: typeof EventosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docentes': {
-      id: '/docentes'
-      path: '/docentes'
-      fullPath: '/docentes'
-      preLoaderRoute: typeof DocentesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contactos': {
-      id: '/contactos'
-      path: '/contactos'
-      fullPath: '/contactos'
-      preLoaderRoute: typeof ContactosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/biblioteca': {
-      id: '/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/biblioteca'
-      preLoaderRoute: typeof BibliotecaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acceder': {
-      id: '/acceder'
-      path: '/acceder'
-      fullPath: '/acceder'
-      preLoaderRoute: typeof AccederRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1270,95 +1172,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/acceder': {
+      id: '/acceder'
+      path: '/acceder'
+      fullPath: '/acceder'
+      preLoaderRoute: typeof AccederRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programas/': {
-      id: '/programas/'
-      path: '/'
-      fullPath: '/programas/'
-      preLoaderRoute: typeof ProgramasIndexRouteImport
-      parentRoute: typeof ProgramasRoute
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
+    '/biblioteca': {
+      id: '/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/biblioteca'
+      preLoaderRoute: typeof BibliotecaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/biblioteca/': {
-      id: '/biblioteca/'
-      path: '/'
-      fullPath: '/biblioteca/'
-      preLoaderRoute: typeof BibliotecaIndexRouteImport
-      parentRoute: typeof BibliotecaRoute
-    }
-    '/verify/$code': {
-      id: '/verify/$code'
-      path: '/verify/$code'
-      fullPath: '/verify/$code'
-      preLoaderRoute: typeof VerifyCodeRouteImport
+    '/contactos': {
+      id: '/contactos'
+      path: '/contactos'
+      fullPath: '/contactos'
+      preLoaderRoute: typeof ContactosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/verificar/$numero': {
-      id: '/verificar/$numero'
-      path: '/verificar/$numero'
-      fullPath: '/verificar/$numero'
-      preLoaderRoute: typeof VerificarNumeroRouteImport
+    '/docentes': {
+      id: '/docentes'
+      path: '/docentes'
+      fullPath: '/docentes'
+      preLoaderRoute: typeof DocentesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programas/$slug': {
-      id: '/programas/$slug'
-      path: '/$slug'
-      fullPath: '/programas/$slug'
-      preLoaderRoute: typeof ProgramasSlugRouteImport
-      parentRoute: typeof ProgramasRoute
-    }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
+    '/galeria': {
+      id: '/galeria'
+      path: '/galeria'
+      fullPath: '/galeria'
+      preLoaderRoute: typeof GaleriaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/biblioteca/$slug': {
-      id: '/biblioteca/$slug'
-      path: '/$slug'
-      fullPath: '/biblioteca/$slug'
-      preLoaderRoute: typeof BibliotecaSlugRouteImport
-      parentRoute: typeof BibliotecaRoute
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/estudiante': {
-      id: '/_authenticated/estudiante'
-      path: '/estudiante'
-      fullPath: '/estudiante'
-      preLoaderRoute: typeof AuthenticatedEstudianteRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/programas': {
+      id: '/programas'
+      path: '/programas'
+      fullPath: '/programas'
+      preLoaderRoute: typeof ProgramasRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/docente': {
-      id: '/_authenticated/docente'
-      path: '/docente'
-      fullPath: '/docente'
-      preLoaderRoute: typeof AuthenticatedDocenteRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/recuperar-password': {
+      id: '/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof RecuperarPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/certificados': {
-      id: '/_authenticated/certificados'
-      path: '/certificados'
-      fullPath: '/certificados'
-      preLoaderRoute: typeof AuthenticatedCertificadosRouteImport
+    '/registro': {
+      id: '/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof RegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre-nosotros': {
+      id: '/sobre-nosotros'
+      path: '/sobre-nosotros'
+      fullPath: '/sobre-nosotros'
+      preLoaderRoute: typeof SobreNosotrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solicitud-curso': {
+      id: '/solicitud-curso'
+      path: '/solicitud-curso'
+      fullPath: '/solicitud-curso'
+      preLoaderRoute: typeof SolicitudCursoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cambiar-password': {
@@ -1368,333 +1291,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCambiarPasswordRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/certificados': {
+      id: '/_authenticated/certificados'
+      path: '/certificados'
+      fullPath: '/certificados'
+      preLoaderRoute: typeof AuthenticatedCertificadosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/mis-cursos/': {
-      id: '/_authenticated/mis-cursos/'
-      path: '/mis-cursos'
-      fullPath: '/mis-cursos/'
-      preLoaderRoute: typeof AuthenticatedMisCursosIndexRouteImport
+    '/_authenticated/docente': {
+      id: '/_authenticated/docente'
+      path: '/docente'
+      fullPath: '/docente'
+      preLoaderRoute: typeof AuthenticatedDocenteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/estudiante/': {
-      id: '/_authenticated/estudiante/'
-      path: '/'
-      fullPath: '/estudiante/'
-      preLoaderRoute: typeof AuthenticatedEstudianteIndexRouteImport
-      parentRoute: typeof AuthenticatedEstudianteRoute
+    '/_authenticated/estudiante': {
+      id: '/_authenticated/estudiante'
+      path: '/estudiante'
+      fullPath: '/estudiante'
+      preLoaderRoute: typeof AuthenticatedEstudianteRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/docente/': {
-      id: '/_authenticated/docente/'
+    '/biblioteca/': {
+      id: '/biblioteca/'
       path: '/'
-      fullPath: '/docente/'
-      preLoaderRoute: typeof AuthenticatedDocenteIndexRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
+      fullPath: '/biblioteca/'
+      preLoaderRoute: typeof BibliotecaIndexRouteImport
+      parentRoute: typeof BibliotecaRoute
+    }
+    '/biblioteca/$slug': {
+      id: '/biblioteca/$slug'
+      path: '/$slug'
+      fullPath: '/biblioteca/$slug'
+      preLoaderRoute: typeof BibliotecaSlugRouteImport
+      parentRoute: typeof BibliotecaRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/programas/': {
+      id: '/programas/'
+      path: '/'
+      fullPath: '/programas/'
+      preLoaderRoute: typeof ProgramasIndexRouteImport
+      parentRoute: typeof ProgramasRoute
+    }
+    '/programas/$slug': {
+      id: '/programas/$slug'
+      path: '/$slug'
+      fullPath: '/programas/$slug'
+      preLoaderRoute: typeof ProgramasSlugRouteImport
+      parentRoute: typeof ProgramasRoute
+    }
+    '/verificar/$numero': {
+      id: '/verificar/$numero'
+      path: '/verificar/$numero'
+      fullPath: '/verificar/$numero'
+      preLoaderRoute: typeof VerificarNumeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$code': {
+      id: '/verify/$code'
+      path: '/verify/$code'
+      fullPath: '/verify/$code'
+      preLoaderRoute: typeof VerifyCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/biblioteca/$slug_/leer': {
-      id: '/biblioteca/$slug_/leer'
-      path: '/$slug/leer'
-      fullPath: '/biblioteca/$slug/leer'
-      preLoaderRoute: typeof BibliotecaSlugLeerRouteImport
-      parentRoute: typeof BibliotecaRoute
-    }
-    '/api/public/zoom-webhook': {
-      id: '/api/public/zoom-webhook'
-      path: '/api/public/zoom-webhook'
-      fullPath: '/api/public/zoom-webhook'
-      preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/zoom-oauth-callback': {
-      id: '/api/public/zoom-oauth-callback'
-      path: '/api/public/zoom-oauth-callback'
-      fullPath: '/api/public/zoom-oauth-callback'
-      preLoaderRoute: typeof ApiPublicZoomOauthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/course-request': {
-      id: '/api/public/course-request'
-      path: '/api/public/course-request'
-      fullPath: '/api/public/course-request'
-      preLoaderRoute: typeof ApiPublicCourseRequestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/balance-activo-webhook': {
-      id: '/api/public/balance-activo-webhook'
-      path: '/api/public/balance-activo-webhook'
-      fullPath: '/api/public/balance-activo-webhook'
-      preLoaderRoute: typeof ApiPublicBalanceActivoWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/mis-cursos/$slug': {
-      id: '/_authenticated/mis-cursos/$slug'
-      path: '/mis-cursos/$slug'
-      fullPath: '/mis-cursos/$slug'
-      preLoaderRoute: typeof AuthenticatedMisCursosSlugRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/estudiante/instructivo': {
-      id: '/_authenticated/estudiante/instructivo'
-      path: '/instructivo'
-      fullPath: '/estudiante/instructivo'
-      preLoaderRoute: typeof AuthenticatedEstudianteInstructivoRouteImport
-      parentRoute: typeof AuthenticatedEstudianteRoute
-    }
-    '/_authenticated/estudiante/facturacion': {
-      id: '/_authenticated/estudiante/facturacion'
-      path: '/facturacion'
-      fullPath: '/estudiante/facturacion'
-      preLoaderRoute: typeof AuthenticatedEstudianteFacturacionRouteImport
-      parentRoute: typeof AuthenticatedEstudianteRoute
-    }
-    '/_authenticated/estudiante/evaluaciones': {
-      id: '/_authenticated/estudiante/evaluaciones'
-      path: '/evaluaciones'
-      fullPath: '/estudiante/evaluaciones'
-      preLoaderRoute: typeof AuthenticatedEstudianteEvaluacionesRouteImport
-      parentRoute: typeof AuthenticatedEstudianteRoute
-    }
-    '/_authenticated/estudiante/cuenta': {
-      id: '/_authenticated/estudiante/cuenta'
-      path: '/cuenta'
-      fullPath: '/estudiante/cuenta'
-      preLoaderRoute: typeof AuthenticatedEstudianteCuentaRouteImport
-      parentRoute: typeof AuthenticatedEstudianteRoute
-    }
-    '/_authenticated/docente/lecciones': {
-      id: '/_authenticated/docente/lecciones'
-      path: '/lecciones'
-      fullPath: '/docente/lecciones'
-      preLoaderRoute: typeof AuthenticatedDocenteLeccionesRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/instructivo': {
-      id: '/_authenticated/docente/instructivo'
-      path: '/instructivo'
-      fullPath: '/docente/instructivo'
-      preLoaderRoute: typeof AuthenticatedDocenteInstructivoRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/grupos': {
-      id: '/_authenticated/docente/grupos'
-      path: '/grupos'
-      fullPath: '/docente/grupos'
-      preLoaderRoute: typeof AuthenticatedDocenteGruposRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/evaluaciones': {
-      id: '/_authenticated/docente/evaluaciones'
-      path: '/evaluaciones'
-      fullPath: '/docente/evaluaciones'
-      preLoaderRoute: typeof AuthenticatedDocenteEvaluacionesRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/cursos': {
-      id: '/_authenticated/docente/cursos'
-      path: '/cursos'
-      fullPath: '/docente/cursos'
-      preLoaderRoute: typeof AuthenticatedDocenteCursosRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/cuenta': {
-      id: '/_authenticated/docente/cuenta'
-      path: '/cuenta'
-      fullPath: '/docente/cuenta'
-      preLoaderRoute: typeof AuthenticatedDocenteCuentaRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/comunidad': {
-      id: '/_authenticated/docente/comunidad'
-      path: '/comunidad'
-      fullPath: '/docente/comunidad'
-      preLoaderRoute: typeof AuthenticatedDocenteComunidadRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/clases-vivo': {
-      id: '/_authenticated/docente/clases-vivo'
-      path: '/clases-vivo'
-      fullPath: '/docente/clases-vivo'
-      preLoaderRoute: typeof AuthenticatedDocenteClasesVivoRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/docente/calificaciones': {
-      id: '/_authenticated/docente/calificaciones'
-      path: '/calificaciones'
-      fullPath: '/docente/calificaciones'
-      preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
-      parentRoute: typeof AuthenticatedDocenteRoute
-    }
-    '/_authenticated/clase-vivo/$meetingId': {
-      id: '/_authenticated/clase-vivo/$meetingId'
-      path: '/clase-vivo/$meetingId'
-      fullPath: '/clase-vivo/$meetingId'
-      preLoaderRoute: typeof AuthenticatedClaseVivoMeetingIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/usuarios': {
-      id: '/_authenticated/admin/usuarios'
-      path: '/usuarios'
-      fullPath: '/admin/usuarios'
-      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/testimonios': {
-      id: '/_authenticated/admin/testimonios'
-      path: '/testimonios'
-      fullPath: '/admin/testimonios'
-      preLoaderRoute: typeof AuthenticatedAdminTestimoniosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/solicitudes': {
-      id: '/_authenticated/admin/solicitudes'
-      path: '/solicitudes'
-      fullPath: '/admin/solicitudes'
-      preLoaderRoute: typeof AuthenticatedAdminSolicitudesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/resenas': {
-      id: '/_authenticated/admin/resenas'
-      path: '/resenas'
-      fullPath: '/admin/resenas'
-      preLoaderRoute: typeof AuthenticatedAdminResenasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/programas': {
-      id: '/_authenticated/admin/programas'
-      path: '/programas'
-      fullPath: '/admin/programas'
-      preLoaderRoute: typeof AuthenticatedAdminProgramasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/mora': {
-      id: '/_authenticated/admin/mora'
-      path: '/mora'
-      fullPath: '/admin/mora'
-      preLoaderRoute: typeof AuthenticatedAdminMoraRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/modulos': {
-      id: '/_authenticated/admin/modulos'
-      path: '/modulos'
-      fullPath: '/admin/modulos'
-      preLoaderRoute: typeof AuthenticatedAdminModulosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/mensajes': {
-      id: '/_authenticated/admin/mensajes'
-      path: '/mensajes'
-      fullPath: '/admin/mensajes'
-      preLoaderRoute: typeof AuthenticatedAdminMensajesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/integraciones': {
-      id: '/_authenticated/admin/integraciones'
-      path: '/integraciones'
-      fullPath: '/admin/integraciones'
-      preLoaderRoute: typeof AuthenticatedAdminIntegracionesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/inscripciones': {
-      id: '/_authenticated/admin/inscripciones'
-      path: '/inscripciones'
-      fullPath: '/admin/inscripciones'
-      preLoaderRoute: typeof AuthenticatedAdminInscripcionesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/hero': {
-      id: '/_authenticated/admin/hero'
-      path: '/hero'
-      fullPath: '/admin/hero'
-      preLoaderRoute: typeof AuthenticatedAdminHeroRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/grupos': {
-      id: '/_authenticated/admin/grupos'
-      path: '/grupos'
-      fullPath: '/admin/grupos'
-      preLoaderRoute: typeof AuthenticatedAdminGruposRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/facturacion': {
-      id: '/_authenticated/admin/facturacion'
-      path: '/facturacion'
-      fullPath: '/admin/facturacion'
-      preLoaderRoute: typeof AuthenticatedAdminFacturacionRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/eventos': {
-      id: '/_authenticated/admin/eventos'
-      path: '/eventos'
-      fullPath: '/admin/eventos'
-      preLoaderRoute: typeof AuthenticatedAdminEventosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/evaluaciones': {
-      id: '/_authenticated/admin/evaluaciones'
-      path: '/evaluaciones'
-      fullPath: '/admin/evaluaciones'
-      preLoaderRoute: typeof AuthenticatedAdminEvaluacionesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/docentes': {
-      id: '/_authenticated/admin/docentes'
-      path: '/docentes'
-      fullPath: '/admin/docentes'
-      preLoaderRoute: typeof AuthenticatedAdminDocentesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/certificados': {
-      id: '/_authenticated/admin/certificados'
-      path: '/certificados'
-      fullPath: '/admin/certificados'
-      preLoaderRoute: typeof AuthenticatedAdminCertificadosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/categorias': {
-      id: '/_authenticated/admin/categorias'
-      path: '/categorias'
-      fullPath: '/admin/categorias'
-      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/blog': {
-      id: '/_authenticated/admin/blog'
-      path: '/blog'
-      fullPath: '/admin/blog'
-      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/biblioteca': {
-      id: '/_authenticated/admin/biblioteca'
-      path: '/biblioteca'
-      fullPath: '/admin/biblioteca'
-      preLoaderRoute: typeof AuthenticatedAdminBibliotecaRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/auditoria': {
-      id: '/_authenticated/admin/auditoria'
-      path: '/auditoria'
-      fullPath: '/admin/auditoria'
-      preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/anuncios': {
@@ -1704,60 +1396,326 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/.lovable/oauth/consent': {
-      id: '/.lovable/oauth/consent'
-      path: '/.lovable/oauth/consent'
-      fullPath: '/.lovable/oauth/consent'
-      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+    '/_authenticated/admin/auditoria': {
+      id: '/_authenticated/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/biblioteca': {
+      id: '/_authenticated/admin/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/admin/biblioteca'
+      preLoaderRoute: typeof AuthenticatedAdminBibliotecaRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/blog': {
+      id: '/_authenticated/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/certificados': {
+      id: '/_authenticated/admin/certificados'
+      path: '/certificados'
+      fullPath: '/admin/certificados'
+      preLoaderRoute: typeof AuthenticatedAdminCertificadosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/docentes': {
+      id: '/_authenticated/admin/docentes'
+      path: '/docentes'
+      fullPath: '/admin/docentes'
+      preLoaderRoute: typeof AuthenticatedAdminDocentesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/evaluaciones': {
+      id: '/_authenticated/admin/evaluaciones'
+      path: '/evaluaciones'
+      fullPath: '/admin/evaluaciones'
+      preLoaderRoute: typeof AuthenticatedAdminEvaluacionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/eventos': {
+      id: '/_authenticated/admin/eventos'
+      path: '/eventos'
+      fullPath: '/admin/eventos'
+      preLoaderRoute: typeof AuthenticatedAdminEventosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/facturacion': {
+      id: '/_authenticated/admin/facturacion'
+      path: '/facturacion'
+      fullPath: '/admin/facturacion'
+      preLoaderRoute: typeof AuthenticatedAdminFacturacionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/grupos': {
+      id: '/_authenticated/admin/grupos'
+      path: '/grupos'
+      fullPath: '/admin/grupos'
+      preLoaderRoute: typeof AuthenticatedAdminGruposRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/hero': {
+      id: '/_authenticated/admin/hero'
+      path: '/hero'
+      fullPath: '/admin/hero'
+      preLoaderRoute: typeof AuthenticatedAdminHeroRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/inscripciones': {
+      id: '/_authenticated/admin/inscripciones'
+      path: '/inscripciones'
+      fullPath: '/admin/inscripciones'
+      preLoaderRoute: typeof AuthenticatedAdminInscripcionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/integraciones': {
+      id: '/_authenticated/admin/integraciones'
+      path: '/integraciones'
+      fullPath: '/admin/integraciones'
+      preLoaderRoute: typeof AuthenticatedAdminIntegracionesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/mensajes': {
+      id: '/_authenticated/admin/mensajes'
+      path: '/mensajes'
+      fullPath: '/admin/mensajes'
+      preLoaderRoute: typeof AuthenticatedAdminMensajesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/modulos': {
+      id: '/_authenticated/admin/modulos'
+      path: '/modulos'
+      fullPath: '/admin/modulos'
+      preLoaderRoute: typeof AuthenticatedAdminModulosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/mora': {
+      id: '/_authenticated/admin/mora'
+      path: '/mora'
+      fullPath: '/admin/mora'
+      preLoaderRoute: typeof AuthenticatedAdminMoraRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/programas': {
+      id: '/_authenticated/admin/programas'
+      path: '/programas'
+      fullPath: '/admin/programas'
+      preLoaderRoute: typeof AuthenticatedAdminProgramasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/resenas': {
+      id: '/_authenticated/admin/resenas'
+      path: '/resenas'
+      fullPath: '/admin/resenas'
+      preLoaderRoute: typeof AuthenticatedAdminResenasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/solicitudes': {
+      id: '/_authenticated/admin/solicitudes'
+      path: '/solicitudes'
+      fullPath: '/admin/solicitudes'
+      preLoaderRoute: typeof AuthenticatedAdminSolicitudesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/testimonios': {
+      id: '/_authenticated/admin/testimonios'
+      path: '/testimonios'
+      fullPath: '/admin/testimonios'
+      preLoaderRoute: typeof AuthenticatedAdminTestimoniosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/clase-vivo/$meetingId': {
+      id: '/_authenticated/clase-vivo/$meetingId'
+      path: '/clase-vivo/$meetingId'
+      fullPath: '/clase-vivo/$meetingId'
+      preLoaderRoute: typeof AuthenticatedClaseVivoMeetingIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/docente/': {
+      id: '/_authenticated/docente/'
+      path: '/'
+      fullPath: '/docente/'
+      preLoaderRoute: typeof AuthenticatedDocenteIndexRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/calificaciones': {
+      id: '/_authenticated/docente/calificaciones'
+      path: '/calificaciones'
+      fullPath: '/docente/calificaciones'
+      preLoaderRoute: typeof AuthenticatedDocenteCalificacionesRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/clases-vivo': {
+      id: '/_authenticated/docente/clases-vivo'
+      path: '/clases-vivo'
+      fullPath: '/docente/clases-vivo'
+      preLoaderRoute: typeof AuthenticatedDocenteClasesVivoRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/comunidad': {
+      id: '/_authenticated/docente/comunidad'
+      path: '/comunidad'
+      fullPath: '/docente/comunidad'
+      preLoaderRoute: typeof AuthenticatedDocenteComunidadRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/cuenta': {
+      id: '/_authenticated/docente/cuenta'
+      path: '/cuenta'
+      fullPath: '/docente/cuenta'
+      preLoaderRoute: typeof AuthenticatedDocenteCuentaRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/cursos': {
+      id: '/_authenticated/docente/cursos'
+      path: '/cursos'
+      fullPath: '/docente/cursos'
+      preLoaderRoute: typeof AuthenticatedDocenteCursosRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/evaluaciones': {
+      id: '/_authenticated/docente/evaluaciones'
+      path: '/evaluaciones'
+      fullPath: '/docente/evaluaciones'
+      preLoaderRoute: typeof AuthenticatedDocenteEvaluacionesRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/grupos': {
+      id: '/_authenticated/docente/grupos'
+      path: '/grupos'
+      fullPath: '/docente/grupos'
+      preLoaderRoute: typeof AuthenticatedDocenteGruposRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/instructivo': {
+      id: '/_authenticated/docente/instructivo'
+      path: '/instructivo'
+      fullPath: '/docente/instructivo'
+      preLoaderRoute: typeof AuthenticatedDocenteInstructivoRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/docente/lecciones': {
+      id: '/_authenticated/docente/lecciones'
+      path: '/lecciones'
+      fullPath: '/docente/lecciones'
+      preLoaderRoute: typeof AuthenticatedDocenteLeccionesRouteImport
+      parentRoute: typeof AuthenticatedDocenteRoute
+    }
+    '/_authenticated/estudiante/': {
+      id: '/_authenticated/estudiante/'
+      path: '/'
+      fullPath: '/estudiante/'
+      preLoaderRoute: typeof AuthenticatedEstudianteIndexRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/estudiante/cuenta': {
+      id: '/_authenticated/estudiante/cuenta'
+      path: '/cuenta'
+      fullPath: '/estudiante/cuenta'
+      preLoaderRoute: typeof AuthenticatedEstudianteCuentaRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/estudiante/evaluaciones': {
+      id: '/_authenticated/estudiante/evaluaciones'
+      path: '/evaluaciones'
+      fullPath: '/estudiante/evaluaciones'
+      preLoaderRoute: typeof AuthenticatedEstudianteEvaluacionesRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/estudiante/facturacion': {
+      id: '/_authenticated/estudiante/facturacion'
+      path: '/facturacion'
+      fullPath: '/estudiante/facturacion'
+      preLoaderRoute: typeof AuthenticatedEstudianteFacturacionRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/estudiante/instructivo': {
+      id: '/_authenticated/estudiante/instructivo'
+      path: '/instructivo'
+      fullPath: '/estudiante/instructivo'
+      preLoaderRoute: typeof AuthenticatedEstudianteInstructivoRouteImport
+      parentRoute: typeof AuthenticatedEstudianteRoute
+    }
+    '/_authenticated/mis-cursos/': {
+      id: '/_authenticated/mis-cursos/'
+      path: '/mis-cursos'
+      fullPath: '/mis-cursos/'
+      preLoaderRoute: typeof AuthenticatedMisCursosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/mis-cursos/$slug': {
+      id: '/_authenticated/mis-cursos/$slug'
+      path: '/mis-cursos/$slug'
+      fullPath: '/mis-cursos/$slug'
+      preLoaderRoute: typeof AuthenticatedMisCursosSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/balance-activo-webhook': {
+      id: '/api/public/balance-activo-webhook'
+      path: '/api/public/balance-activo-webhook'
+      fullPath: '/api/public/balance-activo-webhook'
+      preLoaderRoute: typeof ApiPublicBalanceActivoWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+    '/api/public/course-request': {
+      id: '/api/public/course-request'
+      path: '/api/public/course-request'
+      fullPath: '/api/public/course-request'
+      preLoaderRoute: typeof ApiPublicCourseRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+    '/api/public/zoom-oauth-callback': {
+      id: '/api/public/zoom-oauth-callback'
+      path: '/api/public/zoom-oauth-callback'
+      fullPath: '/api/public/zoom-oauth-callback'
+      preLoaderRoute: typeof ApiPublicZoomOauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/api/public/zoom-webhook': {
+      id: '/api/public/zoom-webhook'
+      path: '/api/public/zoom-webhook'
+      fullPath: '/api/public/zoom-webhook'
+      preLoaderRoute: typeof ApiPublicZoomWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+    '/biblioteca/$slug_/leer': {
+      id: '/biblioteca/$slug_/leer'
+      path: '/$slug/leer'
+      fullPath: '/biblioteca/$slug/leer'
+      preLoaderRoute: typeof BibliotecaSlugLeerRouteImport
+      parentRoute: typeof BibliotecaRoute
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/recording/$meetingId': {
-      id: '/api/public/recording/$meetingId'
-      path: '/api/public/recording/$meetingId'
-      fullPath: '/api/public/recording/$meetingId'
-      preLoaderRoute: typeof ApiPublicRecordingMeetingIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/sync-active-students': {
-      id: '/api/public/hooks/sync-active-students'
-      path: '/api/public/hooks/sync-active-students'
-      fullPath: '/api/public/hooks/sync-active-students'
-      preLoaderRoute: typeof ApiPublicHooksSyncActiveStudentsRouteImport
+    '/api/public/hooks/evaluar-mora': {
+      id: '/api/public/hooks/evaluar-mora'
+      path: '/api/public/hooks/evaluar-mora'
+      fullPath: '/api/public/hooks/evaluar-mora'
+      preLoaderRoute: typeof ApiPublicHooksEvaluarMoraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/reconcile-zoom-recordings': {
@@ -1767,11 +1725,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReconcileZoomRecordingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/evaluar-mora': {
-      id: '/api/public/hooks/evaluar-mora'
-      path: '/api/public/hooks/evaluar-mora'
-      fullPath: '/api/public/hooks/evaluar-mora'
-      preLoaderRoute: typeof ApiPublicHooksEvaluarMoraRouteImport
+    '/api/public/hooks/sync-active-students': {
+      id: '/api/public/hooks/sync-active-students'
+      path: '/api/public/hooks/sync-active-students'
+      fullPath: '/api/public/hooks/sync-active-students'
+      preLoaderRoute: typeof ApiPublicHooksSyncActiveStudentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/recording/$meetingId': {
+      id: '/api/public/recording/$meetingId'
+      path: '/api/public/recording/$meetingId'
+      fullPath: '/api/public/recording/$meetingId'
+      preLoaderRoute: typeof ApiPublicRecordingMeetingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
