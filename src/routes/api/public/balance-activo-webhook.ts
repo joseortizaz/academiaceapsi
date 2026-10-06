@@ -1,10 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  mapInvoiceRow,
-  mapPaymentRow,
-  syncCustomerData,
-  verifyBaSignature,
-} from "@/lib/balance-activo.server";
+import { syncCustomerData, verifyBaSignature } from "@/lib/balance-activo.server";
 
 type BaEvent = {
   event: string;
@@ -57,51 +52,41 @@ export const Route = createFileRoute("/api/public/balance-activo-webhook")({
         if (!valid) return new Response("Invalid signature", { status: 401 });
 
         try {
-          const evt = body.event;
+          const evt = body.event ?? "";
           const payload = body.data ?? {};
 
-          if (evt === "factura.created" || evt === "factura.updated" || evt === "factura.paid") {
-            const customerId = payload.cliente_id;
-            // Buscar el user_id por balance_activo_customer_id
-            const { data: profile } = await supabaseAdmin
-              .from("profiles")
-              .select("id")
-              .eq("balance_activo_customer_id", customerId)
-              .maybeSingle();
-            const userId = (profile as any)?.id ?? null;
-
-            if (userId) {
-              // El evento no trae el plan de cuotas: se vuelve a leer el estado de
-              // cuenta completo del alumno desde la API (y se recalcula su mora).
-              await syncCustomerData(userId, customerId);
-            } else {
-              const { error: invErr } = await supabaseAdmin
+          if (evt.startsWith("factura.") || evt.startsWith("cobro.")) {
+            // Balance Activo solo manda el cliente en factura.created; en
+            // factura.updated / factura.paid / cobro.* se deduce de la factura ya
+            // guardada. Nunca se escribe el evento tal cual: no trae las cuotas y
+            // desvincularía la factura del alumno.
+            let customerId: string | null = payload.cliente_id ?? null;
+            const facturaId: string | null = evt.startsWith("factura.") ? payload.id ?? null : payload.factura_id ?? null;
+            if (!customerId && facturaId) {
+              const { data: inv } = await supabaseAdmin
                 .from("external_invoices")
-                .upsert(mapInvoiceRow(payload, userId), { onConflict: "external_id" });
-              if (invErr) throw new Error(invErr.message);
+                .select("ba_customer_id")
+                .eq("external_id", facturaId)
+                .maybeSingle();
+              customerId = (inv as any)?.ba_customer_id ?? null;
             }
-          } else if (evt === "cobro.created" || evt === "cobro.updated") {
-            const invoiceExtId = payload.factura_id;
-            const { data: inv } = await supabaseAdmin
-              .from("external_invoices")
-              .select("user_id, ba_customer_id")
-              .eq("external_id", invoiceExtId)
-              .maybeSingle();
-            const userId = (inv as any)?.user_id ?? null;
-            const customerId = (inv as any)?.ba_customer_id ?? payload.cliente_id ?? "";
 
-            // El cobro solo se asigna al dueño de la factura (nunca por otro camino).
-            const { error: payErr } = await supabaseAdmin
-              .from("external_payments")
-              .upsert(mapPaymentRow(payload, userId, customerId), { onConflict: "external_id" });
-            if (payErr) throw new Error(payErr.message);
-
-            // Un cobro cambia el saldo de la factura: refrescar el estado de cuenta del alumno.
-            if (userId && customerId) {
-              await syncCustomerData(userId, customerId).catch(() => undefined);
+            if (customerId) {
+              const { data: profile } = await supabaseAdmin
+                .from("profiles")
+                .select("id")
+                .eq("balance_activo_customer_id", customerId)
+                .maybeSingle();
+              const userId = (profile as any)?.id ?? null;
+              // Alumno vinculado: se relee su estado de cuenta completo (facturas,
+              // cuotas y cobros) y se recalcula su mora. Si la API falla, se
+              // responde 500 para que Balance Activo reintente.
+              if (userId) await syncCustomerData(userId, customerId);
             }
+            // Cliente sin alumno vinculado: no se guarda nada; al vincularlo desde
+            // el panel se sincroniza su estado de cuenta completo.
           }
-          // cliente.* eventos: no requieren acción local por ahora (el vínculo lo hace el admin).
+          // cliente.* : sin acción local (el vínculo lo hace el admin).
 
           if (logRow?.id) {
             await supabaseAdmin
