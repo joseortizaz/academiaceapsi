@@ -10,20 +10,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useEffect, useState } from "react";
 
+const CUENTA_SUSPENDIDA =
+  "Tu cuenta está suspendida. Escribe a administración para más información.";
+
 export const Route = createFileRoute("/acceder")({
   staticData: { sitemap: false },
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string; suspendida?: boolean } => ({
     redirect:
       typeof search.redirect === "string" && search.redirect.startsWith("/")
         ? search.redirect
         : undefined,
+    suspendida: search.suspendida === true || search.suspendida === "1" || search.suspendida === 1 ? true : undefined,
   }),
   component: Acceder,
 });
 
 function Acceder() {
   const navigate = useNavigate();
-  const { redirect } = Route.useSearch();
+  const { redirect, suspendida } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -86,7 +90,12 @@ function Acceder() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.user) {
       setLoading(false);
-      toast.error("Error de acceso", { description: error?.message ?? "No se pudo iniciar sesión" });
+      const baneado = /banned/i.test(error?.message ?? "");
+      toast.error(baneado ? "Cuenta suspendida" : "Error de acceso", {
+        description: baneado
+          ? CUENTA_SUSPENDIDA
+          : (error?.message ?? "No se pudo iniciar sesión"),
+      });
       return;
     }
     toast.success("¡Bienvenido!");
@@ -148,6 +157,11 @@ function Acceder() {
             </Link>
             <h1 className="text-2xl font-bold text-foreground">Accede a tu cuenta</h1>
             <p className="mt-1 text-sm text-muted-foreground">Ingresa tus credenciales para continuar.</p>
+            {suspendida && (
+              <div role="alert" className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                {CUENTA_SUSPENDIDA}
+              </div>
+            )}
 
             <form onSubmit={handleEmailLogin} className="mt-6 space-y-4">
               <div className="space-y-2">

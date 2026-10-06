@@ -13,6 +13,7 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { signRecordingToken } = await import("./recordings.server");
+    const { assertAccountActive, ENROLLMENT_ACCESS_STATES } = await import("./account-status.server");
 
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
@@ -22,6 +23,7 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
     if (!meeting) throw new Error("Clase no encontrada.");
 
     const userId = context.userId;
+    await assertAccountActive(userId);
     const { data: roles } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -60,6 +62,7 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
         .select("id")
         .eq("user_id", userId)
         .eq("programa_id", meeting.programa_id)
+        .in("estado", [...ENROLLMENT_ACCESS_STATES])
         .limit(1);
       allowed = (enr ?? []).length > 0;
     }

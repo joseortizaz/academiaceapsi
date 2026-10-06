@@ -25,6 +25,8 @@ export const getLibraryDownloadUrl = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { logAudit } = await import("./audit.server");
+    const { assertAccountActive } = await import("./account-status.server");
+    await assertAccountActive(context.userId);
 
     const { data: doc, error } = await supabaseAdmin
       .from("library_documents")

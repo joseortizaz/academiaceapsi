@@ -22,6 +22,16 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) {
       throw redirect({ to: "/acceder", search: { redirect: location.pathname } });
     }
+    // Cuenta suspendida por un administrador: cerrar sesión y avisar.
+    const { data: perfil } = await supabase
+      .from("profiles")
+      .select("is_active")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (perfil?.is_active === false) {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/acceder", search: { suspendida: true } });
+    }
     registrarContextoDeAcceso(data.user);
     const debeCambiar = (data.user.app_metadata as any)?.must_change_password === true;
     if (debeCambiar && location.pathname !== "/cambiar-password") {
