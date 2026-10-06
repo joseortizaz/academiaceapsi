@@ -211,10 +211,22 @@ function UsuariosPage() {
   };
 
   const toggleEstado = async (id: string, current: boolean) => {
+    if (
+      current &&
+      !window.confirm(
+        "¿Suspender esta cuenta? La persona no podrá iniciar sesión ni ver contenido hasta que la reactives.",
+      )
+    ) {
+      return;
+    }
     const { error } = await supabase.from("profiles")
       .update({ is_active: !current }).eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success(current ? "Usuario suspendido" : "Usuario activado");
+    toast.success(current ? "Usuario suspendido" : "Usuario activado", {
+      description: current
+        ? "Se cerraron sus sesiones y ya no puede iniciar sesión."
+        : "Ya puede volver a iniciar sesión.",
+    });
     qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
   };
 
@@ -327,7 +339,16 @@ function UsuariosPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Switch checked={activo} onCheckedChange={() => toggleEstado(p.id, activo)} />
+                        <Switch
+                          checked={activo}
+                          disabled={activo && (p.id === current?.id || userRoles.includes("admin"))}
+                          title={
+                            activo && userRoles.includes("admin")
+                              ? "Un administrador no puede suspenderse"
+                              : undefined
+                          }
+                          onCheckedChange={() => toggleEstado(p.id, activo)}
+                        />
                         <Badge
                           className={
                             activo
