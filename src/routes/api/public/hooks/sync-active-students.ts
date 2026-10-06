@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { syncManyCustomers } from "@/lib/balance-activo.server";
+import { loadSyncTargets, syncManyCustomers } from "@/lib/balance-activo.server";
 
 /**
  * Endpoint invocado por pg_cron cada noche para sincronizar los estados de cuenta
@@ -25,33 +25,22 @@ export const Route = createFileRoute("/api/public/hooks/sync-active-students")({
         const started = Date.now();
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const { data: enrollments, error } = await supabaseAdmin
-          .from("enrollments")
-          .select("user_id, profiles!inner(balance_activo_customer_id)")
-          .in("estado", ["activo", "pendiente"])
-          .not("profiles.balance_activo_customer_id", "is", null);
-
-        if (error) {
+        let targets: Array<{ userId: string; customerId: string }>;
+        try {
+          targets = await loadSyncTargets();
+        } catch (e) {
+          const message = e instanceof Error ? e.message : String(e);
           await supabaseAdmin.from("balance_activo_webhook_logs").insert({
             event: "cron_sync",
             signature_valid: true,
             processed: false,
-            error: error.message,
+            error: message,
             payload: { source: "cron", stage: "query_targets" } as any,
           });
-          return new Response(JSON.stringify({ error: error.message }), {
+          return new Response(JSON.stringify({ error: message }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
           });
-        }
-
-        const seen = new Set<string>();
-        const targets: Array<{ userId: string; customerId: string }> = [];
-        for (const row of (enrollments ?? []) as any[]) {
-          const cid = row?.profiles?.balance_activo_customer_id;
-          if (!row.user_id || !cid || seen.has(row.user_id)) continue;
-          seen.add(row.user_id);
-          targets.push({ userId: row.user_id, customerId: cid });
         }
 
         const result = await syncManyCustomers(targets, 5);

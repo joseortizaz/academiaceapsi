@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   baFetch,
+  loadSyncTargets,
   syncCustomerData,
   syncManyCustomers,
   type BaCustomer,
@@ -30,7 +31,13 @@ export const listMyInvoices = createServerFn({ method: "GET" })
       .select("*")
       .eq("user_id", context.userId)
       .order("fecha", { ascending: false });
-    return { invoices: invoices ?? [], payments: payments ?? [] };
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("balance_activo_customer_id")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const linked = !!(profile as any)?.balance_activo_customer_id;
+    return { invoices: invoices ?? [], payments: payments ?? [], linked };
   });
 
 /** Estudiante: refresca sus facturas desde Balance Activo. */
@@ -86,7 +93,20 @@ export const adminLinkCustomer = createServerFn({ method: "POST" })
       .update({ balance_activo_customer_id: data.customerId })
       .eq("id", data.userId);
     if (error) throw new Error(error.message);
-    return { ok: true };
+
+    // Facturas que llegaron antes del vínculo (por webhook) quedan con user_id nulo:
+    // se asignan ahora y se trae el estado de cuenta completo.
+    await supabaseAdmin
+      .from("external_invoices")
+      .update({ user_id: data.userId })
+      .eq("ba_customer_id", data.customerId)
+      .is("user_id", null);
+    try {
+      const r = await syncCustomerData(data.userId, data.customerId);
+      return { ok: true, synced: r.invoices, payments: r.payments };
+    } catch (e) {
+      return { ok: true, syncError: e instanceof Error ? e.message : String(e) };
+    }
   });
 
 /** Admin: sincroniza las facturas de un alumno específico. */
@@ -118,21 +138,7 @@ export const adminRunFullSync = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const started = Date.now();
 
-    const { data: enrollments, error } = await supabaseAdmin
-      .from("enrollments")
-      .select("user_id, profiles!inner(balance_activo_customer_id)")
-      .in("estado", ["activo", "pendiente"])
-      .not("profiles.balance_activo_customer_id", "is", null);
-    if (error) throw new Error(error.message);
-
-    const seen = new Set<string>();
-    const targets: Array<{ userId: string; customerId: string }> = [];
-    for (const row of (enrollments ?? []) as any[]) {
-      const cid = row?.profiles?.balance_activo_customer_id;
-      if (!row.user_id || !cid || seen.has(row.user_id)) continue;
-      seen.add(row.user_id);
-      targets.push({ userId: row.user_id, customerId: cid });
-    }
+    const targets = await loadSyncTargets();
 
     const result = await syncManyCustomers(targets, 5);
     const duration_ms = Date.now() - started;
