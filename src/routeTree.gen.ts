@@ -70,6 +70,7 @@ import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
 import { Route as AuthenticatedAdminResenasRouteImport } from './routes/_authenticated/admin.resenas'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
+import { Route as AuthenticatedAdminMoraRouteImport } from './routes/_authenticated/admin.mora'
 import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authenticated/admin.modulos'
 import { Route as AuthenticatedAdminMensajesRouteImport } from './routes/_authenticated/admin.mensajes'
 import { Route as AuthenticatedAdminIntegracionesRouteImport } from './routes/_authenticated/admin.integraciones'
@@ -95,6 +96,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicRecordingMeetingIdRouteImport } from './routes/api/public/recording.$meetingId'
 import { Route as ApiPublicHooksSyncActiveStudentsRouteImport } from './routes/api/public/hooks/sync-active-students'
 import { Route as ApiPublicHooksReconcileZoomRecordingsRouteImport } from './routes/api/public/hooks/reconcile-zoom-recordings'
+import { Route as ApiPublicHooksEvaluarMoraRouteImport } from './routes/api/public/hooks/evaluar-mora'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -427,6 +429,11 @@ const AuthenticatedAdminProgramasRoute =
     path: '/programas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminMoraRoute = AuthenticatedAdminMoraRouteImport.update({
+  id: '/mora',
+  path: '/mora',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminModulosRoute =
   AuthenticatedAdminModulosRouteImport.update({
     id: '/modulos',
@@ -572,6 +579,12 @@ const ApiPublicHooksReconcileZoomRecordingsRoute =
     path: '/api/public/hooks/reconcile-zoom-recordings',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksEvaluarMoraRoute =
+  ApiPublicHooksEvaluarMoraRouteImport.update({
+    id: '/api/public/hooks/evaluar-mora',
+    path: '/api/public/hooks/evaluar-mora',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -621,6 +634,7 @@ export interface FileRoutesByFullPath {
   '/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
@@ -651,6 +665,7 @@ export interface FileRoutesByFullPath {
   '/docente/': typeof AuthenticatedDocenteIndexRoute
   '/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/evaluar-mora': typeof ApiPublicHooksEvaluarMoraRoute
   '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/api/public/recording/$meetingId': typeof ApiPublicRecordingMeetingIdRoute
@@ -703,6 +718,7 @@ export interface FileRoutesByTo {
   '/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
@@ -733,6 +749,7 @@ export interface FileRoutesByTo {
   '/docente': typeof AuthenticatedDocenteIndexRoute
   '/estudiante': typeof AuthenticatedEstudianteIndexRoute
   '/mis-cursos': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/evaluar-mora': typeof ApiPublicHooksEvaluarMoraRoute
   '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/api/public/recording/$meetingId': typeof ApiPublicRecordingMeetingIdRoute
@@ -792,6 +809,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/integraciones': typeof AuthenticatedAdminIntegracionesRoute
   '/_authenticated/admin/mensajes': typeof AuthenticatedAdminMensajesRoute
   '/_authenticated/admin/modulos': typeof AuthenticatedAdminModulosRoute
+  '/_authenticated/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/resenas': typeof AuthenticatedAdminResenasRoute
   '/_authenticated/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
@@ -822,6 +840,7 @@ export interface FileRoutesById {
   '/_authenticated/docente/': typeof AuthenticatedDocenteIndexRoute
   '/_authenticated/estudiante/': typeof AuthenticatedEstudianteIndexRoute
   '/_authenticated/mis-cursos/': typeof AuthenticatedMisCursosIndexRoute
+  '/api/public/hooks/evaluar-mora': typeof ApiPublicHooksEvaluarMoraRoute
   '/api/public/hooks/reconcile-zoom-recordings': typeof ApiPublicHooksReconcileZoomRecordingsRoute
   '/api/public/hooks/sync-active-students': typeof ApiPublicHooksSyncActiveStudentsRoute
   '/api/public/recording/$meetingId': typeof ApiPublicRecordingMeetingIdRoute
@@ -881,6 +900,7 @@ export interface FileRouteTypes {
     | '/admin/integraciones'
     | '/admin/mensajes'
     | '/admin/modulos'
+    | '/admin/mora'
     | '/admin/programas'
     | '/admin/resenas'
     | '/admin/solicitudes'
@@ -911,6 +931,7 @@ export interface FileRouteTypes {
     | '/docente/'
     | '/estudiante/'
     | '/mis-cursos/'
+    | '/api/public/hooks/evaluar-mora'
     | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/api/public/recording/$meetingId'
@@ -963,6 +984,7 @@ export interface FileRouteTypes {
     | '/admin/integraciones'
     | '/admin/mensajes'
     | '/admin/modulos'
+    | '/admin/mora'
     | '/admin/programas'
     | '/admin/resenas'
     | '/admin/solicitudes'
@@ -993,6 +1015,7 @@ export interface FileRouteTypes {
     | '/docente'
     | '/estudiante'
     | '/mis-cursos'
+    | '/api/public/hooks/evaluar-mora'
     | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/api/public/recording/$meetingId'
@@ -1051,6 +1074,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/integraciones'
     | '/_authenticated/admin/mensajes'
     | '/_authenticated/admin/modulos'
+    | '/_authenticated/admin/mora'
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/resenas'
     | '/_authenticated/admin/solicitudes'
@@ -1081,6 +1105,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docente/'
     | '/_authenticated/estudiante/'
     | '/_authenticated/mis-cursos/'
+    | '/api/public/hooks/evaluar-mora'
     | '/api/public/hooks/reconcile-zoom-recordings'
     | '/api/public/hooks/sync-active-students'
     | '/api/public/recording/$meetingId'
@@ -1120,6 +1145,7 @@ export interface RootRouteChildren {
   ApiPublicZoomOauthCallbackRoute: typeof ApiPublicZoomOauthCallbackRoute
   ApiPublicZoomWebhookRoute: typeof ApiPublicZoomWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksEvaluarMoraRoute: typeof ApiPublicHooksEvaluarMoraRoute
   ApiPublicHooksReconcileZoomRecordingsRoute: typeof ApiPublicHooksReconcileZoomRecordingsRoute
   ApiPublicHooksSyncActiveStudentsRoute: typeof ApiPublicHooksSyncActiveStudentsRoute
   ApiPublicRecordingMeetingIdRoute: typeof ApiPublicRecordingMeetingIdRoute
@@ -1559,6 +1585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminProgramasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/mora': {
+      id: '/_authenticated/admin/mora'
+      path: '/mora'
+      fullPath: '/admin/mora'
+      preLoaderRoute: typeof AuthenticatedAdminMoraRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/modulos': {
       id: '/_authenticated/admin/modulos'
       path: '/modulos'
@@ -1734,6 +1767,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReconcileZoomRecordingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/evaluar-mora': {
+      id: '/api/public/hooks/evaluar-mora'
+      path: '/api/public/hooks/evaluar-mora'
+      fullPath: '/api/public/hooks/evaluar-mora'
+      preLoaderRoute: typeof ApiPublicHooksEvaluarMoraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1754,6 +1794,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminIntegracionesRoute: typeof AuthenticatedAdminIntegracionesRoute
   AuthenticatedAdminMensajesRoute: typeof AuthenticatedAdminMensajesRoute
   AuthenticatedAdminModulosRoute: typeof AuthenticatedAdminModulosRoute
+  AuthenticatedAdminMoraRoute: typeof AuthenticatedAdminMoraRoute
   AuthenticatedAdminProgramasRoute: typeof AuthenticatedAdminProgramasRoute
   AuthenticatedAdminResenasRoute: typeof AuthenticatedAdminResenasRoute
   AuthenticatedAdminSolicitudesRoute: typeof AuthenticatedAdminSolicitudesRoute
@@ -1779,6 +1820,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminIntegracionesRoute: AuthenticatedAdminIntegracionesRoute,
   AuthenticatedAdminMensajesRoute: AuthenticatedAdminMensajesRoute,
   AuthenticatedAdminModulosRoute: AuthenticatedAdminModulosRoute,
+  AuthenticatedAdminMoraRoute: AuthenticatedAdminMoraRoute,
   AuthenticatedAdminProgramasRoute: AuthenticatedAdminProgramasRoute,
   AuthenticatedAdminResenasRoute: AuthenticatedAdminResenasRoute,
   AuthenticatedAdminSolicitudesRoute: AuthenticatedAdminSolicitudesRoute,
@@ -1930,6 +1972,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicZoomOauthCallbackRoute: ApiPublicZoomOauthCallbackRoute,
   ApiPublicZoomWebhookRoute: ApiPublicZoomWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksEvaluarMoraRoute: ApiPublicHooksEvaluarMoraRoute,
   ApiPublicHooksReconcileZoomRecordingsRoute:
     ApiPublicHooksReconcileZoomRecordingsRoute,
   ApiPublicHooksSyncActiveStudentsRoute: ApiPublicHooksSyncActiveStudentsRoute,

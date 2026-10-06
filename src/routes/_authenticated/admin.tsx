@@ -27,6 +27,7 @@ import {
   Star,
   ShieldCheck,
   Library,
+  HandCoins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -55,6 +56,7 @@ const nav = [
   { to: "/admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
   { to: "/admin/solicitudes", label: "Solicitudes", icon: ClipboardList },
   { to: "/admin/facturacion", label: "Facturación & Cobros", icon: CreditCard },
+  { to: "/admin/mora", label: "Mora y acuerdos", icon: HandCoins },
   { to: "/admin/mensajes", label: "Mensajes", icon: Mail },
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
   { to: "/admin/integraciones", label: "Integraciones", icon: Plug },

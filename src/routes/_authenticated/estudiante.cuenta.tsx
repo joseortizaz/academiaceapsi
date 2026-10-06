@@ -282,6 +282,7 @@ function BalanceActivoInvoices() {
       } else {
         toast.success(`Sincronizado: ${r.synced} facturas`);
         qc.invalidateQueries({ queryKey: ["ba-invoices"] });
+        qc.invalidateQueries({ queryKey: ["mi-mora"] });
       }
     } catch (e: any) {
       toast.error(e.message);

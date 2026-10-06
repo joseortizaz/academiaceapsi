@@ -232,6 +232,11 @@ export async function syncCustomerData(
     if (error) throw new Error(`Limpieza de cobros: ${error.message}`);
   }
 
+  // Con los datos al día, recalcular su estado de mora (levanta la restricción
+  // en cuanto el pago queda registrado). No envía avisos.
+  const { evaluarMoraSilencioso } = await import("@/lib/mora.server");
+  await evaluarMoraSilencioso(userId);
+
   return { invoices: invoices.length, payments: payments.length };
 }
 

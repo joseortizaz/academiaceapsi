@@ -18,6 +18,7 @@ import {
 import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
 import { ReviewForm } from "@/components/reviews/ProgramReviews";
+import { ContenidoRestringido, useMiMora } from "@/components/student/MoraBanner";
 
 
 
@@ -34,6 +35,7 @@ function CursoPlayer() {
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
   const [advancing, setAdvancing] = useState(false);
+  const { data: miMora } = useMiMora();
 
 
   const { data: programa } = useQuery({
@@ -394,6 +396,9 @@ function CursoPlayer() {
     }
   };
 
+  if (miMora?.estado?.restringido) {
+    return <ContenidoRestringido />;
+  }
   if (!programa) {
     return <div className="p-8 text-muted-foreground">Cargando…</div>;
   }

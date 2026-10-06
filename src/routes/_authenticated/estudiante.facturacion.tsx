@@ -25,6 +25,7 @@ function estadoBadge(estado: string) {
     paid: "bg-emerald-500/15 text-emerald-700",
     pendiente: "bg-amber-500/15 text-amber-700",
     vencida: "bg-red-500/15 text-red-700",
+    parcial: "bg-sky-500/15 text-sky-700",
     anulada: "bg-muted text-muted-foreground",
   };
   return <Badge className={map[estado] ?? "bg-muted text-muted-foreground"}>{estado}</Badge>;
@@ -48,6 +49,7 @@ function EstudianteFacturacion() {
       } else {
         toast.success(`Actualizado: ${r.synced} facturas`);
         qc.invalidateQueries({ queryKey: ["mis-facturas"] });
+        qc.invalidateQueries({ queryKey: ["mi-mora"] });
       }
     },
     onError: (e: any) => toast.error(e.message ?? "Error al sincronizar"),
@@ -142,6 +144,8 @@ function EstudianteFacturacion() {
         </CardContent>
       </Card>
 
+      <PlanDeCuotas invoices={invoices} />
+
       <Card>
         <CardHeader>
           <CardTitle>Pagos aplicados</CardTitle>
@@ -208,6 +212,84 @@ function SummaryCard({
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
           <p className={`text-xl font-bold ${color}`}>{value}</p>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+type Cuota = {
+  id: string;
+  numero: number;
+  fecha_vencimiento: string;
+  monto: number;
+  monto_pagado: number;
+  saldo: number;
+  estado: string;
+};
+
+function fmtFecha(iso: string) {
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/** Cuotas de cada factura a crédito, tal como las informa Balance Activo. */
+function PlanDeCuotas({ invoices }: { invoices: any[] }) {
+  const conCuotas = invoices.filter(
+    (i) => Array.isArray(i.raw?.cuotas) && i.raw.cuotas.length > 0 && i.estado !== "anulada",
+  );
+  if (conCuotas.length === 0) return null;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Plan de cuotas</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Los pagos cubren primero el pago inicial y luego las cuotas, de la más antigua a la más nueva. Hay 5 días de
+          gracia después de cada vencimiento.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {conCuotas.map((i: any) => {
+          const cuotas = (i.raw.cuotas as Cuota[]).slice().sort((a, b) => a.numero - b.numero);
+          const inicial = Number(i.raw.monto_inicial ?? 0);
+          return (
+            <div key={i.id} className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+                <span className="font-medium">
+                  Factura {i.ncf ?? i.numero ?? ""} · {fmtMoney(i.total, i.moneda)}
+                </span>
+                {inicial > 0 && (
+                  <span className="text-muted-foreground">Pago inicial: {fmtMoney(inicial, i.moneda)}</span>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Cuota</TableHead>
+                      <TableHead>Vence</TableHead>
+                      <TableHead className="text-right">Monto</TableHead>
+                      <TableHead className="text-right">Pagado</TableHead>
+                      <TableHead className="text-right">Saldo</TableHead>
+                      <TableHead>Estado</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {cuotas.map((c) => (
+                      <TableRow key={c.id}>
+                        <TableCell>{c.numero}</TableCell>
+                        <TableCell>{fmtFecha(c.fecha_vencimiento)}</TableCell>
+                        <TableCell className="text-right">{fmtMoney(c.monto, i.moneda)}</TableCell>
+                        <TableCell className="text-right">{fmtMoney(c.monto_pagado, i.moneda)}</TableCell>
+                        <TableCell className="text-right font-medium">{fmtMoney(c.saldo, i.moneda)}</TableCell>
+                        <TableCell>{estadoBadge(c.estado)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );
