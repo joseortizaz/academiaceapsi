@@ -1306,14 +1306,14 @@ export type Database = {
             foreignKeyName: "library_annotations_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
-            referencedRelation: "library_documents"
+            referencedRelation: "library_catalog"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "library_annotations_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
-            referencedRelation: "library_catalog"
+            referencedRelation: "library_documents"
             referencedColumns: ["id"]
           },
         ]
@@ -1458,14 +1458,14 @@ export type Database = {
             foreignKeyName: "library_reading_progress_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
-            referencedRelation: "library_documents"
+            referencedRelation: "library_catalog"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "library_reading_progress_document_id_fkey"
             columns: ["document_id"]
             isOneToOne: false
-            referencedRelation: "library_catalog"
+            referencedRelation: "library_documents"
             referencedColumns: ["id"]
           },
         ]
@@ -2648,6 +2648,7 @@ export type Database = {
       }
     }
     Functions: {
+      account_is_active: { Args: { _user_id?: string }; Returns: boolean }
       audit_attach_context: {
         Args: { _ip: string; _ua: string; _user_id: string }
         Returns: undefined
