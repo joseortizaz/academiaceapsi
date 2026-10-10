@@ -182,6 +182,24 @@ function DocenteClasesVivo() {
         </CardContent>
       </Card>
 
+      {finalizadas.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Clases finalizadas (grabación en proceso)</CardTitle>
+            <CardDescription>
+              Clases que terminaron y aún esperan que Zoom procese la grabación.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ClassTable
+              rows={finalizadas}
+              empty="No hay clases pendientes de grabación."
+              onDelete={(id) => removeMut.mutate(id)}
+            />
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

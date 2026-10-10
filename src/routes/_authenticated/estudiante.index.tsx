@@ -45,6 +45,19 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 function EstudianteDashboard() {
   const { user } = useAuth();
 
+  const { data: cohortCount = 0 } = useQuery({
+    queryKey: ["estudiante-cohort-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("cohort_enrollments")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      return count ?? 0;
+    },
+  });
+
   const { data: zoomClasses = [] } = useQuery({
     queryKey: ["estudiante-zoom-meetings", user?.id],
     enabled: !!user?.id,
