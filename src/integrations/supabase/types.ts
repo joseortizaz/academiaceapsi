@@ -1522,6 +1522,182 @@ export type Database = {
           },
         ]
       }
+      mora_acuerdos: {
+        Row: {
+          cerrado_at: string | null
+          cerrado_por: string | null
+          creado_por: string | null
+          created_at: string
+          desde: string
+          hasta: string
+          id: string
+          nota: string | null
+          user_id: string
+        }
+        Insert: {
+          cerrado_at?: string | null
+          cerrado_por?: string | null
+          creado_por?: string | null
+          created_at?: string
+          desde?: string
+          hasta: string
+          id?: string
+          nota?: string | null
+          user_id: string
+        }
+        Update: {
+          cerrado_at?: string | null
+          cerrado_por?: string | null
+          creado_por?: string | null
+          created_at?: string
+          desde?: string
+          hasta?: string
+          id?: string
+          nota?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mora_avisos: {
+        Row: {
+          canales: string[]
+          created_at: string
+          fecha: string
+          id: string
+          ref: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          canales?: string[]
+          created_at?: string
+          fecha?: string
+          id?: string
+          ref: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          canales?: string[]
+          created_at?: string
+          fecha?: string
+          id?: string
+          ref?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mora_config: {
+        Row: {
+          avisos_activos: boolean
+          contacto_direccion: string
+          id: boolean
+          medios_pago: string | null
+          restriccion_activa: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          avisos_activos?: boolean
+          contacto_direccion?: string
+          id?: boolean
+          medios_pago?: string | null
+          restriccion_activa?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          avisos_activos?: boolean
+          contacto_direccion?: string
+          id?: boolean
+          medios_pago?: string | null
+          restriccion_activa?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      mora_estado: {
+        Row: {
+          acuerdo_id: string | null
+          aviso_hoy: string | null
+          aviso_ref: string | null
+          cuota_antigua_ref: string | null
+          cuota_antigua_saldo: number | null
+          cuota_antigua_venc: string | null
+          cuotas_vencidas: number
+          datos_frescos: boolean
+          datos_sync_at: string | null
+          deberia_restringir: boolean
+          dias_mora: number
+          etapa: string
+          evaluado_at: string
+          monto_vencido: number
+          previo_ref: string | null
+          proxima_ref: string | null
+          proxima_saldo: number | null
+          proxima_venc: string | null
+          restringido: boolean
+          restringido_desde: string | null
+          user_id: string
+        }
+        Insert: {
+          acuerdo_id?: string | null
+          aviso_hoy?: string | null
+          aviso_ref?: string | null
+          cuota_antigua_ref?: string | null
+          cuota_antigua_saldo?: number | null
+          cuota_antigua_venc?: string | null
+          cuotas_vencidas?: number
+          datos_frescos?: boolean
+          datos_sync_at?: string | null
+          deberia_restringir?: boolean
+          dias_mora?: number
+          etapa?: string
+          evaluado_at?: string
+          monto_vencido?: number
+          previo_ref?: string | null
+          proxima_ref?: string | null
+          proxima_saldo?: number | null
+          proxima_venc?: string | null
+          restringido?: boolean
+          restringido_desde?: string | null
+          user_id: string
+        }
+        Update: {
+          acuerdo_id?: string | null
+          aviso_hoy?: string | null
+          aviso_ref?: string | null
+          cuota_antigua_ref?: string | null
+          cuota_antigua_saldo?: number | null
+          cuota_antigua_venc?: string | null
+          cuotas_vencidas?: number
+          datos_frescos?: boolean
+          datos_sync_at?: string | null
+          deberia_restringir?: boolean
+          dias_mora?: number
+          etapa?: string
+          evaluado_at?: string
+          monto_vencido?: number
+          previo_ref?: string | null
+          proxima_ref?: string | null
+          proxima_saldo?: number | null
+          proxima_venc?: string | null
+          restringido?: boolean
+          restringido_desde?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mora_estado_acuerdo_id_fkey"
+            columns: ["acuerdo_id"]
+            isOneToOne: false
+            referencedRelation: "mora_acuerdos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -2668,6 +2844,7 @@ export type Database = {
         Args: { _programa_id: string; _user_id: string }
         Returns: boolean
       }
+      content_access_allowed: { Args: { _user_id?: string }; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -2742,6 +2919,39 @@ export type Database = {
         }
         Returns: undefined
       }
+      mora_evaluar: {
+        Args: { _hoy?: string; _user?: string }
+        Returns: {
+          acuerdo_id: string | null
+          aviso_hoy: string | null
+          aviso_ref: string | null
+          cuota_antigua_ref: string | null
+          cuota_antigua_saldo: number | null
+          cuota_antigua_venc: string | null
+          cuotas_vencidas: number
+          datos_frescos: boolean
+          datos_sync_at: string | null
+          deberia_restringir: boolean
+          dias_mora: number
+          etapa: string
+          evaluado_at: string
+          monto_vencido: number
+          previo_ref: string | null
+          proxima_ref: string | null
+          proxima_saldo: number | null
+          proxima_venc: string | null
+          restringido: boolean
+          restringido_desde: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "mora_estado"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      mora_hoy: { Args: never; Returns: string }
       move_to_dlq: {
         Args: {
           dlq_name: string

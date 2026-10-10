@@ -110,6 +110,7 @@ function DocenteClasesVivo() {
   const programados = classes.filter((c) => c.status === "scheduled" && !isLiveNow(c));
   const enVivo = classes.filter((c) => c.status === "live" || isLiveNow(c));
   const grabadas = classes.filter((c) => c.status === "recorded");
+  const finalizadas = classes.filter((c) => c.status === "ended" && !isLiveNow(c));
 
   return (
     <div className="space-y-6">
@@ -180,6 +181,24 @@ function DocenteClasesVivo() {
           />
         </CardContent>
       </Card>
+
+      {finalizadas.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Clases finalizadas (grabación en proceso)</CardTitle>
+            <CardDescription>
+              Clases que terminaron y aún esperan que Zoom procese la grabación.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ClassTable
+              rows={finalizadas}
+              empty="No hay clases pendientes de grabación."
+              onDelete={(id) => removeMut.mutate(id)}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -362,6 +381,13 @@ function CreateClassDialog({
         description: `ID ${m.zoom_meeting_id}`,
         action: { label: "Copiar enlace", onClick: () => navigator.clipboard.writeText(m.zoom_join_url) },
       });
+      if ((m as any).cohortActiveStudents === 0) {
+        toast.warning("Este grupo no tiene alumnos asignados", {
+          description:
+            "Nadie podrá ver ni entrar a esta clase hasta que administración asigne a los alumnos al grupo (Admin > Grupos > Alumnos).",
+          duration: 15000,
+        });
+      }
       onCreated();
       onClose();
     },

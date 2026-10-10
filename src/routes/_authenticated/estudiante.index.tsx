@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RecordingPlayer } from "@/components/RecordingPlayer";
 import {
   BookOpen, CheckCircle2, Clock, PlayCircle, Calendar, Megaphone, ArrowRight,
-  Radio, Video, FileVideo, ClipboardCheck,
+  Radio, Video, FileVideo, ClipboardCheck, AlertTriangle,
 } from "lucide-react";
 
 type ZoomMeetingLite = {
@@ -44,6 +44,19 @@ export const Route = createFileRoute("/_authenticated/estudiante/")({
 
 function EstudianteDashboard() {
   const { user } = useAuth();
+
+  const { data: cohortCount = 0 } = useQuery({
+    queryKey: ["estudiante-cohort-count", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("cohort_enrollments")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      return count ?? 0;
+    },
+  });
 
   const { data: zoomClasses = [] } = useQuery({
     queryKey: ["estudiante-zoom-meetings", user?.id],
@@ -171,6 +184,19 @@ function EstudianteDashboard() {
         </div>
         <NextLiveClassWidget live={liveZoomClass} upcoming={upcomingZoom} />
       </div>
+
+      {activos.length > 0 && cohortCount === 0 && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="flex items-start gap-3 p-4">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <p className="text-sm">
+              Aún no tienes un grupo asignado. Si tu programa tiene clases en vivo, escribe a
+              administración para que te asignen a tu grupo; mientras tanto no verás las clases
+              en vivo.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {liveZoomClass && <LiveZoomBanner cls={liveZoomClass} />}
       {!liveZoomClass && upcomingZoom && <UpcomingZoomCountdown cls={upcomingZoom} />}
