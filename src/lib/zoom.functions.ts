@@ -157,6 +157,19 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(`No se pudo guardar la reunión: ${error.message}`);
 
+    // Advertencia preventiva: si la clase está restringida a un grupo, el
+    // docente debe saber de inmediato si ese grupo no tiene alumnos asignados
+    // (nadie podría ver ni entrar a la clase).
+    let cohortActiveStudents: number | undefined;
+    if (data.cohortId) {
+      const { count } = await supabaseAdmin
+        .from("cohort_enrollments")
+        .select("id", { count: "exact", head: true })
+        .eq("cohort_id", data.cohortId)
+        .eq("estado", "activo");
+      cohortActiveStudents = count ?? 0;
+    }
+
     const { logAudit } = await import("@/lib/audit.server");
     await logAudit({
       actorId: context.userId,
