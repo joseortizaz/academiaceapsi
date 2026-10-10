@@ -194,7 +194,7 @@ export const createZoomMeeting = createServerFn({ method: "POST" })
       detalle: { docenteId: responsibleTeacherId, claseId: row.id },
     });
 
-    return row;
+    return cohortActiveStudents === undefined ? row : { ...row, cohortActiveStudents };
   });
 
 export const deleteZoomMeeting = createServerFn({ method: "POST" })
