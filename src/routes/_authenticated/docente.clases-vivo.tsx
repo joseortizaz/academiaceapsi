@@ -110,6 +110,7 @@ function DocenteClasesVivo() {
   const programados = classes.filter((c) => c.status === "scheduled" && !isLiveNow(c));
   const enVivo = classes.filter((c) => c.status === "live" || isLiveNow(c));
   const grabadas = classes.filter((c) => c.status === "recorded");
+  const finalizadas = classes.filter((c) => c.status === "ended" && !isLiveNow(c));
 
   return (
     <div className="space-y-6">
