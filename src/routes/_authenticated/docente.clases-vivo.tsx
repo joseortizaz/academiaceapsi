@@ -362,6 +362,13 @@ function CreateClassDialog({
         description: `ID ${m.zoom_meeting_id}`,
         action: { label: "Copiar enlace", onClick: () => navigator.clipboard.writeText(m.zoom_join_url) },
       });
+      if ((m as any).cohortActiveStudents === 0) {
+        toast.warning("Este grupo no tiene alumnos asignados", {
+          description:
+            "Nadie podrá ver ni entrar a esta clase hasta que administración asigne a los alumnos al grupo (Admin > Grupos > Alumnos).",
+          duration: 15000,
+        });
+      }
       onCreated();
       onClose();
     },
