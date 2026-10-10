@@ -99,7 +99,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- el tipo del router exige un componente "async/lazy"; una función directa no satisface su firma desde la actualización de @tanstack/react-router.
+  errorComponent: ErrorComponent as any,
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
