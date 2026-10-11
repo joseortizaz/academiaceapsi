@@ -1,15 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 // Los PDF se envían directamente al modelo de IA (Gemini los lee en base64),
 // sin librerías locales de extracción: el bundle de pdfjs rompía el build.
 
 async function assertAdminOrDocente(userId: string) {
-  const { data } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId);
-  const roles = (data ?? []).map((r) => r.role as string);
+  const { getUserRoles } = await import("@/lib/teacher-access.server");
+  const roles = await getUserRoles(userId);
   if (!roles.includes("admin") && !roles.includes("docente")) {
     throw new Error("No autorizado: se requiere rol admin o docente.");
   }

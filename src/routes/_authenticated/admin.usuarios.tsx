@@ -22,13 +22,14 @@ import {
 } from "@/components/ui/dialog";
 import { AdminPageHeader, EmptyState, DeleteButton } from "@/components/admin/AdminUI";
 import { Label } from "@/components/ui/label";
-import { Copy, Eye, KeyRound, MessageCircle, Search, UserPlus } from "lucide-react";
+import { Copy, Eye, KeyRound, MessageCircle, Search, ShieldCheck, ShieldOff, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createStudentAccount,
   deleteUserAccount,
   getUsersAuthInfo,
   resetStudentPassword,
+  resetUserTwoFactor,
 } from "@/lib/admin-users.functions";
 
 const PALABRAS = [
@@ -70,6 +71,7 @@ function UsuariosPage() {
   const deleteUser = useServerFn(deleteUserAccount);
   const crearAlumno = useServerFn(createStudentAccount);
   const resetPassword = useServerFn(resetStudentPassword);
+  const quitarDosPasos = useServerFn(resetUserTwoFactor);
 
   const [search, setSearch] = useState("");
   const [filtroRol, setFiltroRol] = useState<string>("todos");
@@ -230,6 +232,23 @@ function UsuariosPage() {
     qc.invalidateQueries({ queryKey: ["admin", "usuarios"] });
   };
 
+  const quitarVerificacion = async (id: string, nombre: string) => {
+    if (
+      !window.confirm(
+        `¿Quitar la verificación en dos pasos de ${nombre}? Úsalo solo si perdió su teléfono. Al entrar se le pedirá solo la contraseña y podrá activarla de nuevo desde Mi cuenta.`,
+      )
+    ) {
+      return;
+    }
+    try {
+      await quitarDosPasos({ data: { userId: id } });
+      toast.success("Verificación en dos pasos quitada");
+      qc.invalidateQueries({ queryKey: ["admin", "usuarios", "auth"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo quitar la verificación");
+    }
+  };
+
   const removeUser = async (id: string) => {
     try {
       await deleteUser({ data: { userId: id } });
@@ -328,6 +347,14 @@ function UsuariosPage() {
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">
                       {p.nombre} {p.apellido}
+                      {authByUser.get(p.id)?.mfa && (
+                        <span title="Verificación en dos pasos activada">
+                          <ShieldCheck
+                            className="ml-1.5 inline h-4 w-4 text-emerald-600"
+                            aria-label="Verificación en dos pasos activada"
+                          />
+                        </span>
+                      )}
                       {authByUser.get(p.id)?.must_change_password && (
                         <Badge
                           variant="outline"
@@ -413,6 +440,18 @@ function UsuariosPage() {
                             <KeyRound className="h-4 w-4" />
                           </Button>
                         )}
+                        {p.id !== current?.id &&
+                          !userRoles.includes("admin") &&
+                          authByUser.get(p.id)?.mfa && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              title="Quitar verificación en dos pasos"
+                              onClick={() => quitarVerificacion(p.id, `${p.nombre} ${p.apellido}`)}
+                            >
+                              <ShieldOff className="h-4 w-4" />
+                            </Button>
+                          )}
                         {p.id !== current?.id && (
                           <DeleteButton
                             label={`la cuenta de ${p.nombre} ${p.apellido} y todos sus datos asociados`}

@@ -29,8 +29,10 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCambiarPasswordRouteImport } from './routes/_authenticated/cambiar-password'
 import { Route as AuthenticatedCertificadosRouteImport } from './routes/_authenticated/certificados'
+import { Route as AuthenticatedConfigurar2faRouteImport } from './routes/_authenticated/configurar-2fa'
 import { Route as AuthenticatedDocenteRouteImport } from './routes/_authenticated/docente'
 import { Route as AuthenticatedEstudianteRouteImport } from './routes/_authenticated/estudiante'
+import { Route as AuthenticatedVerificar2faRouteImport } from './routes/_authenticated/verificar-2fa'
 import { Route as BibliotecaIndexRouteImport } from './routes/biblioteca.index'
 import { Route as BibliotecaSlugRouteImport } from './routes/biblioteca.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -61,6 +63,7 @@ import { Route as AuthenticatedAdminModulosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMoraRouteImport } from './routes/_authenticated/admin.mora'
 import { Route as AuthenticatedAdminProgramasRouteImport } from './routes/_authenticated/admin.programas'
 import { Route as AuthenticatedAdminResenasRouteImport } from './routes/_authenticated/admin.resenas'
+import { Route as AuthenticatedAdminSeguridadRouteImport } from './routes/_authenticated/admin.seguridad'
 import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin.solicitudes'
 import { Route as AuthenticatedAdminTestimoniosRouteImport } from './routes/_authenticated/admin.testimonios'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
@@ -199,6 +202,12 @@ const AuthenticatedCertificadosRoute =
     path: '/certificados',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedConfigurar2faRoute =
+  AuthenticatedConfigurar2faRouteImport.update({
+    id: '/configurar-2fa',
+    path: '/configurar-2fa',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDocenteRoute = AuthenticatedDocenteRouteImport.update({
   id: '/docente',
   path: '/docente',
@@ -209,6 +218,12 @@ const AuthenticatedEstudianteRoute = AuthenticatedEstudianteRouteImport.update({
   path: '/estudiante',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedVerificar2faRoute =
+  AuthenticatedVerificar2faRouteImport.update({
+    id: '/verificar-2fa',
+    path: '/verificar-2fa',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const BibliotecaIndexRoute = BibliotecaIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -373,6 +388,12 @@ const AuthenticatedAdminResenasRoute =
   AuthenticatedAdminResenasRouteImport.update({
     id: '/resenas',
     path: '/resenas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSeguridadRoute =
+  AuthenticatedAdminSeguridadRouteImport.update({
+    id: '/seguridad',
+    path: '/seguridad',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminSolicitudesRoute =
@@ -606,8 +627,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
+  '/configurar-2fa': typeof AuthenticatedConfigurar2faRoute
   '/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/verificar-2fa': typeof AuthenticatedVerificar2faRoute
   '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -637,6 +660,7 @@ export interface FileRoutesByFullPath {
   '/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/resenas': typeof AuthenticatedAdminResenasRoute
+  '/admin/seguridad': typeof AuthenticatedAdminSeguridadRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -692,6 +716,8 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/certificados': typeof AuthenticatedCertificadosRoute
+  '/configurar-2fa': typeof AuthenticatedConfigurar2faRoute
+  '/verificar-2fa': typeof AuthenticatedVerificar2faRoute
   '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -721,6 +747,7 @@ export interface FileRoutesByTo {
   '/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/admin/resenas': typeof AuthenticatedAdminResenasRoute
+  '/admin/seguridad': typeof AuthenticatedAdminSeguridadRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -781,8 +808,10 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/cambiar-password': typeof AuthenticatedCambiarPasswordRoute
   '/_authenticated/certificados': typeof AuthenticatedCertificadosRoute
+  '/_authenticated/configurar-2fa': typeof AuthenticatedConfigurar2faRoute
   '/_authenticated/docente': typeof AuthenticatedDocenteRouteWithChildren
   '/_authenticated/estudiante': typeof AuthenticatedEstudianteRouteWithChildren
+  '/_authenticated/verificar-2fa': typeof AuthenticatedVerificar2faRoute
   '/biblioteca/$slug': typeof BibliotecaSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -812,6 +841,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/mora': typeof AuthenticatedAdminMoraRoute
   '/_authenticated/admin/programas': typeof AuthenticatedAdminProgramasRoute
   '/_authenticated/admin/resenas': typeof AuthenticatedAdminResenasRoute
+  '/_authenticated/admin/seguridad': typeof AuthenticatedAdminSeguridadRoute
   '/_authenticated/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
   '/_authenticated/admin/testimonios': typeof AuthenticatedAdminTestimoniosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
@@ -872,8 +902,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cambiar-password'
     | '/certificados'
+    | '/configurar-2fa'
     | '/docente'
     | '/estudiante'
+    | '/verificar-2fa'
     | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -903,6 +935,7 @@ export interface FileRouteTypes {
     | '/admin/mora'
     | '/admin/programas'
     | '/admin/resenas'
+    | '/admin/seguridad'
     | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
@@ -958,6 +991,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/cambiar-password'
     | '/certificados'
+    | '/configurar-2fa'
+    | '/verificar-2fa'
     | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -987,6 +1022,7 @@ export interface FileRouteTypes {
     | '/admin/mora'
     | '/admin/programas'
     | '/admin/resenas'
+    | '/admin/seguridad'
     | '/admin/solicitudes'
     | '/admin/testimonios'
     | '/admin/usuarios'
@@ -1046,8 +1082,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/cambiar-password'
     | '/_authenticated/certificados'
+    | '/_authenticated/configurar-2fa'
     | '/_authenticated/docente'
     | '/_authenticated/estudiante'
+    | '/_authenticated/verificar-2fa'
     | '/biblioteca/$slug'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -1077,6 +1115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/mora'
     | '/_authenticated/admin/programas'
     | '/_authenticated/admin/resenas'
+    | '/_authenticated/admin/seguridad'
     | '/_authenticated/admin/solicitudes'
     | '/_authenticated/admin/testimonios'
     | '/_authenticated/admin/usuarios'
@@ -1298,6 +1337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCertificadosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/configurar-2fa': {
+      id: '/_authenticated/configurar-2fa'
+      path: '/configurar-2fa'
+      fullPath: '/configurar-2fa'
+      preLoaderRoute: typeof AuthenticatedConfigurar2faRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/docente': {
       id: '/_authenticated/docente'
       path: '/docente'
@@ -1310,6 +1356,13 @@ declare module '@tanstack/react-router' {
       path: '/estudiante'
       fullPath: '/estudiante'
       preLoaderRoute: typeof AuthenticatedEstudianteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/verificar-2fa': {
+      id: '/_authenticated/verificar-2fa'
+      path: '/verificar-2fa'
+      fullPath: '/verificar-2fa'
+      preLoaderRoute: typeof AuthenticatedVerificar2faRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/biblioteca/': {
@@ -1520,6 +1573,13 @@ declare module '@tanstack/react-router' {
       path: '/resenas'
       fullPath: '/admin/resenas'
       preLoaderRoute: typeof AuthenticatedAdminResenasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/seguridad': {
+      id: '/_authenticated/admin/seguridad'
+      path: '/seguridad'
+      fullPath: '/admin/seguridad'
+      preLoaderRoute: typeof AuthenticatedAdminSeguridadRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/solicitudes': {
@@ -1797,6 +1857,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMoraRoute: typeof AuthenticatedAdminMoraRoute
   AuthenticatedAdminProgramasRoute: typeof AuthenticatedAdminProgramasRoute
   AuthenticatedAdminResenasRoute: typeof AuthenticatedAdminResenasRoute
+  AuthenticatedAdminSeguridadRoute: typeof AuthenticatedAdminSeguridadRoute
   AuthenticatedAdminSolicitudesRoute: typeof AuthenticatedAdminSolicitudesRoute
   AuthenticatedAdminTestimoniosRoute: typeof AuthenticatedAdminTestimoniosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
@@ -1823,6 +1884,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMoraRoute: AuthenticatedAdminMoraRoute,
   AuthenticatedAdminProgramasRoute: AuthenticatedAdminProgramasRoute,
   AuthenticatedAdminResenasRoute: AuthenticatedAdminResenasRoute,
+  AuthenticatedAdminSeguridadRoute: AuthenticatedAdminSeguridadRoute,
   AuthenticatedAdminSolicitudesRoute: AuthenticatedAdminSolicitudesRoute,
   AuthenticatedAdminTestimoniosRoute: AuthenticatedAdminTestimoniosRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
@@ -1891,8 +1953,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCambiarPasswordRoute: typeof AuthenticatedCambiarPasswordRoute
   AuthenticatedCertificadosRoute: typeof AuthenticatedCertificadosRoute
+  AuthenticatedConfigurar2faRoute: typeof AuthenticatedConfigurar2faRoute
   AuthenticatedDocenteRoute: typeof AuthenticatedDocenteRouteWithChildren
   AuthenticatedEstudianteRoute: typeof AuthenticatedEstudianteRouteWithChildren
+  AuthenticatedVerificar2faRoute: typeof AuthenticatedVerificar2faRoute
   AuthenticatedClaseVivoMeetingIdRoute: typeof AuthenticatedClaseVivoMeetingIdRoute
   AuthenticatedMisCursosSlugRoute: typeof AuthenticatedMisCursosSlugRoute
   AuthenticatedMisCursosIndexRoute: typeof AuthenticatedMisCursosIndexRoute
@@ -1902,8 +1966,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCambiarPasswordRoute: AuthenticatedCambiarPasswordRoute,
   AuthenticatedCertificadosRoute: AuthenticatedCertificadosRoute,
+  AuthenticatedConfigurar2faRoute: AuthenticatedConfigurar2faRoute,
   AuthenticatedDocenteRoute: AuthenticatedDocenteRouteWithChildren,
   AuthenticatedEstudianteRoute: AuthenticatedEstudianteRouteWithChildren,
+  AuthenticatedVerificar2faRoute: AuthenticatedVerificar2faRoute,
   AuthenticatedClaseVivoMeetingIdRoute: AuthenticatedClaseVivoMeetingIdRoute,
   AuthenticatedMisCursosSlugRoute: AuthenticatedMisCursosSlugRoute,
   AuthenticatedMisCursosIndexRoute: AuthenticatedMisCursosIndexRoute,

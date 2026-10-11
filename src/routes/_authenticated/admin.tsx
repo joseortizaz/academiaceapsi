@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Library,
   HandCoins,
+  LockKeyhole,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsBell } from "@/components/NotificationsBell";
@@ -61,6 +62,7 @@ const nav = [
   { to: "/admin/usuarios", label: "Usuarios", icon: UserCog },
   { to: "/admin/integraciones", label: "Integraciones", icon: Plug },
   { to: "/admin/auditoria", label: "Auditoría", icon: ShieldCheck },
+  { to: "/admin/seguridad", label: "Seguridad", icon: LockKeyhole },
 ];
 
 function AdminLayout() {

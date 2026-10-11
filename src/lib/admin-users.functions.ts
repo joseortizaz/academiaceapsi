@@ -233,6 +233,7 @@ export const getUsersAuthInfo = createServerFn({ method: "POST" })
       email: string | null;
       must_change_password: boolean;
       last_sign_in_at: string | null;
+      mfa: boolean;
     }[] = [];
 
     let page = 1;
@@ -246,6 +247,7 @@ export const getUsersAuthInfo = createServerFn({ method: "POST" })
           email: u.email ?? null,
           must_change_password: (u.app_metadata as any)?.must_change_password === true,
           last_sign_in_at: u.last_sign_in_at ?? null,
+          mfa: (u.factors ?? []).some((f) => f.status === "verified"),
         });
       }
       if (batch.length < 1000) break;
@@ -253,6 +255,62 @@ export const getUsersAuthInfo = createServerFn({ method: "POST" })
     }
 
     return usuarios;
+  });
+
+// ───────── Quitar la verificación en dos pasos de otra cuenta (admin) ─────────
+// Para quien perdió el teléfono: borra sus autenticadores; al entrar de nuevo
+// solo le pedirá la contraseña y podrá volver a activarla desde "Mi cuenta".
+
+export const resetUserTwoFactor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string }) => {
+    if (!input?.userId) throw new Error("userId requerido");
+    return { userId: input.userId };
+  })
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+
+    if (data.userId === context.userId) {
+      throw new Error("Tu propia verificación en dos pasos se gestiona en Administración > Seguridad");
+    }
+
+    const { data: targetIsAdmin, error: roleError } = await context.supabase.rpc("has_role", {
+      _user_id: data.userId,
+      _role: "admin",
+    });
+    if (roleError) throw new Error(roleError.message);
+    if (targetIsAdmin) {
+      throw new Error("No se puede quitar la verificación en dos pasos de una cuenta administradora");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existing, error: getError } = await supabaseAdmin.auth.admin.getUserById(
+      data.userId,
+    );
+    if (getError || !existing?.user) throw new Error("No se encontró la cuenta");
+
+    const factores = existing.user.factors ?? [];
+    for (const f of factores) {
+      const { error } = await supabaseAdmin.auth.admin.mfa.deleteFactor({
+        id: f.id,
+        userId: data.userId,
+      });
+      if (error) throw new Error(error.message);
+    }
+
+    const { logAudit } = await import("@/lib/audit.server");
+    await logAudit({
+      actorId: context.userId,
+      accion: "restablecer_2fa",
+      entidad: "usuario",
+      entidadId: data.userId,
+      entidadEtiqueta: existing.user.email ?? null,
+      sujetoId: data.userId,
+      detalle: { factores: factores.length },
+      sensible: true,
+    });
+
+    return { eliminados: factores.length };
   });
 
 // ───────────── Cambio de contraseña provisional (propio) ─────────────

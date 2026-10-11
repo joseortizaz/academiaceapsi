@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Save, KeyRound } from "lucide-react";
 import { AvatarUploader } from "@/components/AvatarUploader";
+import { TarjetaDosPasos } from "@/components/security/TarjetaDosPasos";
 
 export const Route = createFileRoute("/_authenticated/docente/cuenta")({
   staticData: { sitemap: false },
@@ -147,6 +148,8 @@ function CuentaDocente() {
           </CardContent>
         </Card>
       </div>
+
+      <TarjetaDosPasos />
     </div>
   );
 }
