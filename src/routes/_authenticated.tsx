@@ -14,6 +14,8 @@ function registrarContextoDeAcceso(user: { id: string; last_sign_in_at?: string 
   void recordLoginContext({ data: undefined as never }).catch(() => {});
 }
 
+const PANTALLAS_2FA = new Set(["/verificar-2fa", "/configurar-2fa"]);
+
 export const Route = createFileRoute("/_authenticated")({
   staticData: { sitemap: "exclude-subtree" },
   ssr: false,
@@ -36,6 +38,25 @@ export const Route = createFileRoute("/_authenticated")({
     const debeCambiar = (data.user.app_metadata as any)?.must_change_password === true;
     if (debeCambiar && location.pathname !== "/cambiar-password") {
       throw redirect({ to: "/cambiar-password", search: {} });
+    }
+    if (debeCambiar) return;
+
+    // Verificación en dos pasos: obligatoria para administradores, opcional para el resto.
+    if (PANTALLAS_2FA.has(location.pathname)) return;
+    const { data: nivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (nivel?.currentLevel === "aal2") return;
+    if (nivel?.nextLevel === "aal2") {
+      // Tiene autenticador: falta el código de esta sesión.
+      throw redirect({ to: "/verificar-2fa", search: { redirect: location.href } });
+    }
+    const { data: esAdmin } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (esAdmin) {
+      throw redirect({ to: "/configurar-2fa", search: { redirect: location.href } });
     }
   },
 

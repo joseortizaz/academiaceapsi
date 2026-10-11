@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { rolesEfectivos } from "@/lib/mfa.server";
 
 export type TeacherProgramScope = {
   isAdmin: boolean;
@@ -17,7 +18,8 @@ export async function getUserRoles(userId: string): Promise<string[]> {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId);
-  return (data ?? []).map((r) => r.role as string);
+  // El rol admin solo cuenta con la verificación en dos pasos completada.
+  return rolesEfectivos(userId, (data ?? []).map((r) => r.role as string));
 }
 
 async function getTeacherId(userId: string): Promise<string | null> {

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Download, Save, KeyRound, Receipt, FileText, RefreshCw, ExternalLink } from "lucide-react";
 import { AvatarUploader } from "@/components/AvatarUploader";
+import { TarjetaDosPasos } from "@/components/security/TarjetaDosPasos";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyInvoices, syncMyInvoices } from "@/lib/balance-activo.functions";
 
@@ -181,6 +182,8 @@ function MiCuenta() {
           </CardContent>
         </Card>
       </div>
+
+      <TarjetaDosPasos />
 
       <BalanceActivoInvoices />
 

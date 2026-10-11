@@ -24,11 +24,8 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
 
     const userId = context.userId;
     await assertContentAccess(userId);
-    const { data: roles } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    const roleList = (roles ?? []).map((r) => r.role as string);
+    const { getUserRoles } = await import("./teacher-access.server");
+    const roleList = await getUserRoles(userId);
 
     let allowed = roleList.includes("admin");
 

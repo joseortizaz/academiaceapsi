@@ -142,6 +142,12 @@ export function describirEvento(ev: AuditEvent, ctx: Contexto = {}): string {
   if (ev.categoria === "acceso") {
     if (ev.accion === "login") return `${actor} inició sesión`;
     if (ev.accion === "cambio_password") return `${actor} cambió su contraseña provisional`;
+    if (ev.accion === "activar_2fa") return `${actor} activó la verificación en dos pasos`;
+    if (ev.accion === "desactivar_2fa") {
+      return ev.actor_id && ev.actor_id !== ev.sujeto_id
+        ? `${actor} quitó la verificación en dos pasos de ${ev.entidad_etiqueta ?? sujeto}`
+        : `${actor} desactivó la verificación en dos pasos`;
+    }
     if (ev.accion === "registro") {
       const via = (ev.detalle?.["via"] as string) ?? "autoregistro";
       return `${actor} se registró (${via === "administrador" ? "por administrador" : "autoregistro"})`;
@@ -151,6 +157,8 @@ export function describirEvento(ev: AuditEvent, ctx: Contexto = {}): string {
   switch (ev.accion) {
     case "crear_alumno":
       return `${actor} creó la cuenta del alumno ${ev.entidad_etiqueta ?? sujeto}`;
+    case "restablecer_2fa":
+      return `${actor} quitó la verificación en dos pasos de ${ev.entidad_etiqueta ?? sujeto}`;
     case "restablecer_password":
       return `${actor} restableció la contraseña de ${ev.entidad_etiqueta ?? sujeto}`;
     case "eliminar_cuenta": {
