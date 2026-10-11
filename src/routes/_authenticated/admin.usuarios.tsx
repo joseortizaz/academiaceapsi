@@ -88,7 +88,7 @@ function UsuariosPage() {
   const [resetPass, setResetPass] = useState("");
   const [reseteando, setReseteando] = useState(false);
 
-  const { data: authInfo = [] } = useQuery({
+  const { data: authInfo = [], error: authInfoError } = useQuery({
     queryKey: ["admin", "usuarios", "auth"],
     queryFn: async () => await getUsersAuthInfo(),
   });
@@ -267,6 +267,13 @@ function UsuariosPage() {
           </Button>
         }
       />
+
+      {authInfoError && (
+        <p className="mb-4 rounded-md bg-amber-100 p-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-200">
+          No se pudieron cargar los correos de las cuentas:{" "}
+          {authInfoError instanceof Error ? authInfoError.message : "error desconocido"}
+        </p>
+      )}
 
       <div className="mb-4 flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[220px]">

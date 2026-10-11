@@ -92,6 +92,13 @@
       "when": 1791306689206,
       "tag": "0012_mora",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791753600000,
+      "tag": "0013_banned_until_finito",
+      "breakpoints": true
     }
   ]
 }
