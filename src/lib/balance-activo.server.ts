@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-const BASE_URL = () => process.env.BALANCE_ACTIVO_API_URL || "https://balanceactivo.net/api/public/v1";
+const BASE_URL = () => process.env.BALANCE_ACTIVO_API_URL || "https://ingresaas.net/api/public/v1";
 const API_KEY = () => process.env.BALANCE_ACTIVO_API_KEY;
 const WEBHOOK_SECRET = () => process.env.BALANCE_ACTIVO_WEBHOOK_SECRET;
 
