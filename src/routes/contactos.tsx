@@ -49,9 +49,9 @@ function Contactos() {
             </Card>
           ))}
           <div className="flex gap-2 pt-2">
-            <a href="#" aria-label="Facebook" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Facebook className="h-4 w-4" /></a>
-            <a href="#" aria-label="Instagram" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Instagram className="h-4 w-4" /></a>
-            <a href="#" aria-label="YouTube" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Youtube className="h-4 w-4" /></a>
+            <a href="https://www.facebook.com/share/1Jg7uG2aqg/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Facebook className="h-4 w-4" /></a>
+            <a href="https://instagram.com/ceapsird?psln=bWIyYTl6NHY3MXRi" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Instagram className="h-4 w-4" /></a>
+            <a href="https://youtube.com/@aprendizajeycambio9751?si=Bgm7DjLzkx5YkIqC" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="rounded-full bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"><Youtube className="h-4 w-4" /></a>
           </div>
         </div>
 
