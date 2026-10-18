@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { GraduationCap, Award, Video, Users, Clock, CheckCircle2, Star, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero-ceapsi.jpg";
+import { useProgramCounts } from "@/hooks/use-program-counts";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -183,14 +184,56 @@ function CursosDestacadosSection() {
 }
 
 
-const testimonios = [
-  { nombre: "María Fernández", ciudad: "Santo Domingo", texto: "El diplomado superó mis expectativas. Los docentes son profesionales reconocidos en el país.", rating: 5 },
-  { nombre: "Luis Peña", ciudad: "Santiago", texto: "Pude estudiar a mi ritmo desde el Cibao. La plataforma es excelente y muy clara.", rating: 5 },
-  { nombre: "Rosa Jiménez", ciudad: "La Romana", texto: "Recibí mi certificado al instante. Hoy aplico todo lo aprendido en mi consulta.", rating: 5 },
-];
+type PublicReview = { id: string; autor: string; pais: string | null; rating: number; comentario: string | null; programa_titulo: string };
 
+function TestimoniosSection() {
+  const { data: reviews = [] } = useQuery<PublicReview[]>({
+    queryKey: ["public-latest-reviews"],
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)("get_latest_public_reviews", { _limit: 6 });
+      if (error) throw error;
+      return (data ?? []) as PublicReview[];
+    },
+  });
+  if (reviews.length === 0) return null;
+  return (
+    <section className="bg-background py-16 md:py-24">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Testimonios</p>
+          <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">Voces de nuestros egresados</h2>
+        </div>
+        <div className="mt-12 flex flex-wrap justify-center gap-6">
+          {reviews.map((t) => (
+            <Card key={t.id} className="w-full border-border md:w-[calc(33.333%-1rem)] md:min-w-[300px]">
+              <CardContent className="p-6">
+                <div className="flex gap-1 text-accent" aria-label={`${t.rating} de 5 estrellas`}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={`h-4 w-4 ${i < t.rating ? "fill-current" : "opacity-30"}`} />
+                  ))}
+                </div>
+                {t.comentario && <p className="mt-4 text-sm leading-relaxed text-foreground/80">"{t.comentario}"</p>}
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="text-sm font-semibold text-foreground">{t.autor}</p>
+                  <p className="text-xs text-muted-foreground">{t.programa_titulo}{t.pais ? ` · ${t.pais}` : ""}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatValue({ value }: { value: number | undefined }) {
+  return value === undefined
+    ? <span className="inline-block h-7 w-10 animate-pulse rounded bg-primary-foreground/20 align-middle" aria-label="Cargando" />
+    : <>{value}</>;
+}
 
 function Home() {
+  const { data: counts } = useProgramCounts();
   return (
     <PublicLayout>
       {/* HERO */}
@@ -215,9 +258,10 @@ function Home() {
                 <Link to="/sobre-nosotros">Conoce la academia</Link>
               </Button>
             </div>
-            <div className="mt-10 grid grid-cols-3 gap-4 border-t border-primary-foreground/15 pt-6">
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 border-t border-primary-foreground/15 pt-6">
               <div><p className="text-2xl font-bold text-accent">+2,500</p><p className="text-xs text-primary-foreground/70">Egresados</p></div>
-              <div><p className="text-2xl font-bold text-accent">25+</p><p className="text-xs text-primary-foreground/70">Diplomados</p></div>
+              <div><p className="text-2xl font-bold text-accent"><StatValue value={counts?.diplomados} /></p><p className="text-xs text-primary-foreground/70">Diplomados</p></div>
+              <div><p className="text-2xl font-bold text-accent"><StatValue value={counts?.cursos} /></p><p className="text-xs text-primary-foreground/70">Cursos</p></div>
               <div><p className="text-2xl font-bold text-accent">98%</p><p className="text-xs text-primary-foreground/70">Satisfacción</p></div>
             </div>
           </div>
@@ -265,34 +309,7 @@ function Home() {
 
 
       {/* TESTIMONIOS */}
-      <section className="bg-background py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-accent">Testimonios</p>
-            <h2 className="mt-3 text-3xl font-bold text-foreground md:text-4xl">
-              Voces de nuestros egresados
-            </h2>
-          </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {testimonios.map((t) => (
-              <Card key={t.nombre} className="border-border">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 text-accent">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-relaxed text-foreground/80">"{t.texto}"</p>
-                  <div className="mt-5 border-t border-border pt-4">
-                    <p className="text-sm font-semibold text-foreground">{t.nombre}</p>
-                    <p className="text-xs text-muted-foreground">{t.ciudad}, RD</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimoniosSection />
 
       {/* CTA */}
       <section className="bg-primary py-16 text-primary-foreground">
