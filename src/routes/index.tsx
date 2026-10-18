@@ -288,7 +288,7 @@ function Home() {
               { icon: Award, t: "Certificado verificable", d: "Con validez nacional. Recibe tu certificado digital descargable al completar el 100%, con código único para verificar su autenticidad." },
               { icon: Users, t: "Docentes certificados", d: "Aprende con psicólogos y educadores reconocidos en RD." },
               { icon: CheckCircle2, t: "Avance gradual", d: "Sistema de aprendizaje progresivo que asegura tu dominio del tema." },
-              { icon: GraduationCap, t: "Diplomados acreditados", d: "Programas formales con módulos, evaluaciones y tutorías." },
+              { icon: GraduationCap, t: "Diplomados estructurados", d: "Programas formales con módulos, evaluaciones y tutorías." },
             ].map((b) => (
               <Card key={b.t} className="border-border transition hover:shadow-lg">
                 <CardContent className="p-6">
