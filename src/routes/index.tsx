@@ -259,7 +259,7 @@ function Home() {
               </Button>
             </div>
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 border-t border-primary-foreground/15 pt-6">
-              <div><p className="text-2xl font-bold text-accent">+2,500</p><p className="text-xs text-primary-foreground/70">Egresados</p></div>
+              <div><p className="text-2xl font-bold text-accent">+2,900</p><p className="text-xs text-primary-foreground/70">Diplomas otorgados</p></div>
               <div><p className="text-2xl font-bold text-accent"><StatValue value={counts?.diplomados} /></p><p className="text-xs text-primary-foreground/70">Diplomados</p></div>
               <div><p className="text-2xl font-bold text-accent"><StatValue value={counts?.cursos} /></p><p className="text-xs text-primary-foreground/70">Cursos</p></div>
               <div><p className="text-2xl font-bold text-accent">98%</p><p className="text-xs text-primary-foreground/70">Satisfacción</p></div>

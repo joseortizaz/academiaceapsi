@@ -70,7 +70,7 @@ function SobreNosotros() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { n: "+2,500", l: "Egresados activos", full: true },
+              { n: "+2,900", l: "Diplomas otorgados", full: true },
               { n: counts ? String(counts.diplomados) : null, l: "Diplomados" },
               { n: counts ? String(counts.cursos) : null, l: "Cursos" },
               { n: "32", l: "Provincias alcanzadas" },
