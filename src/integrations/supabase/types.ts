@@ -2881,6 +2881,18 @@ export type Database = {
           tipo: string
         }[]
       }
+      get_latest_public_reviews: {
+        Args: { _limit?: number }
+        Returns: {
+          autor: string
+          comentario: string
+          created_at: string
+          id: string
+          pais: string
+          programa_titulo: string
+          rating: number
+        }[]
+      }
       get_program_reviews: {
         Args: { _limit?: number; _offset?: number; _programa_id: string }
         Returns: {
