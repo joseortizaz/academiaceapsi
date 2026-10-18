@@ -285,7 +285,7 @@ function Home() {
             {[
               { icon: Video, t: "Clases en vivo por Zoom", d: "Interactúa en tiempo real con docentes referentes del país." },
               { icon: Clock, t: "Cursos a tu ritmo", d: "Contenido asincrónico disponible 24/7 desde cualquier dispositivo." },
-              { icon: Award, t: "Certificación oficial", d: "Recibe tu certificado digital descargable al completar el 100%." },
+              { icon: Award, t: "Certificado verificable", d: "Con validez nacional. Recibe tu certificado digital descargable al completar el 100%, con código único para verificar su autenticidad." },
               { icon: Users, t: "Docentes certificados", d: "Aprende con psicólogos y educadores reconocidos en RD." },
               { icon: CheckCircle2, t: "Avance gradual", d: "Sistema de aprendizaje progresivo que asegura tu dominio del tema." },
               { icon: GraduationCap, t: "Diplomados acreditados", d: "Programas formales con módulos, evaluaciones y tutorías." },
