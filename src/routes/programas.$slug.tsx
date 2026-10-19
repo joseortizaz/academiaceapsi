@@ -21,6 +21,7 @@ import {
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgramReviews } from "@/components/reviews/ProgramReviews";
+import { fechaCohorte, proximasDePrograma, useProximasCohortes } from "@/lib/cohortes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   TeacherProfileDialog, fullName as docenteNombre, initials as docenteIniciales, type Teacher,
@@ -141,6 +142,11 @@ function DetallePrograma() {
       return data;
     },
   });
+
+  // Fechas, horario y cupo salen de los grupos (cohortes) que aún no empiezan.
+  const { data: cohortesPorPrograma } = useProximasCohortes();
+  const proximas = proximasDePrograma(programa, cohortesPorPrograma);
+  const esAsincrono = programa?.modalidad === "asincrono";
 
   const shareUrl = programaUrl(slug);
   const copiarEnlace = async () => {
@@ -421,15 +427,17 @@ function DetallePrograma() {
                   <Calendar className="h-4 w-4" /> {programa.duracion_semanas} semanas
                 </span>
               )}
-              {programa.fecha_inicio && (
+              {esAsincrono ? (
                 <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
-                  Inicio {new Date(programa.fecha_inicio).toLocaleDateString("es-DO")}
+                  <Calendar className="h-4 w-4" /> Acceso inmediato
                 </span>
-              )}
-              {programa.max_estudiantes && (
+              ) : proximas[0] ? (
+                <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                  <Calendar className="h-4 w-4 text-primary" /> Inicia {fechaCohorte(proximas[0].fecha_inicio)}
+                </span>
+              ) : (
                 <span className="inline-flex items-center gap-1.5">
-                  <Users className="h-4 w-4" /> Cupo {programa.max_estudiantes}
+                  <Calendar className="h-4 w-4" /> Próxima cohorte en preparación
                 </span>
               )}
             </div>
@@ -740,12 +748,36 @@ function DetallePrograma() {
             </div>
           )}
 
-          {programa.horario && (
+          {!esAsincrono && (
             <div className="rounded-lg border bg-card p-5">
               <h3 className="flex items-center gap-2 font-bold">
-                <Calendar className="h-4 w-4 text-primary" /> Horario
+                <Calendar className="h-4 w-4 text-primary" />
+                {proximas.length > 1 ? "Próximas cohortes" : "Próxima cohorte"}
               </h3>
-              <p className="mt-2 text-sm text-muted-foreground">{programa.horario}</p>
+              {proximas.length > 0 ? (
+                <ul className="mt-3 space-y-3">
+                  {proximas.map((c) => (
+                    <li key={c.fecha_inicio + (c.horario ?? "")} className="text-sm">
+                      <p className="font-semibold text-foreground">
+                        Inicia {fechaCohorte(c.fecha_inicio)}
+                      </p>
+                      {c.horario && <p className="text-muted-foreground">{c.horario}</p>}
+                      {c.cupo_maximo ? (
+                        <p className="inline-flex items-center gap-1 text-muted-foreground">
+                          <Users className="h-3.5 w-3.5" /> Cupo de {c.cupo_maximo} participantes
+                        </p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="mt-2 space-y-3 text-sm text-muted-foreground">
+                  <p>Estamos preparando el próximo grupo. Déjanos tus datos y te avisamos cuando abra la inscripción.</p>
+                  <Button asChild size="sm" variant="outline" className="w-full">
+                    <Link to="/solicitud-curso">Avísame cuando abra</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 

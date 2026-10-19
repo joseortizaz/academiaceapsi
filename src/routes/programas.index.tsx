@@ -10,7 +10,6 @@ import {
   Calendar,
   Clock,
   GraduationCap,
-  Users,
 } from "lucide-react";
 import { StarRating } from "@/components/reviews/StarRating";
 import {
@@ -20,6 +19,7 @@ import {
   modalidadLabelLong,
 } from "@/lib/program-labels";
 import { cn } from "@/lib/utils";
+import { fechaCohorte, proximasDePrograma, useProximasCohortes } from "@/lib/cohortes";
 
 type ProgramasSearch = { tipo?: string; modalidad?: string };
 
@@ -106,6 +106,7 @@ function ProgramasPage() {
     },
   });
   const statsMap = new Map(stats.map((s) => [s.programa_id, s]));
+  const { data: cohortes } = useProximasCohortes();
 
   const tipos = Array.from(new Set(programas.map((p) => p.tipo).filter(Boolean)));
   const modalidades = Array.from(new Set(programas.map((p) => p.modalidad).filter(Boolean)));
@@ -246,18 +247,28 @@ function ProgramasPage() {
                         {p.duracion_horas} horas
                       </span>
                     )}
-                    {p.fecha_inicio && (
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {new Date(p.fecha_inicio).toLocaleDateString("es-DO")}
-                      </span>
-                    )}
-                    {p.max_estudiantes && (
-                      <span className="inline-flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" />
-                        Cupo {p.max_estudiantes}
-                      </span>
-                    )}
+                    {(() => {
+                      if (p.modalidad === "asincrono") {
+                        return (
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="h-3.5 w-3.5" />
+                            Acceso inmediato
+                          </span>
+                        );
+                      }
+                      const proxima = proximasDePrograma(p, cohortes)[0];
+                      return proxima ? (
+                        <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
+                          Inicia {fechaCohorte(proxima.fecha_inicio)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Próxima cohorte en preparación
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   <div className="mt-auto flex items-center justify-between gap-2 pt-2">

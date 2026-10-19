@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { GraduationCap, BookOpen } from "lucide-react";
 import { StudentShell } from "@/components/student/StudentShell";
+import { fechaLargaCohorte, hoyRD, useMiAccesoCohortes } from "@/lib/cohortes";
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/")({
   staticData: { sitemap: false },
@@ -15,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/mis-cursos/")({
 
 function MisCursos() {
   const { user } = useAuth();
+  const { data: accesos } = useMiAccesoCohortes();
+  const hoy = hoyRD();
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["mis-cursos", user?.id],
@@ -75,7 +78,12 @@ function MisCursos() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {rows.map((e) => (
+            {rows.map((e) => {
+              const acceso = accesos?.get(e.programa_id);
+              const cerrado = !!acceso && !acceso.abierto;
+              const enGracia =
+                !!acceso?.abierto && !!acceso.fecha_fin && !!acceso.ultimo_dia_acceso && acceso.fecha_fin < hoy;
+              return (
               <article key={e.id} className="overflow-hidden rounded-xl border bg-card shadow-sm">
                 <div className="aspect-video bg-muted">
                   {e.programa?.imagen_url ? (
@@ -89,9 +97,13 @@ function MisCursos() {
                 <div className="space-y-3 p-4">
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline" className="capitalize">{e.programa?.tipo ?? "Programa"}</Badge>
-                    <Badge variant={e.estado === "activo" ? "default" : "secondary"}>
-                      {e.estado}
-                    </Badge>
+                    {cerrado ? (
+                      <Badge variant="secondary">Grupo cerrado</Badge>
+                    ) : (
+                      <Badge variant={e.estado === "activo" ? "default" : "secondary"}>
+                        {e.estado}
+                      </Badge>
+                    )}
                     {e.programa?.modalidad === "presencial" && (
                       <Badge variant="outline">Presencial</Badge>
                     )}
@@ -114,7 +126,19 @@ function MisCursos() {
                       <Progress value={e.progreso_porcentaje} />
                     </div>
                   )}
-                  {e.estado === "pendiente" ? (
+                  {enGracia && (
+                    <p className="rounded-md bg-amber-500/10 p-2 text-xs text-amber-800 dark:text-amber-300">
+                      Tu grupo terminó. Tienes acceso a los contenidos hasta el{" "}
+                      <strong>{fechaLargaCohorte(acceso!.ultimo_dia_acceso!)}</strong>.
+                    </p>
+                  )}
+                  {cerrado ? (
+                    <Button asChild className="w-full" variant="secondary">
+                      <Link to="/mis-cursos/$slug" params={{ slug: e.programa?.slug ?? "" }}>
+                        Acceso finalizado
+                      </Link>
+                    </Button>
+                  ) : e.estado === "pendiente" ? (
                     <Button disabled className="w-full" variant="secondary">
                       Pago pendiente de verificación
                     </Button>
@@ -135,7 +159,8 @@ function MisCursos() {
                   )}
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

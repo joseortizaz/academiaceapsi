@@ -432,6 +432,11 @@ function ProgramasPage() {
               </div>
             </div>
 
+            <p className="rounded-md bg-muted p-3 text-xs text-muted-foreground">
+              La web publica la fecha, el día, el horario y el cupo de cada grupo desde <strong>Grupos</strong>.
+              Los campos de fecha, horario y cupo de aquí son solo de referencia interna.
+            </p>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>Fecha de inicio</Label>

@@ -13,7 +13,7 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { signRecordingToken } = await import("./recordings.server");
-    const { assertContentAccess, ENROLLMENT_ACCESS_STATES } = await import("./account-status.server");
+    const { assertContentAccess, assertCohortAccess, ENROLLMENT_ACCESS_STATES } = await import("./account-status.server");
 
     const { data: meeting } = await supabaseAdmin
       .from("zoom_meetings")
@@ -24,6 +24,7 @@ export const getRecordingPlaybackUrl = createServerFn({ method: "GET" })
 
     const userId = context.userId;
     await assertContentAccess(userId);
+    await assertCohortAccess(userId, meeting.programa_id);
     const { getUserRoles } = await import("./teacher-access.server");
     const roleList = await getUserRoles(userId);
 

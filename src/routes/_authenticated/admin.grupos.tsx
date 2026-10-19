@@ -21,6 +21,7 @@ import {
   AdminPageHeader, CreateButton, EditButton, DeleteButton, FormDialog, EmptyState,
 } from "@/components/admin/AdminUI";
 import { Users } from "lucide-react";
+import { fechaCohorte, hoyRD, ultimoDiaAcceso, COHORTE_DIAS_GRACIA } from "@/lib/cohortes";
 
 export const Route = createFileRoute("/_authenticated/admin/grupos")({
   staticData: { sitemap: false },
@@ -190,6 +191,7 @@ function GruposPage() {
                 <TableHead>Docente</TableHead>
                 <TableHead>Horario</TableHead>
                 <TableHead>Nivel actual</TableHead>
+                <TableHead>Acceso alumnos</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -206,6 +208,17 @@ function GruposPage() {
                     <TableCell>{t ? `${t.nombre} ${t.apellido ?? ""}` : "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{c.horario ?? "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{c.nivel_actual ?? "—"}</TableCell>
+                    <TableCell className="text-sm">
+                      {c.fecha_fin ? (
+                        ultimoDiaAcceso(c.fecha_fin) < hoyRD() ? (
+                          <Badge variant="secondary">Cerrado desde {fechaCohorte(ultimoDiaAcceso(c.fecha_fin))}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Hasta {fechaCohorte(ultimoDiaAcceso(c.fecha_fin))}</span>
+                        )
+                      ) : (
+                        <span className="text-muted-foreground">Sin fecha fin</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge className={estadoColor[c.estado] ?? ""}>{c.estado}</Badge>
                     </TableCell>
@@ -311,6 +324,11 @@ function GruposPage() {
               <div className="grid gap-2">
                 <Label>Fecha fin</Label>
                 <Input type="date" value={s.fecha_fin ?? ""} onChange={(e) => set({ fecha_fin: e.target.value || null })} />
+                <p className="text-xs text-muted-foreground">
+                  {s.fecha_fin
+                    ? `Acceso de los alumnos hasta el ${fechaCohorte(ultimoDiaAcceso(s.fecha_fin))}.`
+                    : `El acceso se cierra ${COHORTE_DIAS_GRACIA} días después de esta fecha.`}
+                </p>
               </div>
             </div>
             <div className="grid gap-2">

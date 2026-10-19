@@ -19,6 +19,8 @@ import { LessonComments } from "@/components/LessonComments";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
 import { ReviewForm } from "@/components/reviews/ProgramReviews";
 import { ContenidoRestringido, useMiMora } from "@/components/student/MoraBanner";
+import { CohorteCerrada } from "@/components/student/CohorteCerrada";
+import { useMiAccesoCohortes } from "@/lib/cohortes";
 
 
 
@@ -36,6 +38,7 @@ function CursoPlayer() {
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const { data: miMora } = useMiMora();
+  const { data: accesoCohortes } = useMiAccesoCohortes();
 
 
   const { data: programa } = useQuery({
@@ -401,6 +404,10 @@ function CursoPlayer() {
   }
   if (!programa) {
     return <div className="p-8 text-muted-foreground">Cargando…</div>;
+  }
+  const accesoCohorte = accesoCohortes?.get(programa.id);
+  if (accesoCohorte && !accesoCohorte.abierto) {
+    return <CohorteCerrada acceso={accesoCohorte} />;
   }
   if (!enrollment) {
     return (

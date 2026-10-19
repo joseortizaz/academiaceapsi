@@ -299,8 +299,9 @@ export const getMeetingSdkSignature = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!meeting) throw new Error("Reunión no encontrada.");
 
-    const { assertContentAccess } = await import("./account-status.server");
+    const { assertContentAccess, assertCohortAccess } = await import("./account-status.server");
     await assertContentAccess(context.userId);
+    await assertCohortAccess(context.userId, meeting.programa_id);
 
     const roles = await getUserRoles(context.userId);
     const isAdmin = roles.includes("admin");
