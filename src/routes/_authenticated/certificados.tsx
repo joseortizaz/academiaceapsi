@@ -9,9 +9,12 @@ import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog"
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
 import { registrarActividad } from "@/lib/audit-client";
 import type { CertificateTemplateData } from "@/components/CertificateTemplate";
+import { canDownloadCertificate, certificateStatusLabel, certificateStatusClass } from "@/lib/certificate-status";
+import { pageHead } from "@/lib/site";
 
 export const Route = createFileRoute("/_authenticated/certificados")({
   staticData: { sitemap: false },
+  head: () => pageHead("/certificados", "Mis certificados — Academia Ceapsi RD", "Consulta el estado y descarga tus certificados emitidos de Academia Ceapsi RD."),
   component: MisCertificados,
 });
 
@@ -23,10 +26,11 @@ function MisCertificados() {
     queryKey: ["mis-certificados", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
+      if (!user) return [];
       const { data } = await supabase
         .from("certificates")
         .select("id, numero_certificado, fecha_emision, estado, programa_id, verification_code")
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .order("fecha_emision", { ascending: false });
       if (!data || data.length === 0) return [];
 
@@ -44,6 +48,7 @@ function MisCertificados() {
   });
 
   const openPreview = (cert: (typeof certificados)[number]) => {
+    if (!canDownloadCertificate(cert.estado)) return;
     const code = (cert as any).verification_code ?? cert.numero_certificado;
     registrarActividad({
       accion: "descargar_certificado",
@@ -99,6 +104,9 @@ function MisCertificados() {
                   </div>
                   <div className="flex-1">
                     <h2 className="font-semibold leading-tight">{cert.programa?.titulo}</h2>
+                    <span className={`mt-2 inline-block rounded px-2 py-0.5 text-xs ${certificateStatusClass(cert.estado)}`}>
+                      {certificateStatusLabel(cert.estado)}
+                    </span>
                     <p className="mt-1 font-mono text-xs text-muted-foreground">
                       {cert.numero_certificado}
                     </p>
@@ -113,9 +121,15 @@ function MisCertificados() {
                   </div>
                 </div>
                 <div className="mt-4 flex gap-2">
+                  {canDownloadCertificate(cert.estado) ? <>
                   <Button size="sm" className="flex-1" onClick={() => openPreview(cert)}>
                     <Eye className="mr-2 h-4 w-4" /> Ver / descargar
                   </Button>
+                  </> : cert.estado === "pendiente_aprobacion" ? (
+                    <p className="text-sm text-muted-foreground">En revisión por el equipo académico.</p>
+                  ) : cert.estado === "rechazado" ? (
+                    <p className="text-sm text-destructive">Requiere revisión. Contacta al equipo académico.</p>
+                  ) : null}
                   <Button asChild size="sm" variant="outline">
                     <a href={`/verify/${code}`} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="h-4 w-4" />
