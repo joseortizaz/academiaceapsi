@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Award, Eye, ExternalLink, Search, Plus, RotateCw } from "lucide-react";
+import { Award, Eye, ExternalLink, Search, Plus, RotateCw, Check, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { certificateStatusLabel, certificateStatusClass } from "@/lib/certificate-status";
+import { pageHead } from "@/lib/site";
 import { toast } from "sonner";
 import { CertificatePreviewDialog } from "@/components/CertificatePreviewDialog";
 import { buildVerifyUrl } from "@/lib/certificate-pdf";
@@ -21,6 +24,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/certificados")({
   staticData: { sitemap: false },
+  head: () => pageHead("/admin/certificados", "Aprobación de certificados — Academia Ceapsi RD", "Gestiona, aprueba y revisa los certificados académicos de Academia Ceapsi RD."),
   component: AdminCertificados,
 });
 
@@ -40,6 +44,8 @@ interface CertRow {
 function AdminCertificados() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
+  const [estado, setEstado] = useState("todos");
+  const [rejectCert, setRejectCert] = useState<CertRow | null>(null);
   const [previewData, setPreviewData] = useState<CertificateTemplateData | null>(null);
   const [issueOpen, setIssueOpen] = useState(false);
 
@@ -71,8 +77,9 @@ function AdminCertificados() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return certs;
     return certs.filter((c) => {
+      if (estado !== "todos" && c.estado !== estado) return false;
+      if (!q) return true;
       const nombre = `${c.student?.nombre ?? ""} ${c.student?.apellido ?? ""}`.toLowerCase();
       return (
         nombre.includes(q) ||
@@ -81,7 +88,23 @@ function AdminCertificados() {
         c.verification_code?.toLowerCase().includes(q)
       );
     });
-  }, [certs, search]);
+  }, [certs, search, estado]);
+
+  const approve = useMutation({
+    mutationFn: async (cert: CertRow) => {
+      const { data, error } = await supabase.from("certificates")
+        .update({ estado: "emitido" }).eq("id", cert.id)
+        .eq("estado", "pendiente_aprobacion").select("id").single();
+      if (error || !data) throw error ?? new Error("El certificado ya no está pendiente");
+    },
+    onSuccess: () => {
+      toast.success("Certificado aprobado");
+      qc.invalidateQueries({ queryKey: ["admin-certs"] });
+      qc.invalidateQueries({ queryKey: ["mc-cert"] });
+      qc.invalidateQueries({ queryKey: ["mis-certificados"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const regenerate = useMutation({
     mutationFn: async (cert: CertRow) => {
@@ -131,7 +154,8 @@ function AdminCertificados() {
         </Button>
       </header>
 
-      <div className="relative max-w-md">
+      <div className="flex flex-wrap gap-3">
+      <div className="relative w-full max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Buscar por estudiante, programa o código…"
@@ -139,6 +163,16 @@ function AdminCertificados() {
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
         />
+      </div>
+      <Select value={estado} onValueChange={setEstado}>
+        <SelectTrigger className="w-full sm:w-64" aria-label="Filtrar certificados por estado"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="todos">Todos</SelectItem>
+          <SelectItem value="pendiente_aprobacion">Pendientes de aprobación</SelectItem>
+          <SelectItem value="emitido">Emitidos</SelectItem>
+          <SelectItem value="rechazado">Rechazados</SelectItem>
+        </SelectContent>
+      </Select>
       </div>
 
       <div className="rounded-lg border bg-card">
@@ -180,17 +214,21 @@ function AdminCertificados() {
                   <TableCell className="font-mono text-xs">{c.verification_code}</TableCell>
                   <TableCell>
                     <span
-                      className={`rounded px-2 py-0.5 text-xs ${
-                        c.estado === "emitido"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-destructive/10 text-destructive"
-                      }`}
+                      className={`rounded px-2 py-0.5 text-xs ${certificateStatusClass(c.estado)}`}
                     >
-                      {c.estado}
+                      {c.estado === "pendiente_aprobacion" ? "Pendiente" : certificateStatusLabel(c.estado)}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      {c.estado === "pendiente_aprobacion" && <>
+                        <Button size="sm" variant="ghost" title="Aprobar" aria-label="Aprobar certificado" disabled={approve.isPending} onClick={() => approve.mutate(c)}>
+                          <Check className="h-4 w-4 text-success" />
+                        </Button>
+                        <Button size="sm" variant="ghost" title="Rechazar" aria-label="Rechazar certificado" onClick={() => setRejectCert(c)}>
+                          <X className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>}
                       <Button size="sm" variant="ghost" onClick={() => openPreview(c)} title="Vista previa">
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -228,8 +266,40 @@ function AdminCertificados() {
       />
 
       <IssueCertificateDialog open={issueOpen} onOpenChange={setIssueOpen} onIssued={() => qc.invalidateQueries({ queryKey: ["admin-certs"] })} />
+      {rejectCert && <RejectCertificateDialog cert={rejectCert} onClose={() => setRejectCert(null)} onRejected={() => {
+        qc.invalidateQueries({ queryKey: ["admin-certs"] });
+        qc.invalidateQueries({ queryKey: ["mc-cert"] });
+        qc.invalidateQueries({ queryKey: ["mis-certificados"] });
+      }} />}
     </div>
   );
+}
+
+function RejectCertificateDialog({ cert, onClose, onRejected }: { cert: CertRow; onClose: () => void; onRejected: () => void }) {
+  const [motivo, setMotivo] = useState("");
+  const reject = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.from("certificates")
+        .update({ estado: "rechazado", notas: motivo.trim() || null })
+        .eq("id", cert.id).eq("estado", "pendiente_aprobacion").select("id").single();
+      if (error || !data) throw error ?? new Error("El certificado ya no está pendiente");
+    },
+    onSuccess: () => { toast.success("Certificado rechazado"); onRejected(); onClose(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return <Dialog open onOpenChange={(open) => { if (!open && !reject.isPending) onClose(); }}>
+    <DialogContent>
+      <DialogHeader><DialogTitle>Rechazar certificado</DialogTitle></DialogHeader>
+      <div className="space-y-2">
+        <label htmlFor="cert-reject-reason" className="text-sm font-medium">Motivo (opcional)</label>
+        <Textarea id="cert-reject-reason" value={motivo} onChange={(e) => setMotivo(e.target.value)} disabled={reject.isPending} />
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose} disabled={reject.isPending}>Cancelar</Button>
+        <Button variant="destructive" onClick={() => reject.mutate()} disabled={reject.isPending}>Rechazar certificado</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>;
 }
 
 function IssueCertificateDialog({
