@@ -127,6 +127,13 @@
       "when": 1792378474678,
       "tag": "0017_mora_en_vistas_y_evaluaciones",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792519638731,
+      "tag": "0018_certificate_approval",
+      "breakpoints": true
     }
   ]
 }

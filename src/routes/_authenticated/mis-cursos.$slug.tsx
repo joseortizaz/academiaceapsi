@@ -21,11 +21,14 @@ import { ReviewForm } from "@/components/reviews/ProgramReviews";
 import { ContenidoRestringido, useMiMora } from "@/components/student/MoraBanner";
 import { CohorteCerrada } from "@/components/student/CohorteCerrada";
 import { useMiAccesoCohortes } from "@/lib/cohortes";
+import { canDownloadCertificate } from "@/lib/certificate-status";
+import { pageHead } from "@/lib/site";
 
 
 
 export const Route = createFileRoute("/_authenticated/mis-cursos/$slug")({
   staticData: { sitemap: false },
+  head: () => pageHead("/mis-cursos", "Mi programa — Academia Ceapsi RD", "Contenido, progreso y estado del certificado de tu programa en Academia Ceapsi RD."),
   component: CursoPlayer,
 });
 
@@ -384,16 +387,17 @@ function CursoPlayer() {
   const emitirCertificado = async () => {
     if (!enrollment || !programa || !user || pct < 100) return;
     try {
-      const { error } = await supabase.from("certificates").insert({
+      const { data: created, error } = await supabase.from("certificates").insert({
         user_id: user.id,
         programa_id: programa.id,
         enrollment_id: enrollment.id,
         numero_certificado: `CEAPSI-${new Date().getFullYear()}-${enrollment.id.slice(0, 8)}`,
         estado: "emitido",
-      });
+      }).select("estado").single();
       if (error) throw error;
-      toast.success("¡Certificado emitido!");
+      toast.success(created.estado === "pendiente_aprobacion" ? "Certificado enviado a revisión" : "¡Certificado emitido!");
       qc.invalidateQueries({ queryKey: ["mc-cert", enrollment.id] });
+      qc.invalidateQueries({ queryKey: ["mis-certificados"] });
     } catch (e: any) {
       toast.error(e.message ?? "Solicita a un administrador la emisión del certificado");
     }
@@ -600,7 +604,7 @@ function CursoPlayer() {
             <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 text-center">
               <Award className="mx-auto h-8 w-8 text-primary" />
               <p className="mt-2 text-sm font-medium">¡Has completado el programa!</p>
-              {certificate ? (
+              {certificate && canDownloadCertificate(certificate.estado) ? (
                 <Button
                   className="mt-3 w-full"
                   size="sm"
@@ -609,12 +613,22 @@ function CursoPlayer() {
                   <Download className="mr-2 h-4 w-4" />
                   Ver / descargar certificado
                 </Button>
-              ) : (
+              ) : certificate?.estado === "pendiente_aprobacion" ? (
+                <div role="status" className="mt-3 rounded-lg bg-accent/20 p-3 text-sm text-accent-foreground">
+                  Tu certificado está en revisión por el equipo académico. Te avisaremos cuando esté listo para descargar.
+                </div>
+              ) : certificate?.estado === "rechazado" ? (
+                <div role="status" className="mt-3 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                  <p>Tu certificado requiere revisión adicional</p>
+                  {certificate.notas?.trim() && <p className="mt-2 whitespace-pre-wrap break-words">{certificate.notas}</p>}
+                  <p className="mt-2">Contacta al equipo académico.</p>
+                </div>
+              ) : !certificate ? (
                 <Button onClick={emitirCertificado} size="sm" className="mt-3 w-full">
                   Generar certificado
                 </Button>
-              )}
-              {certificate && (
+              ) : null}
+              {certificate && canDownloadCertificate(certificate.estado) && (
                 <CertificatePreviewDialog
                   open={certPreviewOpen}
                   onOpenChange={setCertPreviewOpen}
