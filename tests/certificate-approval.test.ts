@@ -4,7 +4,7 @@ import postgres from "postgres";
 
 // Every integration test rolls back, including notifications and audit entries.
 async function checkInitialState(modalidad: string, admin: boolean, expected: string) {
-  const url = process.env.SUPABASE_DB_URL;
+  const url = process.env.CERTIFICATE_TEST_DATABASE_URL;
   if (!url) throw new Error("Falta la conexión de prueba");
   const sql = postgres(url, { max: 1, prepare: false });
   let verified = false;
@@ -42,7 +42,10 @@ async function checkInitialState(modalidad: string, admin: boolean, expected: st
   assert.equal(verified, true);
 }
 
-test("sincrono: fuerza pendiente aunque el alumno envíe emitido y notifica admins", () => checkInitialState("sincrono", false, "pendiente_aprobacion"));
-test("mixto: fuerza pendiente aunque el alumno envíe emitido y notifica admins", () => checkInitialState("mixto", false, "pendiente_aprobacion"));
-test("asincrono: alumno recibe emitido automáticamente", () => checkInitialState("asincrono", false, "emitido"));
-test("admin: emisión manual síncrona queda emitida", () => checkInitialState("sincrono", true, "emitido"));
+// A dedicated privileged test database is required to SET ROLE authenticated;
+// the sandbox read-only connection cannot exercise insert/RLS behavior.
+const options = { skip: !process.env.CERTIFICATE_TEST_DATABASE_URL };
+test("sincrono: fuerza pendiente aunque el alumno envíe emitido y notifica admins", options, () => checkInitialState("sincrono", false, "pendiente_aprobacion"));
+test("mixto: fuerza pendiente aunque el alumno envíe emitido y notifica admins", options, () => checkInitialState("mixto", false, "pendiente_aprobacion"));
+test("asincrono: alumno recibe emitido automáticamente", options, () => checkInitialState("asincrono", false, "emitido"));
+test("admin: emisión manual síncrona queda emitida", options, () => checkInitialState("sincrono", true, "emitido"));
