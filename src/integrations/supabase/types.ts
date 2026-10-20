@@ -2844,6 +2844,15 @@ export type Database = {
         Args: { _programa_id: string; _user_id: string }
         Returns: boolean
       }
+      cohort_access_open: {
+        Args: { _programa_id: string; _user_id?: string }
+        Returns: boolean
+      }
+      cohorte_dias_gracia: { Args: never; Returns: number }
+      cohorte_ultimo_dia_acceso: {
+        Args: { _fecha_fin: string }
+        Returns: string
+      }
       content_access_allowed: { Args: { _user_id?: string }; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -2910,6 +2919,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      hoy_rd: { Args: never; Returns: string }
       is_module_available_for_user: {
         Args: { _modulo_id: string; _user_id: string }
         Returns: boolean
@@ -2930,6 +2940,16 @@ export type Database = {
           _programa_id?: string
         }
         Returns: undefined
+      }
+      mi_acceso_cohortes: {
+        Args: never
+        Returns: {
+          abierto: boolean
+          cohorte: string
+          fecha_fin: string
+          programa_id: string
+          ultimo_dia_acceso: string
+        }[]
       }
       mora_evaluar: {
         Args: { _hoy?: string; _user?: string }
@@ -2977,6 +2997,16 @@ export type Database = {
         Args: never
         Returns: {
           is_owner: boolean
+          programa_id: string
+        }[]
+      }
+      proximas_cohortes: {
+        Args: never
+        Returns: {
+          cupo_maximo: number
+          fecha_inicio: string
+          horario: string
+          modalidad: string
           programa_id: string
         }[]
       }
