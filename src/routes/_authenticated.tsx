@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
-      throw redirect({ to: "/acceder", search: { redirect: location.pathname } });
+      throw redirect({ to: "/acceder", search: { redirect: location.href } });
     }
     // Cuenta suspendida por un administrador: cerrar sesión y avisar.
     const { data: perfil } = await supabase
