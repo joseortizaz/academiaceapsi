@@ -549,9 +549,12 @@ export type Database = {
           created_at: string
           id: string
           imagen_url: string | null
+          notificado_at: string | null
           programa_id: string
           titulo: string
           updated_at: string
+          visible_desde: string
+          visible_hasta: string | null
         }
         Insert: {
           autor_id: string
@@ -559,9 +562,12 @@ export type Database = {
           created_at?: string
           id?: string
           imagen_url?: string | null
+          notificado_at?: string | null
           programa_id: string
           titulo: string
           updated_at?: string
+          visible_desde?: string
+          visible_hasta?: string | null
         }
         Update: {
           autor_id?: string
@@ -569,9 +575,12 @@ export type Database = {
           created_at?: string
           id?: string
           imagen_url?: string | null
+          notificado_at?: string | null
           programa_id?: string
           titulo?: string
           updated_at?: string
+          visible_desde?: string
+          visible_hasta?: string | null
         }
         Relationships: [
           {
