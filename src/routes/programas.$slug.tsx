@@ -27,6 +27,19 @@ import {
   TeacherProfileDialog, fullName as docenteNombre, initials as docenteIniciales, type Teacher,
 } from "@/components/site/TeacherProfileDialog";
 
+// Diplomados actualizados en noviembre de 2026: su plan de estudios se publica en la
+// descripción. Las lecciones siguen el programa anterior (grupos en curso), así que no
+// se muestran en la página pública. Quitar el slug cuando sus módulos estén al día.
+const OCULTAR_CONTENIDO_PUBLICO = new Set<string>([
+  "estimulacion-temprana-on-line",
+  "terapia-de-aprendizaje-on-line",
+  "terapia-del-lenguaje-on-line",
+  "psicoterapia-infanto-juvenil",
+  "intervencion-psicopedagogica-on-line",
+  "tecnicas-de-modificacion-conductual-on-line",
+  "trastornos-del-neurodesarrollo",
+]);
+
 export const Route = createFileRoute("/programas/$slug")({
   staticData: { sitemap: true },
   validateSearch: (search: Record<string, unknown>): Record<string, unknown> & { inscribir?: 1 } => ({
@@ -492,7 +505,7 @@ function DetallePrograma() {
                 </AccordionItem>
               )}
 
-          {modulos.length > 0 && (
+          {modulos.length > 0 && !OCULTAR_CONTENIDO_PUBLICO.has(programa.slug) && (
             <AccordionItem value="contenido" className="rounded-xl border border-b bg-card px-5 shadow-sm">
               <AccordionTrigger className="gap-3 py-4 hover:no-underline">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><BookOpen className="h-5 w-5" /></span>
