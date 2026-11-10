@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,8 +18,23 @@ import {
 import { Search, CheckCircle2, FileText, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+type CalificacionesSearch = { assessmentId?: string; submissionId?: string };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const Route = createFileRoute("/_authenticated/docente/calificaciones")({
   staticData: { sitemap: false },
+  // Enlaces desde notificaciones: ?assessmentId=...&submissionId=...
+  validateSearch: (search: Record<string, unknown>): CalificacionesSearch => ({
+    assessmentId:
+      typeof search.assessmentId === "string" && UUID_RE.test(search.assessmentId)
+        ? search.assessmentId
+        : undefined,
+    submissionId:
+      typeof search.submissionId === "string" && UUID_RE.test(search.submissionId)
+        ? search.submissionId
+        : undefined,
+  }),
   component: DocenteCalificaciones,
 });
 
@@ -48,12 +63,15 @@ function DocenteCalificaciones() {
   const [nota, setNota] = useState("");
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
-  // Enlace desde la notificación: /docente/calificaciones?assessmentId=...
-  const [assessmentFilter, setAssessmentFilter] = useState<string | null>(() =>
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("assessmentId")
-      : null,
-  );
+  // El filtro sale de la URL (no de un estado que solo se lee al montar):
+  // así, al pulsar otra notificación estando ya en esta página, la vista
+  // cambia a la evaluación correcta en vez de quedarse con la anterior.
+  const navigate = Route.useNavigate();
+  const { assessmentId, submissionId } = Route.useSearch();
+  const assessmentFilter = assessmentId ?? null;
+  const clearAssessmentFilter = () => {
+    void navigate({ search: {}, replace: true });
+  };
 
   // Programas del docente por cualquiera de las vías (titular, grupo o módulo)
   const scopesQ = useQuery({
@@ -168,11 +186,37 @@ function DocenteCalificaciones() {
 
   const pendientes = rows.filter((r) => !r.calificado).length;
 
+
   const openEdit = (s: Submission) => {
     setEditing(s);
     setNota(s.puntaje_obtenido != null ? String(s.puntaje_obtenido) : "");
     setFeedback(s.feedback ?? "");
   };
+
+  // Si la notificación apunta a una entrega concreta, abrirla directamente.
+  const autoOpenedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!submissionId) {
+      autoOpenedRef.current = null;
+      return;
+    }
+    if (autoOpenedRef.current === submissionId) return;
+    if (!submissionsQ.isSuccess) return;
+    const target = (submissionsQ.data ?? []).find((s) => s.id === submissionId);
+    autoOpenedRef.current = submissionId;
+    if (target) {
+      openEdit(target);
+    } else {
+      toast.error("No se encontró esa entrega. Puede que haya sido eliminada o que ya no tengas acceso.");
+    }
+    // Quitar submissionId de la URL para que volver a pulsar la misma
+    // notificación vuelva a abrir la entrega.
+    void navigate({
+      search: assessmentId ? { assessmentId } : {},
+      replace: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submissionId, submissionsQ.isSuccess, submissionsQ.data]);
 
   const handleSave = async () => {
     if (!editing) return;
@@ -222,7 +266,7 @@ function DocenteCalificaciones() {
         <h1 className="text-2xl font-bold">Calificaciones</h1>
         <p className="text-muted-foreground">{pendientes} entregas pendientes de revisión.</p>
         {assessmentFilter && (
-          <Button variant="link" className="h-auto p-0" onClick={() => setAssessmentFilter(null)}>
+          <Button variant="link" className="h-auto p-0" onClick={clearAssessmentFilter}>
             Mostrando una sola evaluación · Ver todas las entregas
           </Button>
         )}
@@ -284,7 +328,11 @@ function DocenteCalificaciones() {
               {filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-10">
-                    {loading ? "Cargando entregas…" : "Sin entregas."}
+                    {loading
+                      ? "Cargando entregas…"
+                      : assessmentFilter
+                        ? "No hay entregas visibles para esta evaluación."
+                        : "Sin entregas."}
                   </TableCell>
                 </TableRow>
               )}
