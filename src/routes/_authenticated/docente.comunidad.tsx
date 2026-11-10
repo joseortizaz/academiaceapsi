@@ -12,13 +12,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ImageUploader } from "@/components/admin/ImageUploader";
-import { Send, Pencil, Trash2, Plus, Megaphone } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Send, Pencil, Trash2, Plus, Megaphone, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/docente/comunidad")({
   staticData: { sitemap: false },
   component: DocenteComunidad,
 });
+
+/** ISO → valor para <input type="datetime-local"> en hora local. */
+function toLocalInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleString("es-DO", { dateStyle: "medium", timeStyle: "short" });
+
+function estadoVisibilidad(p: { visible_desde: string; visible_hasta: string | null }) {
+  const now = Date.now();
+  if (new Date(p.visible_desde).getTime() > now) return { label: "Programada", variant: "secondary" as const };
+  if (p.visible_hasta && new Date(p.visible_hasta).getTime() <= now) return { label: "Finalizada", variant: "outline" as const };
+  return { label: "Visible", variant: "default" as const };
+}
 
 type Post = {
   id: string;
@@ -27,6 +46,8 @@ type Post = {
   titulo: string;
   contenido: string;
   imagen_url: string | null;
+  visible_desde: string;
+  visible_hasta: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -76,28 +97,45 @@ function DocenteComunidad() {
   const [titulo, setTitulo] = useState("");
   const [contenido, setContenido] = useState("");
   const [imagenUrl, setImagenUrl] = useState("");
+  const [visibleDesde, setVisibleDesde] = useState("");
+  const [visibleHasta, setVisibleHasta] = useState("");
   const [saving, setSaving] = useState(false);
 
   const startCreate = () => {
     setEditing(null);
     setTitulo(""); setContenido(""); setImagenUrl("");
+    setVisibleDesde(toLocalInput(new Date().toISOString())); setVisibleHasta("");
     setOpen(true);
   };
   const startEdit = (p: Post) => {
     setEditing(p);
     setTitulo(p.titulo); setContenido(p.contenido); setImagenUrl(p.imagen_url ?? "");
+    setVisibleDesde(toLocalInput(p.visible_desde)); setVisibleHasta(toLocalInput(p.visible_hasta));
     setOpen(true);
   };
 
   const save = async () => {
     if (!activeProgramaId) { toast.error("Selecciona un curso."); return; }
     if (!titulo.trim() || !contenido.trim()) { toast.error("Título y contenido son obligatorios."); return; }
+    const desde = visibleDesde ? new Date(visibleDesde) : new Date();
+    const hasta = visibleHasta ? new Date(visibleHasta) : null;
+    if (Number.isNaN(desde.getTime()) || (hasta && Number.isNaN(hasta.getTime()))) {
+      toast.error("Revisa las fechas de visibilidad."); return;
+    }
+    if (hasta && hasta <= desde) {
+      toast.error("La fecha de fin debe ser posterior a la de inicio."); return;
+    }
+    if (hasta && hasta.getTime() <= Date.now()) {
+      toast.error("La fecha de fin ya pasó; los alumnos no verían la publicación."); return;
+    }
+    const ventana = { visible_desde: desde.toISOString(), visible_hasta: hasta ? hasta.toISOString() : null };
+    const programada = desde.getTime() > Date.now();
     setSaving(true);
     try {
       if (editing) {
         const { error } = await (supabase as any)
           .from("community_posts")
-          .update({ titulo: titulo.trim(), contenido: contenido.trim(), imagen_url: imagenUrl || null })
+          .update({ titulo: titulo.trim(), contenido: contenido.trim(), imagen_url: imagenUrl || null, ...ventana })
           .eq("id", editing.id);
         if (error) throw error;
         toast.success("Publicación actualizada.");
@@ -110,9 +148,14 @@ function DocenteComunidad() {
             titulo: titulo.trim(),
             contenido: contenido.trim(),
             imagen_url: imagenUrl || null,
+            ...ventana,
           });
         if (error) throw error;
-        toast.success("Publicación enviada. Los alumnos recibirán una notificación.");
+        toast.success(
+          programada
+            ? `Publicación programada para el ${fmt(ventana.visible_desde)}. Los alumnos serán notificados entonces.`
+            : "Publicación enviada. Los alumnos recibirán una notificación.",
+        );
       }
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["docente-comunidad-posts", activeProgramaId] });
@@ -171,11 +214,19 @@ function DocenteComunidad() {
         {posts.map((p) => (
           <Card key={p.id}>
             <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
-              <div>
-                <CardTitle className="text-base">{p.titulo}</CardTitle>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle className="text-base">{p.titulo}</CardTitle>
+                  <Badge variant={estadoVisibilidad(p).variant}>{estadoVisibilidad(p).label}</Badge>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(p.created_at).toLocaleString()}
+                  {fmt(p.created_at)}
                   {p.updated_at !== p.created_at && " · editado"}
+                </p>
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <CalendarClock className="h-3 w-3" />
+                  Visible desde {fmt(p.visible_desde)}
+                  {p.visible_hasta ? ` hasta ${fmt(p.visible_hasta)}` : " · sin fecha de fin"}
                 </p>
               </div>
               {p.autor_id === user?.id && (
@@ -220,7 +271,37 @@ function DocenteComunidad() {
             </div>
             <div>
               <Label>Imagen (opcional)</Label>
-              <ImageUploader bucket="course-images" folder="community" value={imagenUrl} onChange={setImagenUrl} />
+              <ImageUploader
+                bucket="community-images"
+                folder={`${user?.id}/${activeProgramaId}`}
+                value={imagenUrl}
+                onChange={setImagenUrl}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="visible-desde">Visible desde</Label>
+                <Input
+                  id="visible-desde"
+                  type="datetime-local"
+                  value={visibleDesde}
+                  onChange={(e) => setVisibleDesde(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="visible-hasta">Visible hasta (opcional)</Label>
+                <Input
+                  id="visible-hasta"
+                  type="datetime-local"
+                  value={visibleHasta}
+                  min={visibleDesde || undefined}
+                  onChange={(e) => setVisibleHasta(e.target.value)}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground sm:col-span-2">
+                Los alumnos solo verán la publicación dentro de este rango. Si la fecha de inicio es futura,
+                la notificación se enviará al llegar ese momento. Deja "hasta" vacío para que no expire.
+              </p>
             </div>
           </div>
           <DialogFooter>

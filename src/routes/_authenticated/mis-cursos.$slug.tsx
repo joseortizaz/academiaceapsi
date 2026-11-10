@@ -20,6 +20,7 @@ import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
 import { ReviewForm } from "@/components/reviews/ProgramReviews";
 import { ContenidoRestringido, useMiMora } from "@/components/student/MoraBanner";
 import { CohorteCerrada } from "@/components/student/CohorteCerrada";
+import { CourseCommunityPosts } from "@/components/student/CourseCommunityPosts";
 import { useMiAccesoCohortes } from "@/lib/cohortes";
 import { canDownloadCertificate } from "@/lib/certificate-status";
 import { pageHead } from "@/lib/site";
@@ -653,6 +654,7 @@ function CursoPlayer() {
         </aside>
 
         <main className="space-y-4">
+          <CourseCommunityPosts programaId={programa.id} />
           {(liveNow || nextUpcoming) && (
             <div
               className={`rounded-lg border p-4 ${
