@@ -22,6 +22,7 @@ import {
 } from "@/components/admin/AdminUI";
 import { Users } from "lucide-react";
 import { fechaCohorte, hoyRD, ultimoDiaAcceso, COHORTE_DIAS_GRACIA } from "@/lib/cohortes";
+import { PLAN_TODOS, PLAN_VERSIONES, planFromSelect, planLabel, planToSelect } from "@/lib/plan-estudios";
 
 export const Route = createFileRoute("/_authenticated/admin/grupos")({
   staticData: { sitemap: false },
@@ -43,6 +44,7 @@ type Cohort = {
   cupo_maximo: number | null;
   estado: string;
   notas: string | null;
+  plan_version: number | null;
 };
 
 const empty: Cohort = {
@@ -59,6 +61,7 @@ const empty: Cohort = {
   cupo_maximo: null,
   estado: "planificado",
   notas: "",
+  plan_version: null,
 };
 
 const estadoColor: Record<string, string> = {
@@ -191,6 +194,7 @@ function GruposPage() {
                 <TableHead>Docente</TableHead>
                 <TableHead>Horario</TableHead>
                 <TableHead>Nivel actual</TableHead>
+                <TableHead>Plan</TableHead>
                 <TableHead>Acceso alumnos</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
@@ -208,6 +212,11 @@ function GruposPage() {
                     <TableCell>{t ? `${t.nombre} ${t.apellido ?? ""}` : "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{c.horario ?? "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{c.nivel_actual ?? "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={c.plan_version == null ? "outline" : "secondary"}>
+                        {c.plan_version == null ? "Todos" : planLabel(c.plan_version)}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-sm">
                       {c.fecha_fin ? (
                         ultimoDiaAcceso(c.fecha_fin) < hoyRD() ? (
@@ -311,6 +320,24 @@ function GruposPage() {
             <div className="grid gap-2">
               <Label>Nivel actual</Label>
               <Input value={s.nivel_actual ?? ""} onChange={(e) => set({ nivel_actual: e.target.value })} placeholder="Ej: Módulo 2 - Semana 3" />
+            </div>
+            <div className="grid gap-2">
+              <Label>Plan de estudios</Label>
+              <Select
+                value={planToSelect(s.plan_version)}
+                onValueChange={(v) => set({ plan_version: planFromSelect(v) })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PLAN_TODOS}>Sin plan: ve todos los módulos</SelectItem>
+                  {PLAN_VERSIONES.map((v) => (
+                    <SelectItem key={v} value={String(v)}>{planLabel(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Los alumnos del grupo solo ven los módulos de este plan y los marcados para todos los grupos.
+              </p>
             </div>
             <div className="grid gap-2">
               <Label>Horario</Label>

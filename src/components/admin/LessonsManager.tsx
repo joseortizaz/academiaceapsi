@@ -20,6 +20,7 @@ import { AiContentGenerator } from "@/components/ai/AiContentGenerator";
 import { LessonAudiosManager } from "@/components/LessonAudiosManager";
 import { Badge } from "@/components/ui/badge";
 import { LessonMaterialsManager } from "@/components/LessonMaterialsManager";
+import { PLAN_TODOS, PLAN_VERSIONES, planFromSelect, planLabel, planToSelect } from "@/lib/plan-estudios";
 
 type Leccion = {
   id?: string;
@@ -45,6 +46,7 @@ type CourseModule = {
   titulo: string;
   descripcion: string;
   orden: number;
+  plan_version: number | null;
 };
 
 const emptyLeccion = (programa_id: string, modulo_id: string | null = null): Leccion => ({
@@ -54,7 +56,7 @@ const emptyLeccion = (programa_id: string, modulo_id: string | null = null): Lec
 });
 
 const emptyModulo = (programa_id: string): CourseModule => ({
-  programa_id, titulo: "", descripcion: "", orden: 0,
+  programa_id, titulo: "", descripcion: "", orden: 0, plan_version: null,
 });
 
 interface Props { scope: "admin" | "docente" }
@@ -253,6 +255,7 @@ export function LessonsManager({ scope }: Props) {
                     <TableRow>
                       <TableHead className="w-16">#</TableHead>
                       <TableHead>Título</TableHead>
+                      <TableHead>Plan</TableHead>
                       <TableHead>Lecciones</TableHead>
                       <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
@@ -262,6 +265,11 @@ export function LessonsManager({ scope }: Props) {
                       <TableRow key={m.id}>
                         <TableCell>{m.orden}</TableCell>
                         <TableCell className="font-medium">{m.titulo}</TableCell>
+                        <TableCell>
+                          <Badge variant={m.plan_version == null ? "outline" : "secondary"}>
+                            {planLabel(m.plan_version)}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           {rows.filter((r) => r.modulo_id === m.id).length}
                         </TableCell>
@@ -404,6 +412,25 @@ export function LessonsManager({ scope }: Props) {
                 value={s.orden}
                 onChange={(e) => set({ orden: Number(e.target.value) })}
               />
+            </div>
+            <div className="grid gap-2">
+              <Label>Plan de estudios</Label>
+              <Select
+                value={planToSelect(s.plan_version)}
+                onValueChange={(v) => set({ plan_version: planFromSelect(v) })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PLAN_TODOS}>{planLabel(null)}</SelectItem>
+                  {PLAN_VERSIONES.map((v) => (
+                    <SelectItem key={v} value={String(v)}>{planLabel(v)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Los alumnos solo ven este módulo si su grupo tiene el mismo plan
+                (o si el grupo no tiene plan asignado).
+              </p>
             </div>
           </>
         )}
