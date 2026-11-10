@@ -24,6 +24,7 @@ import { CourseCommunityPosts } from "@/components/student/CourseCommunityPosts"
 import { useMiAccesoCohortes } from "@/lib/cohortes";
 import { canDownloadCertificate } from "@/lib/certificate-status";
 import { pageHead } from "@/lib/site";
+import { moduloVisibleParaPlan } from "@/lib/plan-estudios";
 
 
 
@@ -68,7 +69,7 @@ function CursoPlayer() {
     },
   });
 
-  const { data: modulos = [] } = useQuery({
+  const { data: modulosTodos = [] } = useQuery({
     queryKey: ["mc-modulos", programa?.id],
     enabled: !!programa?.id,
     queryFn: async () => {
@@ -81,15 +82,15 @@ function CursoPlayer() {
     },
   });
 
-  const { data: courseModules = [] } = useQuery({
+  const { data: courseModulesTodos = [] } = useQuery({
     queryKey: ["mc-course-modules", programa?.id],
     enabled: !!programa?.id && programa?.tipo === "diplomado",
     queryFn: async () => {
       const { data } = await (supabase.from as any)("course_modules")
-        .select("id,titulo,orden")
+        .select("id,titulo,orden,plan_version")
         .eq("programa_id", programa!.id)
         .order("orden");
-      return (data as { id: string; titulo: string; orden: number }[]) ?? [];
+      return (data as { id: string; titulo: string; orden: number; plan_version: number | null }[]) ?? [];
     },
   });
 
@@ -166,13 +167,27 @@ function CursoPlayer() {
     queryFn: async () => {
       const { data } = await supabase
         .from("cohort_enrollments" as any)
-        .select("cohort_id, program_cohorts:cohort_id ( fecha_inicio, nombre )")
+        .select("cohort_id, program_cohorts:cohort_id ( fecha_inicio, nombre, plan_version )")
         .eq("enrollment_id", enrollment!.id)
         .eq("estado", "activo")
         .maybeSingle();
       return (data as any) ?? null;
     },
   });
+
+  // Cada grupo ve solo los módulos de su plan de estudios (ver src/lib/plan-estudios.ts).
+  const planGrupo: number | null = cohortInfo?.program_cohorts?.plan_version ?? null;
+  const courseModules = useMemo(
+    () => courseModulesTodos.filter((cm) => moduloVisibleParaPlan(cm.plan_version, planGrupo)),
+    [courseModulesTodos, planGrupo],
+  );
+  const modulos = useMemo(() => {
+    const visibles = new Set(courseModules.map((cm) => cm.id));
+    const conocidos = new Set(courseModulesTodos.map((cm) => cm.id));
+    return modulosTodos.filter((m: any) =>
+      !m.modulo_id || visibles.has(m.modulo_id) || !conocidos.has(m.modulo_id),
+    );
+  }, [modulosTodos, courseModules, courseModulesTodos]);
 
   const { data: liveMeetings = [] } = useQuery({
     queryKey: ["mc-zoom", programa?.id, user?.id],

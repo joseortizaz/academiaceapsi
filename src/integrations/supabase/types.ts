@@ -676,6 +676,7 @@ export type Database = {
           descripcion: string | null
           id: string
           orden: number
+          plan_version: number | null
           programa_id: string
           titulo: string
           updated_at: string
@@ -685,6 +686,7 @@ export type Database = {
           descripcion?: string | null
           id?: string
           orden?: number
+          plan_version?: number | null
           programa_id: string
           titulo: string
           updated_at?: string
@@ -694,6 +696,7 @@ export type Database = {
           descripcion?: string | null
           id?: string
           orden?: number
+          plan_version?: number | null
           programa_id?: string
           titulo?: string
           updated_at?: string
@@ -1941,6 +1944,7 @@ export type Database = {
           nivel_actual: string | null
           nombre: string
           notas: string | null
+          plan_version: number | null
           programa_id: string
           ubicacion: string | null
           updated_at: string
@@ -1959,6 +1963,7 @@ export type Database = {
           nivel_actual?: string | null
           nombre: string
           notas?: string | null
+          plan_version?: number | null
           programa_id: string
           ubicacion?: string | null
           updated_at?: string
@@ -1977,6 +1982,7 @@ export type Database = {
           nivel_actual?: string | null
           nombre?: string
           notas?: string | null
+          plan_version?: number | null
           programa_id?: string
           ubicacion?: string | null
           updated_at?: string

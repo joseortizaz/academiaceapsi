@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { moduloVisibleParaPlan } from "@/lib/plan-estudios";
 import { ContinueReading } from "@/components/library/ContinueReading";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -109,15 +110,42 @@ function EstudianteDashboard() {
         : [];
       const pmap = new Map(programs.map((p) => [p.id, p]));
 
-      const liveSessions = programaIds.length
+      const proximasEnVivo = programaIds.length
         ? (await supabase.from("program_modules")
-            .select("id,titulo,fecha_sesion,programa_id")
+            .select("id,titulo,fecha_sesion,programa_id,modulo_id")
             .in("programa_id", programaIds)
             .eq("es_en_vivo", true)
             .gte("fecha_sesion", new Date().toISOString())
             .order("fecha_sesion", { ascending: true })
-            .limit(5)).data ?? []
+            .limit(25)).data ?? []
         : [];
+
+      // Solo las sesiones de los módulos del plan de estudios de su grupo.
+      const planPorPrograma = new Map<string, number | null>();
+      const { data: misGrupos } = await supabase
+        .from("cohort_enrollments" as any)
+        .select("program_cohorts:cohort_id ( programa_id, plan_version )")
+        .eq("user_id", user!.id)
+        .eq("estado", "activo");
+      for (const g of (misGrupos as any[]) ?? []) {
+        const pc = g.program_cohorts;
+        if (pc?.programa_id) planPorPrograma.set(pc.programa_id, pc.plan_version ?? null);
+      }
+      const moduloIds = [...new Set(proximasEnVivo.map((l) => l.modulo_id).filter(Boolean))] as string[];
+      const planPorModulo = new Map<string, number | null>(
+        moduloIds.length
+          ? (((await (supabase.from as any)("course_modules")
+              .select("id,plan_version")
+              .in("id", moduloIds)).data ?? []) as { id: string; plan_version: number | null }[])
+              .map((m) => [m.id, m.plan_version] as [string, number | null])
+          : [],
+      );
+      const liveSessions = proximasEnVivo
+        .filter((l) =>
+          !l.modulo_id ||
+          moduloVisibleParaPlan(planPorModulo.get(l.modulo_id), planPorPrograma.get(l.programa_id)),
+        )
+        .slice(0, 5);
 
       return {
         enrollments: (enrolls.data ?? []).map((e) => ({ ...e, programa: pmap.get(e.programa_id) })),
