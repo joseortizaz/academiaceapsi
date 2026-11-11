@@ -68,6 +68,7 @@ type Programa = {
   objetivos: string;
   publico_meta: string;
   resultados_esperados: string;
+  plan_estudios: string;
 };
 
 const empty: Programa = {
@@ -95,6 +96,7 @@ const empty: Programa = {
   objetivos: "",
   publico_meta: "",
   resultados_esperados: "",
+  plan_estudios: "",
 };
 
 const estadoColor: Record<string, string> = {
@@ -332,6 +334,15 @@ function ProgramasPage() {
                 value={s.resultados_esperados ?? ""}
                 onChange={(html) => set({ resultados_esperados: html })}
                 placeholder="¿Qué competencias obtendrá al finalizar?"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Plan de estudios</Label>
+              <RichTextEditor
+                value={s.plan_estudios ?? ""}
+                onChange={(html) => set({ plan_estudios: html })}
+                placeholder="Módulos del programa, en orden"
               />
             </div>
 

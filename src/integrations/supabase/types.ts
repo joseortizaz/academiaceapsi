@@ -2170,6 +2170,7 @@ export type Database = {
           min_estudiantes: number | null
           modalidad: string
           objetivos: string | null
+          plan_estudios: string | null
           precio: number
           precio_descuento: number | null
           publico_meta: string | null
@@ -2201,6 +2202,7 @@ export type Database = {
           min_estudiantes?: number | null
           modalidad: string
           objetivos?: string | null
+          plan_estudios?: string | null
           precio?: number
           precio_descuento?: number | null
           publico_meta?: string | null
@@ -2232,6 +2234,7 @@ export type Database = {
           min_estudiantes?: number | null
           modalidad?: string
           objetivos?: string | null
+          plan_estudios?: string | null
           precio?: number
           precio_descuento?: number | null
           publico_meta?: string | null
