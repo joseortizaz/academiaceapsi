@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { RichText } from "@/components/RichText";
 import {
   Clock, Calendar, Users, GraduationCap, CheckCircle2, Video, Link2, MessageCircle, FileText, Target, Award, BookOpen,
+  ListOrdered,
 } from "lucide-react";
 import { SITE_URL, programaUrl, plainExcerpt } from "@/lib/site";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -501,6 +502,18 @@ function DetallePrograma() {
                   </AccordionTrigger>
                   <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
                     <RichText html={(programa as any).resultados_esperados} className="text-foreground/90" />
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              {(programa as any).plan_estudios && (
+                <AccordionItem value="plan-estudios" className="rounded-xl border border-b bg-card px-5 shadow-sm">
+                  <AccordionTrigger className="gap-3 py-4 hover:no-underline">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><ListOrdered className="h-5 w-5" /></span>
+                    <span className="min-w-0 flex-1 text-lg font-bold">Plan de estudios</span>
+                  </AccordionTrigger>
+                  <AccordionContent forceMount className="pb-5 data-[state=closed]:hidden">
+                    <RichText html={(programa as any).plan_estudios} className="text-foreground/90" />
                   </AccordionContent>
                 </AccordionItem>
               )}
