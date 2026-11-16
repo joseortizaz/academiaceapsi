@@ -106,7 +106,6 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         await client.init({
           zoomAppRoot: root,
           language: "es-ES",
-          patchJsMedia: true,
           leaveOnPageUnload: true,
           customize: {
             video: {
