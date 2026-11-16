@@ -35,7 +35,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "default-src 'self'",
     // 'unsafe-inline'/'unsafe-eval' son necesarios para el SDK de Zoom y algunos runtimes de React.
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://source.zoom.us https://zoom.us https://*.zoom.us https://player.vimeo.com https://*.vimeocdn.com https://www.youtube.com https://s.ytimg.com",
-    "script-src-elem 'self' 'unsafe-inline' https://source.zoom.us https://zoom.us https://*.zoom.us https://player.vimeo.com https://*.vimeocdn.com https://www.youtube.com https://s.ytimg.com",
+    "script-src-elem 'self' 'unsafe-inline' blob: https://source.zoom.us https://zoom.us https://*.zoom.us https://player.vimeo.com https://*.vimeocdn.com https://www.youtube.com https://s.ytimg.com",
     "style-src 'self' 'unsafe-inline' https://source.zoom.us https://zoom.us https://*.zoom.us https://fonts.googleapis.com https://player.vimeo.com",
     "style-src-elem 'self' 'unsafe-inline' https://source.zoom.us https://zoom.us https://*.zoom.us https://fonts.googleapis.com https://player.vimeo.com",
     "font-src 'self' data: https://fonts.gstatic.com https://source.zoom.us https://*.zoom.us",
