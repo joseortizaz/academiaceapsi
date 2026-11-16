@@ -2862,6 +2862,10 @@ export type Database = {
         Args: { _programa_id: string; _user_id: string }
         Returns: boolean
       }
+      can_upload_community_image: {
+        Args: { _object_name: string }
+        Returns: boolean
+      }
       cohort_access_open: {
         Args: { _programa_id: string; _user_id?: string }
         Returns: boolean
@@ -2894,6 +2898,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      enrollment_plan_version: {
+        Args: { _enrollment_id: string }
+        Returns: number
       }
       gen_verification_code: { Args: never; Returns: string }
       get_assessment_questions_for_student: {
@@ -2945,6 +2953,10 @@ export type Database = {
       is_teacher_of_cohort: { Args: { _cohort_id: string }; Returns: boolean }
       is_teacher_of_program: {
         Args: { _programa_id: string }
+        Returns: boolean
+      }
+      leccion_visible_para_plan: {
+        Args: { _modulo_id: string; _plan: number }
         Returns: boolean
       }
       library_increment_downloads: { Args: { _id: string }; Returns: undefined }
@@ -3028,6 +3040,7 @@ export type Database = {
           programa_id: string
         }[]
       }
+      publicar_community_posts_pendientes: { Args: never; Returns: number }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
