@@ -77,10 +77,32 @@ async function loadZoomEmbedded(): Promise<{
 export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const sigFn = useServerFn(getMeetingSdkSignature);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
   const clientRef = useRef<unknown>(null);
   const [info, setInfo] = useState<SigResult | null>(null);
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
+  const [frameHeight, setFrameHeight] = useState<number>(600);
+
+  // Ajusta el alto del marco al espacio visible de la ventana para que la
+  // página no se desplace y la vista de pantalla compartida use todo ese espacio.
+  useEffect(() => {
+    const compute = () => {
+      const el = frameRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const h = Math.max(420, Math.floor(window.innerHeight - top - 16));
+      setFrameHeight(h);
+    };
+    const raf = requestAnimationFrame(compute);
+    window.addEventListener("resize", compute);
+    window.addEventListener("orientationchange", compute);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("orientationchange", compute);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,6 +125,11 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         const client = ZoomMtgEmbedded.createClient();
         clientRef.current = client;
 
+        const rect = root.getBoundingClientRect();
+        const vw = Math.max(640, Math.min(1440, Math.floor(rect.width)));
+        const rawH = rect.height || frameRef.current?.clientHeight || 600;
+        const vh = Math.max(360, Math.min(810, Math.floor(rawH)));
+
         await client.init({
           zoomAppRoot: root,
           language: "es-ES",
@@ -111,8 +138,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
             video: {
               isResizable: true,
               viewSizes: {
-                default: { width: 1440, height: 810 },
-                ribbon: { width: 300, height: 700 },
+                default: { width: vw, height: vh },
+                ribbon: { width: Math.min(300, Math.floor(vw * 0.25)), height: vh },
               },
               // Evita la vista de galería por defecto: su algoritmo de cuadrícula
               // genera un canvas con alto interno incorrecto (p. ej. 1646px) que
@@ -215,7 +242,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
           )}
         </div>
       )}
-      <div className="relative min-h-[810px] w-full overflow-hidden rounded-lg border bg-black">
+      <div ref={frameRef} className="relative w-full overflow-hidden rounded-lg border bg-black" style={{ height: frameHeight }}>
         <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
