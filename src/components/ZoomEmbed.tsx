@@ -8,6 +8,10 @@ import { toast } from "sonner";
 type SigResult = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getMeetingSdkSignature>>>>;
 type State = "loading" | "joining" | "in-meeting" | "fallback";
 
+// Alto (px) que la UI del SDK dibuja además del viewSize: barra superior +
+// franja de miniaturas + barra de controles inferior.
+const SDK_CHROME_RESERVED = 210;
+
 // El Meeting SDK de Zoom depende de React 18 vía globals (window.React, ReactDOM,
 // Redux, ReduxThunk y, desde la 6.x, ReactRedux). Este proyecto usa React 19, que
 // removió el interno `ReactCurrentOwner` que el SDK necesita, por eso hay que cargar
@@ -83,6 +87,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [frameHeight, setFrameHeight] = useState<number>(600);
+  const [fitScale, setFitScale] = useState(1);
+  const fitScaleRef = useRef(1);
 
   // Ajusta el alto del marco al espacio visible de la ventana para que la
   // página no se desplace y la vista de pantalla compartida use todo ese espacio.
@@ -103,6 +109,46 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
       window.removeEventListener("orientationchange", compute);
     };
   }, []);
+
+  // Ajuste de seguridad: si la UI del SDK aún excede el marco, la escala hacia
+  // abajo (mín. 0.5) para que los controles inferiores queden visibles.
+  useEffect(() => {
+    if (state !== "in-meeting") return;
+    const fit = () => {
+      const root = containerRef.current;
+      const frame = frameRef.current;
+      if (!root || !frame) return;
+      const current = fitScaleRef.current || 1;
+      const rootTop = root.getBoundingClientRect().top;
+      let maxBottom = 0;
+      const walk = (el: Element, depth: number) => {
+        if (depth > 3) return;
+        for (const child of Array.from(el.children)) {
+          const r = child.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            maxBottom = Math.max(maxBottom, (r.bottom - rootTop) / current);
+          }
+          walk(child, depth + 1);
+        }
+      };
+      walk(root, 1);
+      const contentH = Math.max(root.scrollHeight, maxBottom);
+      if (!contentH) return;
+      const s = Math.min(1, Math.max(0.5, frame.clientHeight / contentH));
+      if (Math.abs(s - current) > 0.01) {
+        fitScaleRef.current = s;
+        setFitScale(s);
+      }
+    };
+    const t1 = window.setTimeout(fit, 800);
+    const t2 = window.setTimeout(fit, 2500);
+    window.addEventListener("resize", fit);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener("resize", fit);
+    };
+  }, [state]);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,8 +173,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
 
         const rect = root.getBoundingClientRect();
         const vw = Math.max(640, Math.min(1440, Math.floor(rect.width)));
-        const rawH = rect.height || frameRef.current?.clientHeight || 600;
-        const vh = Math.max(360, Math.min(810, Math.floor(rawH)));
+        const frameH = rect.height || frameRef.current?.clientHeight || 600;
+        const vh = Math.max(300, Math.min(810, Math.floor(frameH - SDK_CHROME_RESERVED)));
 
         await client.init({
           zoomAppRoot: root,
@@ -243,7 +289,17 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         </div>
       )}
       <div ref={frameRef} className="relative w-full overflow-hidden rounded-lg border bg-black" style={{ height: frameHeight }}>
-        <div ref={containerRef} id="zoom-meeting-root" className="h-full w-full" />
+        <div
+          ref={containerRef}
+          id="zoom-meeting-root"
+          className="h-full w-full"
+          style={{
+            transform: fitScale < 1 ? `scale(${fitScale})` : undefined,
+            transformOrigin: "top left",
+            width: fitScale < 1 ? `${100 / fitScale}%` : "100%",
+            height: fitScale < 1 ? `${100 / fitScale}%` : "100%",
+          }}
+        />
         {state !== "in-meeting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm text-white">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
