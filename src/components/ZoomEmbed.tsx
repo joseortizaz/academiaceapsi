@@ -9,16 +9,20 @@ type SigResult = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getMeet
 type State = "loading" | "joining" | "in-meeting" | "fallback";
 
 // El Meeting SDK de Zoom depende de React 18 vía globals (window.React, ReactDOM,
-// Redux, ReduxThunk). Este proyecto usa React 19, que removió el interno
-// `ReactCurrentOwner` que el SDK necesita, por eso hay que cargar React 18
-// desde CDN y exponerlo como global ANTES de importar el SDK.
-const ZOOM_SDK_VERSION = "3.13.2";
+// Redux, ReduxThunk y, desde la 6.x, ReactRedux). Este proyecto usa React 19, que
+// removió el interno `ReactCurrentOwner` que el SDK necesita, por eso hay que cargar
+// React 18 desde CDN y exponerlo como global ANTES de importar el SDK.
+// OJO: Zoom aplica cada trimestre una versión mínima del SDK; si las clases empiezan
+// a fallar con JOIN_MEETING_FAILED código 3000 ("versión ya no compatible"),
+// sube ZOOM_SDK_VERSION a la más reciente.
+const ZOOM_SDK_VERSION = "6.10.0";
 const CDN_SCRIPTS = [
-  { global: "React", url: "https://source.zoom.us/3.13.2/lib/vendor/react.min.js" },
-  { global: "ReactDOM", url: "https://source.zoom.us/3.13.2/lib/vendor/react-dom.min.js" },
-  { global: "Redux", url: "https://source.zoom.us/3.13.2/lib/vendor/redux.min.js" },
-  { global: "ReduxThunk", url: "https://source.zoom.us/3.13.2/lib/vendor/redux-thunk.min.js" },
-  { global: "lodash", url: "https://source.zoom.us/3.13.2/lib/vendor/lodash.min.js" },
+  { global: "React", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/react.min.js` },
+  { global: "ReactDOM", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/react-dom.min.js` },
+  { global: "Redux", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/redux.min.js` },
+  { global: "ReduxThunk", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/redux-thunk.min.js` },
+  { global: "ReactRedux", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/react-redux.min.js` },
+  { global: "lodash", url: `https://source.zoom.us/${ZOOM_SDK_VERSION}/lib/vendor/lodash.min.js` },
 ];
 
 function loadScript(src: string): Promise<void> {
