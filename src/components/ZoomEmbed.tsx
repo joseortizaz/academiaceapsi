@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMeetingSdkSignature } from "@/lib/zoom.functions";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Loader2 } from "lucide-react";
+import { ExternalLink, Loader2, Maximize } from "lucide-react";
 import { toast } from "sonner";
 
 type SigResult = Awaited<ReturnType<ReturnType<typeof useServerFn<typeof getMeetingSdkSignature>>>>;
@@ -10,7 +10,17 @@ type State = "loading" | "joining" | "in-meeting" | "fallback";
 
 // Alto (px) que la UI del SDK dibuja además del viewSize: barra superior +
 // franja de miniaturas + barra de controles inferior.
-const SDK_CHROME_RESERVED = 210;
+const SDK_CHROME_RESERVED = 80;
+
+// El SDK 6.10.0 calcula el alto final como max(viewSizes.height,
+// altoNatural * viewSizes.width / anchoNatural): el alto depende del ancho.
+// Por eso el ANCHO se deriva del ALTO disponible (16:9).
+function computeViewSizes(frameW: number, frameH: number): { vw: number; vh: number } {
+  const availH = Math.max(300, frameH - SDK_CHROME_RESERVED);
+  const vh = Math.min(810, Math.floor(availH));
+  const vw = Math.max(640, Math.min(1440, Math.floor(frameW), Math.floor((vh * 16) / 9)));
+  return { vw, vh };
+}
 
 // El Meeting SDK de Zoom depende de React 18 vía globals (window.React, ReactDOM,
 // Redux, ReduxThunk y, desde la 6.x, ReactRedux). Este proyecto usa React 19, que
@@ -87,6 +97,8 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
   const [state, setState] = useState<State>("loading");
   const [error, setError] = useState<string | null>(null);
   const [frameHeight, setFrameHeight] = useState<number>(600);
+  const [frameWidth, setFrameWidth] = useState<number>(0);
+  const [viewWidth, setViewWidth] = useState<number | null>(null);
   const [fitScale, setFitScale] = useState(1);
   const fitScaleRef = useRef(1);
 
@@ -96,17 +108,22 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     const compute = () => {
       const el = frameRef.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      const h = Math.max(420, Math.floor(window.innerHeight - top - 16));
+      const rect = el.getBoundingClientRect();
+      const h = document.fullscreenElement
+        ? window.innerHeight
+        : Math.max(420, Math.floor(window.innerHeight - (rect.top + window.scrollY) - 16));
       setFrameHeight(h);
+      setFrameWidth(Math.floor(el.clientWidth));
     };
     const raf = requestAnimationFrame(compute);
     window.addEventListener("resize", compute);
     window.addEventListener("orientationchange", compute);
+    document.addEventListener("fullscreenchange", compute);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", compute);
       window.removeEventListener("orientationchange", compute);
+      document.removeEventListener("fullscreenchange", compute);
     };
   }, []);
 
@@ -151,6 +168,39 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
     };
   }, [state]);
 
+  // Re-aplica los tamaños de vista al SDK cuando cambia el marco (resize o
+  // pantalla completa), con debounce de 300 ms.
+  useEffect(() => {
+    if (state !== "in-meeting") return;
+    const t = window.setTimeout(() => {
+      const frame = frameRef.current;
+      if (!frame) return;
+      const { vw, vh } = computeViewSizes(frame.clientWidth, frame.clientHeight);
+      try {
+        (clientRef.current as { updateVideoOptions?: (o: unknown) => void } | null)?.updateVideoOptions?.({
+          viewSizes: {
+            default: { width: vw, height: vh },
+            ribbon: { width: Math.min(300, Math.floor(vw * 0.25)), height: vh },
+          },
+        });
+      } catch (e) {
+        console.warn("[Zoom] updateVideoOptions falló:", e);
+      }
+      setViewWidth(vw);
+      fitScaleRef.current = 1;
+      setFitScale(1);
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [frameHeight, frameWidth, state]);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen?.();
+    } else {
+      void frameRef.current?.requestFullscreen?.();
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -173,9 +223,9 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         clientRef.current = client;
 
         const rect = root.getBoundingClientRect();
-        const vw = Math.max(640, Math.min(1440, Math.floor(rect.width)));
         const frameH = rect.height || frameRef.current?.clientHeight || 600;
-        const vh = Math.max(300, Math.min(810, Math.floor(frameH - SDK_CHROME_RESERVED)));
+        const { vw, vh } = computeViewSizes(rect.width, frameH);
+        setViewWidth(vw);
 
         await client.init({
           zoomAppRoot: root,
@@ -280,25 +330,32 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
               {info.role === 1 && " · Anfitrión"}
             </p>
           </div>
-          {info.joinUrl && (
-            <Button variant="ghost" size="sm" asChild>
-              <a href={info.role === 1 && info.startUrl ? info.startUrl : info.joinUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-1 h-3 w-3" /> Abrir en Zoom
-              </a>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={toggleFullscreen}>
+              <Maximize className="mr-1 h-3 w-3" /> Pantalla completa
             </Button>
-          )}
+            {info.joinUrl && (
+              <Button variant="ghost" size="sm" asChild>
+                <a href={info.role === 1 && info.startUrl ? info.startUrl : info.joinUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-1 h-3 w-3" /> Abrir en Zoom
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
       )}
       <div ref={frameRef} className="relative w-full overflow-hidden rounded-lg border bg-black" style={{ height: frameHeight }}>
         <div
           ref={containerRef}
           id="zoom-meeting-root"
-          className="h-full w-full"
+          className="h-full"
           style={{
+            width: viewWidth ? `${viewWidth}px` : "100%",
+            height: "100%",
+            margin: "0 auto",
+            // Red de seguridad: solo escala si la UI aún excede el marco.
             transform: fitScale < 1 ? `scale(${fitScale})` : undefined,
-            transformOrigin: "top left",
-            width: fitScale < 1 ? `${100 / fitScale}%` : "100%",
-            height: fitScale < 1 ? `${100 / fitScale}%` : "100%",
+            transformOrigin: "top center",
           }}
         />
         {state !== "in-meeting" && (
