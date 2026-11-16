@@ -124,6 +124,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
       const walk = (el: Element, depth: number) => {
         if (depth > 3) return;
         for (const child of Array.from(el.children)) {
+          if (getComputedStyle(child).position === "fixed") continue;
           const r = child.getBoundingClientRect();
           if (r.width > 0 && r.height > 0) {
             maxBottom = Math.max(maxBottom, (r.bottom - rootTop) / current);
@@ -132,7 +133,7 @@ export function ZoomEmbed({ meetingRowId }: { meetingRowId: string }) {
         }
       };
       walk(root, 1);
-      const contentH = Math.max(root.scrollHeight, maxBottom);
+      const contentH = maxBottom;
       if (!contentH) return;
       const s = Math.min(1, Math.max(0.5, frame.clientHeight / contentH));
       if (Math.abs(s - current) > 0.01) {
