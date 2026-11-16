@@ -134,6 +134,13 @@
       "when": 1792519638731,
       "tag": "0018_certificate_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794848194588,
+      "tag": "0019_tighten_open_access_rules",
+      "breakpoints": true
     }
   ]
 }
