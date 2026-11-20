@@ -185,6 +185,19 @@ function DocenteCalificaciones() {
   });
 
   const pendientes = rows.filter((r) => !r.calificado).length;
+  const calificadas = rows.length - pendientes;
+  const conteo = { todos: rows.length, pendiente: pendientes, calificado: calificadas };
+  const etiquetas = { todos: "Todas", pendiente: "Pendientes", calificado: "Calificadas" } as const;
+  const tituloFiltrado = assessmentFilter
+    ? (assessmentById.get(assessmentFilter)?.titulo as string | undefined) ?? "Evaluación"
+    : null;
+
+  // Las pestañas siempre muestran el conjunto completo del tipo elegido:
+  // si se llegó desde una notificación (una sola evaluación), se quita ese filtro.
+  const selectFilter = (f: "todos" | "pendiente" | "calificado") => {
+    setFilter(f);
+    if (assessmentFilter) clearAssessmentFilter();
+  };
 
 
   const openEdit = (s: Submission) => {
@@ -266,9 +279,14 @@ function DocenteCalificaciones() {
         <h1 className="text-2xl font-bold">Calificaciones</h1>
         <p className="text-muted-foreground">{pendientes} entregas pendientes de revisión.</p>
         {assessmentFilter && (
-          <Button variant="link" className="h-auto p-0" onClick={clearAssessmentFilter}>
-            Mostrando una sola evaluación · Ver todas las entregas
-          </Button>
+          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm">
+            <span>
+              Mostrando solo: <span className="font-medium">{tituloFiltrado}</span>
+            </span>
+            <Button size="sm" variant="outline" className="h-7" onClick={clearAssessmentFilter}>
+              Ver todas las entregas
+            </Button>
+          </div>
         )}
       </div>
 
@@ -279,8 +297,13 @@ function DocenteCalificaciones() {
         </div>
         <div className="flex gap-1">
           {(["todos", "pendiente", "calificado"] as const).map((f) => (
-            <Button key={f} size="sm" variant={filter === f ? "default" : "outline"} onClick={() => setFilter(f)} className="capitalize">
-              {f}
+            <Button
+              key={f}
+              size="sm"
+              variant={filter === f && !assessmentFilter ? "default" : "outline"}
+              onClick={() => selectFilter(f)}
+            >
+              {etiquetas[f]} ({conteo[f]})
             </Button>
           ))}
         </div>
@@ -332,7 +355,11 @@ function DocenteCalificaciones() {
                       ? "Cargando entregas…"
                       : assessmentFilter
                         ? "No hay entregas visibles para esta evaluación."
-                        : "Sin entregas."}
+                        : filter === "pendiente"
+                          ? "No hay entregas pendientes."
+                          : filter === "calificado"
+                            ? "No hay entregas calificadas."
+                            : "Sin entregas."}
                   </TableCell>
                 </TableRow>
               )}
