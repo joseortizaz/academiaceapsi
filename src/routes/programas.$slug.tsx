@@ -1,6 +1,8 @@
 import { tipoLabel, modalidadLabel } from "@/lib/program-labels";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { esProgramaGratis, inscribirseGratis } from "@/lib/enrollment.functions";
 import { useEffect, useMemo, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -132,6 +134,7 @@ function DetallePrograma() {
   const qc = useQueryClient();
   const [inscOpen, setInscOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const inscribirseGratisFn = useServerFn(inscribirseGratis);
   const [form, setForm] = useState({
     nombre_completo: "",
     documento_identidad: "",
@@ -268,8 +271,27 @@ function DetallePrograma() {
     },
   });
 
+  const gratis = !!programa && esProgramaGratis(programa);
+  // Para programas gratuitos, una solicitud "pendiente" antigua se puede activar.
+  const pendienteGratis = gratis && existing?.estado === "pendiente";
+
+  const inscribirGratis = async () => {
+    if (!programa || submitting) return;
+    setSubmitting(true);
+    try {
+      await inscribirseGratisFn({ data: { programaId: programa.id } });
+      toast.success("¡Listo! Ya estás inscrito en el programa.");
+      await qc.invalidateQueries({ queryKey: ["enrollment", programa.id] });
+      navigate({ to: "/mis-cursos/$slug", params: { slug: programa.slug } });
+    } catch (e: any) {
+      toast.error(e?.message ?? "No se pudo completar la inscripción");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   useEffect(() => {
-    if (inscribir !== 1 || !programa || existing) {
+    if (inscribir !== 1 || !programa || (existing && !pendienteGratis)) {
       return;
     }
     if (authLoading) {
@@ -282,13 +304,18 @@ function DetallePrograma() {
       });
       return;
     }
-    setInscOpen(true);
     navigate({
       to: "/programas/$slug",
       params: { slug },
       search: {},
       replace: true,
     });
+    if (gratis) {
+      void inscribirGratis();
+    } else {
+      setInscOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, existing, inscribir, isAuthenticated, navigate, programa, slug, user]);
 
   if (isLoading) {
@@ -321,6 +348,10 @@ function DetallePrograma() {
         to: "/acceder",
         search: { redirect: enrollmentRedirect },
       });
+      return;
+    }
+    if (gratis) {
+      await inscribirGratis();
       return;
     }
     setInscOpen(true);
@@ -687,18 +718,29 @@ function DetallePrograma() {
                   </span>
                 )}
               </div>
-              {existing ? (
+              {existing && !pendienteGratis ? (
                 <Button asChild className="mt-4 w-full">
                   <Link to="/mis-cursos/$slug" params={{ slug: programa.slug }}>Ir al curso</Link>
                 </Button>
               ) : (
-                <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading}>
+                <Button className="mt-4 w-full" onClick={inscribirse} disabled={authLoading || submitting}>
                   {authLoading
                     ? "Cargando…"
-                    : isAuthenticated
-                      ? "Inscribirme ahora"
-                      : "Acceder para inscribirme"}
+                    : submitting && gratis
+                      ? "Inscribiendo…"
+                      : pendienteGratis
+                        ? "Activar mi inscripción"
+                        : gratis
+                          ? "Inscribirme gratis"
+                          : isAuthenticated
+                            ? "Inscribirme ahora"
+                            : "Acceder para inscribirme"}
                 </Button>
+              )}
+              {gratis && !existing && !authLoading && !isAuthenticated && (
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  Crea tu cuenta o inicia sesión y quedarás inscrito al instante.
+                </p>
               )}
               {programa.syllabus_url && (
                 <Button asChild variant="outline" className="mt-2 w-full">
