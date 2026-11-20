@@ -66,7 +66,7 @@ function withSecurityHeaders(response: Response, request?: Request): Response {
   }
   if (request) {
     const url = new URL(request.url);
-    const isRoom = url.pathname.startsWith("/clase-vivo/") && url.searchParams.get("sab") !== "0";
+    const isRoom = url.pathname.startsWith("/clase-vivo/") && url.searchParams.get("sab") === "1";
     if (isRoom && !headers.has("Document-Isolation-Policy")) {
       headers.set("Document-Isolation-Policy", "isolate-and-credentialless");
     }
