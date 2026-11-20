@@ -36,7 +36,7 @@ export const signInWithEmail = createServerFn({ method: "POST" })
     const supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
+      { auth: { autoRefreshToken: false, persistSession: false } },
     );
 
     const { data: authData, error } = await supabase.auth.signInWithPassword({
@@ -60,14 +60,14 @@ export const signUpWithEmail = createServerFn({ method: "POST" })
       nombre: string;
       apellido: string;
       telefono?: string;
-    }) => input
+    }) => input,
   )
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
+      { auth: { autoRefreshToken: false, persistSession: false } },
     );
 
     const { data: authData, error } = await supabase.auth.signUp({
@@ -82,10 +82,53 @@ export const signUpWithEmail = createServerFn({ method: "POST" })
       },
     });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (/already|registered|exists/i.test(error.message)) throw new Error(EMAIL_YA_REGISTRADO);
+      throw new Error(error.message);
+    }
+    // Correo existente con confirmación activa: Supabase devuelve un usuario sin identidades.
+    if (authData.user && (authData.user.identities?.length ?? 0) === 0) {
+      throw new Error(EMAIL_YA_REGISTRADO);
+    }
     return {
       access_token: authData.session?.access_token,
       refresh_token: authData.session?.refresh_token,
       user: authData.user,
     };
+  });
+
+export const EMAIL_YA_REGISTRADO = "Ya existe una cuenta registrada con ese correo electrónico.";
+
+/**
+ * Comprueba si un correo ya tiene cuenta antes de registrarlo.
+ * Supabase Auth, con confirmación de correo activa, responde "éxito" al
+ * registrar un correo existente, así que la comprobación se hace aquí.
+ * Devuelve `null` si no se pudo comprobar (p. ej. migración sin aplicar);
+ * en ese caso el formulario sigue y se apoya en la respuesta de signUp.
+ */
+export const verificarEmailRegistrado = createServerFn({ method: "POST" })
+  .inputValidator((input: { email: string }) => {
+    const email = String(input?.email ?? "")
+      .trim()
+      .toLowerCase();
+    if (!email || email.length > 320 || !email.includes("@")) {
+      throw new Error("Correo electrónico no válido");
+    }
+    return { email };
+  })
+  .handler(async ({ data }): Promise<{ registrado: boolean | null }> => {
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: existe, error } = await supabaseAdmin.rpc("email_registrado", {
+        p_email: data.email,
+      });
+      if (error) {
+        console.error("[registro] email_registrado falló:", error.message);
+        return { registrado: null };
+      }
+      return { registrado: existe === true };
+    } catch (err) {
+      console.error("[registro] email_registrado falló:", err);
+      return { registrado: null };
+    }
   });

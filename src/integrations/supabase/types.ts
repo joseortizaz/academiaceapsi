@@ -2858,6 +2858,7 @@ export type Database = {
         }[]
       }
       audit_trunc: { Args: { v: Json }; Returns: Json }
+      email_registrado: { Args: { p_email: string }; Returns: boolean }
       can_review_program: {
         Args: { _programa_id: string; _user_id: string }
         Returns: boolean

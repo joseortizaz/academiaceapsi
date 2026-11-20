@@ -6,10 +6,12 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GraduationCap, CheckCircle2 } from "lucide-react";
+import { GraduationCap, CheckCircle2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { EMAIL_YA_REGISTRADO, verificarEmailRegistrado } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/registro")({
   staticData: { sitemap: false },
@@ -32,6 +34,8 @@ function Registro() {
   const [password, setPassword] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailDuplicado, setEmailDuplicado] = useState(false);
+  const verificarEmail = useServerFn(verificarEmailRegistrado);
 
   const continueTo = redirect ?? "/estudiante";
 
@@ -41,21 +45,46 @@ function Registro() {
       toast.error("Debes aceptar el Aviso de Privacidad para crear tu cuenta.");
       return;
     }
+    setEmailDuplicado(false);
     setLoading(true);
+    const correo = email.trim().toLowerCase();
+
+    const rechazarDuplicado = () => {
+      setLoading(false);
+      setEmailDuplicado(true);
+      toast.error("Correo ya registrado", { description: EMAIL_YA_REGISTRADO });
+    };
+
+    // 1) Comprobación previa en el servidor (si falla, seguimos y nos apoyamos en signUp).
+    try {
+      const { registrado } = await verificarEmail({ data: { email: correo } });
+      if (registrado === true) return rechazarDuplicado();
+    } catch {
+      /* sin comprobación previa */
+    }
+
+    // 2) Registro.
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: correo,
       password,
       options: {
         data: { nombre, apellido, telefono },
       },
     });
-    setLoading(false);
     if (error) {
+      if (/already|registered|exists/i.test(error.message)) return rechazarDuplicado();
+      setLoading(false);
       toast.error("Error de registro", { description: error.message });
       return;
     }
+    // Con confirmación de correo activa, Supabase no da error ante un correo
+    // existente: devuelve un usuario sin identidades.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) return rechazarDuplicado();
+    setLoading(false);
     if (data.user && !data.session) {
-      toast.success("Registro exitoso", { description: "Revisa tu correo para confirmar tu cuenta." });
+      toast.success("Registro exitoso", {
+        description: "Revisa tu correo para confirmar tu cuenta.",
+      });
       navigate({
         to: "/acceder",
         search: redirect ? { redirect } : {},
@@ -78,30 +107,95 @@ function Registro() {
               <p className="font-bold text-primary">Academia Ceapsi RD</p>
             </Link>
             <h1 className="text-2xl font-bold text-foreground">Crea tu cuenta</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Únete a la comunidad educativa de Ceapsi RD.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Únete a la comunidad educativa de Ceapsi RD.
+            </p>
 
             <form onSubmit={handleRegister} className="mt-6 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="nombre">Nombre</Label>
-                  <Input id="nombre" required placeholder="María" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+                  <Input
+                    id="nombre"
+                    required
+                    placeholder="María"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="apellido">Apellido</Label>
-                  <Input id="apellido" required placeholder="Fernández" value={apellido} onChange={(e) => setApellido(e.target.value)} />
+                  <Input
+                    id="apellido"
+                    required
+                    placeholder="Fernández"
+                    value={apellido}
+                    onChange={(e) => setApellido(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="correo">Correo electrónico</Label>
-                <Input id="correo" type="email" required placeholder="correo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  id="correo"
+                  type="email"
+                  required
+                  placeholder="correo@ejemplo.com"
+                  value={email}
+                  aria-invalid={emailDuplicado || undefined}
+                  aria-describedby={emailDuplicado ? "correo-duplicado" : undefined}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailDuplicado) setEmailDuplicado(false);
+                  }}
+                />
+                {emailDuplicado && (
+                  <div
+                    id="correo-duplicado"
+                    role="alert"
+                    className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive"
+                  >
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <p>
+                      {EMAIL_YA_REGISTRADO}{" "}
+                      <Link
+                        to="/acceder"
+                        search={redirect ? { redirect } : {}}
+                        className="font-semibold underline underline-offset-2"
+                      >
+                        Inicia sesión
+                      </Link>{" "}
+                      o{" "}
+                      <Link
+                        to="/recuperar-password"
+                        className="font-semibold underline underline-offset-2"
+                      >
+                        recupera tu contraseña
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="telefono">Teléfono</Label>
-                <Input id="telefono" type="tel" placeholder="+1 (809) 000-0000" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+                <Input
+                  id="telefono"
+                  type="tel"
+                  placeholder="+1 (809) 000-0000"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <PasswordInput id="password" required placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <PasswordInput
+                  id="password"
+                  required
+                  placeholder="Mínimo 8 caracteres"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
               <div className="flex items-start gap-2">
                 <Checkbox
@@ -110,17 +204,32 @@ function Registro() {
                   onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
                   required
                 />
-                <Label htmlFor="privacidad" className="text-xs font-normal leading-relaxed text-muted-foreground">
+                <Label
+                  htmlFor="privacidad"
+                  className="text-xs font-normal leading-relaxed text-muted-foreground"
+                >
                   He leído y acepto el{" "}
-                  <Link to="/privacidad" target="_blank" className="font-medium text-primary underline underline-offset-2">
+                  <Link
+                    to="/privacidad"
+                    target="_blank"
+                    className="font-medium text-primary underline underline-offset-2"
+                  >
                     Aviso de Privacidad
                   </Link>{" "}
-                  y autorizo de forma libre, expresa y consciente el tratamiento de mis datos personales conforme a la Ley 172-13, incluida su transferencia a proveedores en el exterior necesarios para prestar el servicio.
+                  y autorizo de forma libre, expresa y consciente el tratamiento de mis datos
+                  personales conforme a la Ley 172-13, incluida su transferencia a proveedores en el
+                  exterior necesarios para prestar el servicio.
                 </Label>
               </div>
               <p className="text-xs text-muted-foreground">
                 Responsable: {LEGAL_ENTITY_SHORT} (Academia Ceapsi RD) · Ejerza sus derechos en{" "}
-                <a href={`mailto:${PRIVACY_EMAIL}`} className="text-primary underline underline-offset-2">{PRIVACY_EMAIL}</a>.
+                <a
+                  href={`mailto:${PRIVACY_EMAIL}`}
+                  className="text-primary underline underline-offset-2"
+                >
+                  {PRIVACY_EMAIL}
+                </a>
+                .
               </p>
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Creando cuenta..." : "Crear cuenta"}
@@ -145,7 +254,9 @@ function Registro() {
         <Link to="/" className="flex items-center gap-2 self-end">
           <div className="leading-tight text-right">
             <p className="text-sm font-bold">Academia Ceapsi RD</p>
-            <p className="text-[10px] uppercase tracking-widest text-primary-foreground/70">República Dominicana</p>
+            <p className="text-[10px] uppercase tracking-widest text-primary-foreground/70">
+              República Dominicana
+            </p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
             <GraduationCap className="h-5 w-5" />
@@ -169,7 +280,9 @@ function Registro() {
             ))}
           </ul>
         </div>
-        <p className="text-xs text-primary-foreground/60">© {new Date().getFullYear()} Academia Ceapsi RD</p>
+        <p className="text-xs text-primary-foreground/60">
+          © {new Date().getFullYear()} Academia Ceapsi RD
+        </p>
       </div>
     </div>
   );
