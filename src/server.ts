@@ -59,10 +59,17 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
 };
 
-function withSecurityHeaders(response: Response): Response {
+function withSecurityHeaders(response: Response, request?: Request): Response {
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
     if (!headers.has(key)) headers.set(key, value);
+  }
+  if (request) {
+    const url = new URL(request.url);
+    const isRoom = url.pathname.startsWith("/clase-vivo/") && url.searchParams.get("sab") !== "0";
+    if (isRoom && !headers.has("Document-Isolation-Policy")) {
+      headers.set("Document-Isolation-Policy", "isolate-and-credentialless");
+    }
   }
   return new Response(response.body, {
     status: response.status,
@@ -117,7 +124,7 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
+      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response), request);
     } catch (error) {
       console.error(error);
       return brandedErrorResponse();
